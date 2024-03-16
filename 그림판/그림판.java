@@ -305,7 +305,7 @@ public class 그림판 extends JFrame implements ActionListener {
 	}
 
 	class AttributeDialog extends JDialog {
-		JTextArea texttextArea;
+		JTextArea textArea;
 		
 		AttributeDialog(JFrame frame, BasicFileAttributes attrb){
 			super(frame, "속성", true);
@@ -314,11 +314,11 @@ public class 그림판 extends JFrame implements ActionListener {
 			 *     해상도
 			 *     너비 & 높이
 			 */
-			texttextArea = new JTextArea(
+			textArea = new JTextArea(
 					"마지막 저장 시간 :\t" + attrb.lastModifiedTime() + "\n" +
 					"파일 크기 :\t\t" + (attrb.size() / 1024.0f) + "KiB");
-			texttextArea.setEditable(false);
-			add(texttextArea);
+			textArea.setEditable(false);
+			add(textArea);
 			
 			setLocation(300, 300);
 			pack();
