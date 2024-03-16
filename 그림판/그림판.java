@@ -1,21 +1,14 @@
 package 그림판;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dialog;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -24,9 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
@@ -40,6 +31,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
@@ -253,8 +245,12 @@ public class 그림판 extends JFrame implements ActionListener {
 		fileSaved = true;
 		return response;
 	}
-	//미구현
 	private void showAttribute() { //속성(Ctrl+E | 파일 특성 : 마지막 저장, 디스크 크기, 해상도 | 이미지 크기 : 너비, 높이)
+		if (filePath == "") {
+			JOptionPane.showConfirmDialog(null, "이미지가 파일로 저장되어 있지 않아 정보를 불러올 수 없습니다.", "그림판", JOptionPane.CLOSED_OPTION);
+			return;
+		}
+		
 		BasicFileAttributes attrb = null;
 		Path path = Paths.get(filePath);
 		try {
@@ -263,7 +259,7 @@ public class 그림판 extends JFrame implements ActionListener {
 			e.printStackTrace();
 		}
 		
-		AttributeDialog ad = new AttributeDialog (this);
+		AttributeDialog ad = new AttributeDialog (this, attrb);
 	}
 	
 	@Override
@@ -309,13 +305,23 @@ public class 그림판 extends JFrame implements ActionListener {
 	}
 
 	class AttributeDialog extends JDialog {
-		JTextField textField;
+		JTextArea texttextArea;
 		
-		AttributeDialog(JFrame frame){
-			super(frame);
-			//////////////////////////////////////
-			//여기에 파일 속성 관련한 내용 삽입할 수 있도록
-			//
+		AttributeDialog(JFrame frame, BasicFileAttributes attrb){
+			super(frame, "속성", true);
+			/*
+			 * 아직 못 넣은 속성 정보 :
+			 *     해상도
+			 *     너비 & 높이
+			 */
+			texttextArea = new JTextArea(
+					"마지막 저장 시간 :\t" + attrb.lastModifiedTime() + "\n" +
+					"파일 크기 :\t\t" + (attrb.size() / 1024.0f) + "KiB");
+			texttextArea.setEditable(false);
+			add(texttextArea);
+			
+			setLocation(300, 300);
+			pack();
 			setVisible(true);
 		}
 	}
