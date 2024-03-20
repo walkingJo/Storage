@@ -62,10 +62,10 @@ public:
 	}
 	void setExpression(string expression) {
 		for (int i = 0; i < expression.length(); ++i)
-			textBox[2][2 + i] = expression[i];
+			textBox[1][2 + i] = expression[i];
 	}
 	void setResult(string result) {
-		int strlen = result.length();
+		int strlen = (int)result.length();
 		//가장 마지막 문자가 (28, 3)에 위치해야 함
 		for (int x = 0; x < strlen; ++x)
 			textBox[3][x + 29 - strlen] = result[x];
