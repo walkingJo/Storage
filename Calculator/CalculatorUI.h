@@ -19,10 +19,13 @@ class CalculatorUI {
 private:
 	ExpressionBuffer exprBuff;
 	Coord cursor;
-	bool isRunning = false;
+
 	Field bufferedField[2] = {};
 	short fieldIdx;
+	
 	string result;
+	unsigned char order;
+	bool isRunning = false;
 
 	void moveCursor(Coord coord) {
 		/* calc : 6 * 5 */
@@ -40,7 +43,6 @@ private:
 		if (!_kbhit())
 			return;
 
-		static unsigned char order;
 		order = _getch();
 
 		if (order != ARR_HEAD)
@@ -52,6 +54,7 @@ private:
 		else if (order == '-') exprBuff.addInfixFunc("-");
 		else if (order == '*') exprBuff.addInfixFunc("*");
 		else if (order == '/') exprBuff.addInfixFunc("/");
+		else if (order == '!') exprBuff.addPostfixFunc("!");
 		else if ('A' <= order && order <= 'Z' || 'a' <= order && order <= 'z') {
 			//calculator.addTBDChar(order) >> ?
 		}
@@ -85,7 +88,7 @@ private:
 		else if (order == BSP) {
 			exprBuff.backspace();
 		}
-		else if (order == ENTER) result = exprBuff.calculate();
+		else if (order == ENTER || order == '=') result = exprBuff.calculate();
 		else if (order == SPACE) {
 			switch (cursor.x * 0x10 +
 					cursor.y * 0x01) {
@@ -143,6 +146,7 @@ private:
 		short nextIdx = (fieldIdx + 1) % 2;
 		bufferedField[fieldIdx].reset();
 		bufferedField[fieldIdx].setExpression(exprBuff.getTotalExpression());
+		bufferedField[fieldIdx].keyEntered(order);
 		bufferedField[fieldIdx].setResult(result);
 		bufferedField[fieldIdx].print(cursor, bufferedField[nextIdx]);
 		fieldIdx = nextIdx;
@@ -156,11 +160,12 @@ public:
 	CalculatorUI() {
 		exprBuff = ExpressionBuffer();
 		cursor = Coord(0, 0);
-		isRunning = true;
 		bufferedField[0] = Field();
 		bufferedField[1] = Field();
 		fieldIdx = 0;
 		result = "";
+		order = ' ';
+		isRunning = true;
 
 		bufferedField[fieldIdx].print(cursor);
 	}

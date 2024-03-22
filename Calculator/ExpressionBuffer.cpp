@@ -1,3 +1,4 @@
+#include "Calculator.h"
 #include "ExpressionBuffer.h"
 #include <cassert>
 
@@ -120,8 +121,8 @@ ExpressionBuffer::ExpressionBuffer() {
 	elementCount = 0;
 }
 string ExpressionBuffer::calculate() {
-	string result = "not yet";
-	return result;
+	Calculator calc = Calculator(this);
+	return calc.calculate();
 }
 string ExpressionBuffer::getTotalExpression() {
 	string result = "";

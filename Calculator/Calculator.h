@@ -8,7 +8,7 @@
 using std::vector;
 
 class Expression {
-private:
+public:
 	ElementType type;
 	union _Value {
 		long long iValue;
@@ -45,7 +45,7 @@ public:
 	void addExpression(Expression expr) {
 		lowerExpr.push_back(expr);
 	}
-	void calculate() {
+	Expression /*!*/calculate() {
 		/*
 		* 계산방식 1:
 		*		인자들을 모두 계산하고, switch문 내부에서 따로 또 계산
@@ -74,13 +74,39 @@ public:
 		case 7: break; // ln
 		}
 		//하위 식들 소멸
+
+		return *this;
 	}
 };
 
 class Calculator {
 private:
+	vector<Expression> expressions;
+	void /*!*/makeAST() {
+		//
+	}
 public:
-	//vector<Expression> expressions = vector<Expression>(100);
+	/*!*/Calculator(ExpressionBuffer* exprBuff) {
+		expressions = vector<Expression>(exprBuff->elementCount);
+		for (int i = 0; i < exprBuff->elementCount; ++i) {
+			expressions[i] = Expression(exprBuff->elements[i]);
+		}
+	}
+	Calculator() {
+		expressions = vector<Expression>();
+	}
+
+	string calculate() {
+		makeAST();
+		Expression result = expressions[0].calculate();
+		char* buff = new char[32];
+		switch (result.type) {
+			//변환은 sprintf로 한다.
+		case ElementType::INT_NUM:		sprintf_s(buff, 32, "%lld", result.value.iValue);	return string(buff);	break;
+		case ElementType::FLOAT_NUM:	sprintf_s(buff, 32, "%lf", result.value.fValue);	return string(buff);	break;
+		}
+		return "NAN";
+	}
 	//for (int i = 0; i < tokenCount; ++i) {
 	//	expressions[i] = Expression(tokens[i]);
 	//}

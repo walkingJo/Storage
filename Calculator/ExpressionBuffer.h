@@ -30,17 +30,18 @@ public:
 
 	Element(ElementType type, string str) : type(type), str(str) { }
 	Element() { 
-		string temp = string();
-		Element(ElementType::NON, temp);
+		type = ElementType::NON;
+		str = "";
 	}
 };
 
 class ExpressionBuffer {
-private:
+public:
 	Element* elements;
 	int elementCount;
+private:
 	//int elementCursor; /* element index */
-	//int stringCursor;/* string index */
+	//int stringCursor;  /* string index */
 
 	ElementType getLastElementType();
 
