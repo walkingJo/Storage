@@ -36,7 +36,7 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		CTRL_X, CTRL_C, CTRL_V,
 		SCALE, LEAN, ROTATE,
 		}
-	private ImgArea area = new ImgArea();
+	private ImgArea area;// = new ImgArea(0, 0, imageType);
 	private DRAW_TYPE drawType = DRAW_TYPE.PENCIL;
 	private DRAW_TYPE oldDrawType = drawType;
 	private Color penColor = Color.blue;
@@ -50,7 +50,7 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		img = new BufferedImage(750, 500, imageType);
 		tempImg = new BufferedImage(750, 500, imageType);
 		img.getGraphics().setColor(Color.green);
-		img.getGraphics().fillRect(0, 0, 700, 500);
+		img.getGraphics().fillRect(0, 0, 750, 500);
 		repaint();
 	}
 	public MyCanvas() {
@@ -59,7 +59,7 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		
 		reset();
 		
-		setPreferredSize(new Dimension(700, 500));
+		setPreferredSize(new Dimension(750, 500));
 	}
 
 	@Override
@@ -113,7 +113,18 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 			copyImg(tempImg, img);
 		} else if (drawType == DRAW_TYPE.AREA0) { //타입이 영역 드래그0이라면, 드래그한 영역을 저장할 것
 			//이미지 저장
-			drawType = drawType.AREA1;
+			area = new ImgArea();
+			for (int col = area.getLocation().y; col < area.getLocation().y + area.getHeight(); ++col) {
+				for (int row = area.getLocation().x; row < area.getLocation().x + area.getWidth(); ++row) {
+					area.setRGB(col, row, img.getRGB(col, row));
+					img.setRGB(col, row, 0);
+				}
+			}
+			//및 img의 해당 영역 삭제
+			drawType = DRAW_TYPE.AREA1;
+		} else if (drawType == DRAW_TYPE.AREA1) {
+			drawType = DRAW_TYPE.AREA0;
+			copyImg(tempImg, img);
 		}
 		else
 			copyImg(tempImg, img);
@@ -170,7 +181,7 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 				그림판app.setFileSaved(false);
 		
 		// 여기에서 커서 이미지 그리기
-		this.getGraphics().drawImage(img, 0, 0, 700, 500, this);
+		this.getGraphics().drawImage(img, 0, 0, 750, 500, this);
 	}
 	
 	private Point lerp(float t) {
@@ -217,7 +228,7 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 
 			Point qPts[] = { new Point(qPt.x - 1, qPt.y), new Point(qPt.x + 1, qPt.y), new Point(qPt.x, qPt.y - 1), new Point(qPt.x, qPt.y + 1) };
 			for (Point newPt : qPts) {
-				if (0 <= newPt.x && newPt.x < 700 && 0 <= newPt.y && newPt.y < 500
+				if (0 <= newPt.x && newPt.x < 750 && 0 <= newPt.y && newPt.y < 500
 						&& img.getRGB(newPt.x, newPt.y) == ocolor) {
 					img.setRGB(newPt.x, newPt.y, pcolor);
 					qu.add(newPt);
@@ -331,6 +342,22 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		this.getGraphics().drawImage(img, 0, 0, 750, 500, this);
 	}
 
+	/*
+	 * Ctrl+X
+	 * Ctrl+C
+	 * Ctrl+V
+	 * 
+	 * Ctrl+Z
+	 * Ctrl+Y
+	 * 
+	 * 크기 조절
+	 * 기울이기
+	 * 확대
+	 * 
+	 * 드래그 :	tempImg
+	 * 프레스 :	copy(img >> temp); tempImg
+	 * 릴리스 :	copy(temp >> img)
+	 */
 	class ImgArea extends BufferedImage {
 		Point location;
 		
@@ -339,7 +366,7 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 			location = new Point(0, 0);
 		}
 		public ImgArea() {
-			this(Math.abs(srcPt.x - dstPt.x),
+			super(Math.abs(srcPt.x - dstPt.x),
 					Math.abs(srcPt.y - dstPt.y),
 					imageType);
 			location = new Point(srcPt.x < dstPt.x ? srcPt.x : dstPt.x, srcPt.y < dstPt.y ? srcPt.y : dstPt.y);

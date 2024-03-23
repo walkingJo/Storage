@@ -382,14 +382,14 @@ public class 그림판 extends JFrame implements ActionListener {
 			case 0: newFile();	break; // 새 파일
 			case 1: openFile();	break; // 파일 불러오기
 			case 2: saveFile();	break; // 파일 저장
-			case 3:
+			case 3: canvas.setDrawType(DRAW_TYPE.AREA0);		break;
 			case 4: canvas.setDrawType(DRAW_TYPE.PENCIL);		break;
 			case 5: canvas.setDrawType(DRAW_TYPE.FILL);			break;
 			case 6: canvas.setDrawType(DRAW_TYPE.ERASE);		break;
 			case 7: canvas.setDrawType(DRAW_TYPE.EXTRACTOR);	break;
 			case 8: canvas.setDrawType(DRAW_TYPE.LINE);			break;
 			case 9: canvas.setDrawType(DRAW_TYPE.CURVE0);		break;
-			case 10: canvas.setDrawType(DRAW_TYPE.TRIANGLE);		break;
+			case 10: canvas.setDrawType(DRAW_TYPE.TRIANGLE);	break;
 			case 11: canvas.setDrawType(DRAW_TYPE.RECTANGLE);	break;
 			case 12: canvas.setDrawType(DRAW_TYPE.OVAL);		break;
 			case 13:
