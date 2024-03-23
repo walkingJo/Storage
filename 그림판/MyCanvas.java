@@ -4,8 +4,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -15,9 +13,6 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
-import javax.swing.event.MouseInputListener;
-
-import com.sun.javadoc.Type;
 
 import java.lang.Math;
 import java.util.LinkedList;
@@ -33,11 +28,15 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 	private BufferedImage tempImg;
 	private int imageType = BufferedImage.TYPE_INT_ARGB;
 	public enum DRAW_TYPE {
-		CTRL_X, CTRL_C, CTRL_V,
 		PENCIL, FILL, ERASE, EXTRACTOR, LINE,
 		CURVE0, CURVE1, CURVE2,
 		TRIANGLE, RECTANGLE, OVAL,
-		SCALE, LEAN, ROTATE }
+		
+		AREA0, AREA1, //영역 드래그 타입명
+		CTRL_X, CTRL_C, CTRL_V,
+		SCALE, LEAN, ROTATE,
+		}
+	private ImgArea area = new ImgArea();
 	private DRAW_TYPE drawType = DRAW_TYPE.PENCIL;
 	private DRAW_TYPE oldDrawType = drawType;
 	private Color penColor = Color.blue;
@@ -48,8 +47,8 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		this.그림판app = 그림판app;
 	}
 	public void reset() {
-		img = new BufferedImage(700, 500, imageType);
-		tempImg = new BufferedImage(700, 500, imageType);
+		img = new BufferedImage(750, 500, imageType);
+		tempImg = new BufferedImage(750, 500, imageType);
 		img.getGraphics().setColor(Color.green);
 		img.getGraphics().fillRect(0, 0, 700, 500);
 		repaint();
@@ -69,12 +68,29 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 			curvePt1 = new Point(e.getX(), e.getY());
 		else if (drawType == DRAW_TYPE.CURVE2)
 			curvePt2 = new Point(e.getX(), e.getY());
+		else if (drawType == DRAW_TYPE.AREA0);
+		else if (drawType == DRAW_TYPE.AREA1) {
+			//area.set location
+			dstPt = e.getLocationOnScreen();
+
+			Point areaPt = area.getLocation();
+			area.setLocation(new Point(
+			        areaPt.x + dstPt.x - srcPt.x, 
+			        areaPt.y + dstPt.y - srcPt.y));
+
+			srcPt = dstPt;
+		}
 		else
 			dstPt = new Point(e.getX(), e.getY());
-
-		if (!(drawType == DRAW_TYPE.PENCIL || drawType == DRAW_TYPE.ERASE)) copyImg(img, tempImg); //연필이나 지우개가 이닐 경우 : 연필이나 지우개는 팬을 놓은 경우(그리기를 끝마친 경우)에 임시 이미지를 주 이미지로 옮긴다
-		draw(tempImg);
-		if (drawType == DRAW_TYPE.PENCIL || drawType == DRAW_TYPE.ERASE) srcPt = dstPt; //연필이나 재우개일 경우 : 연필이나 지우개는 이전 프레임의 끝점이 다음 프레임의 시작점이 되므로 srcPt 조정
+		
+		//연필이나 재우개일 경우 : 연필이나 지우개는 이전 프레임의 끝점이 다음 프레임의 시작점이 되므로 srcPt 조정
+		if (drawType == DRAW_TYPE.PENCIL || drawType == DRAW_TYPE.ERASE) {
+			draw(tempImg);
+			srcPt = dstPt; //끝점을 다시 시작점으로 만든다. 선이 연속적일 수 있는 이유
+		} else { //연필도 지우개도 이닐 경우 : 연필이나 지우개는 팬을 놓은 경우(그리기를 끝마친 경우)에 임시 이미지를 주 이미지로 옮긴다
+			copyImg(img, tempImg); //tempImg를 원본 이미지(img)로 초기화함
+			draw(tempImg);
+		}
 	}
 	@Override
 	public void mouseMoved(MouseEvent e) {}
@@ -95,7 +111,11 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		else if (drawType == DRAW_TYPE.CURVE1)	drawType = DRAW_TYPE.CURVE2;
 		else if (drawType == DRAW_TYPE.CURVE2) {drawType = DRAW_TYPE.CURVE0;
 			copyImg(tempImg, img);
-		} else
+		} else if (drawType == DRAW_TYPE.AREA0) { //타입이 영역 드래그0이라면, 드래그한 영역을 저장할 것
+			//이미지 저장
+			drawType = drawType.AREA1;
+		}
+		else
 			copyImg(tempImg, img);
 	}
 	@Override
@@ -107,30 +127,35 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		Graphics graphics = img.getGraphics();
 		graphics.setColor(penColor);
 
-		if (drawType == DRAW_TYPE.CTRL_X);
-		if (drawType == DRAW_TYPE.CTRL_C);
-		if (drawType == DRAW_TYPE.CTRL_V);
-
-		if (drawType == DRAW_TYPE.PENCIL)		drawPencil(graphics);
-		if (drawType == DRAW_TYPE.FILL)			fill(img, dstPt);
-		if (drawType == DRAW_TYPE.ERASE)		erase(graphics);
-		if (drawType == DRAW_TYPE.EXTRACTOR)	extractor(graphics);
-		if (drawType == DRAW_TYPE.LINE)			drawLine(graphics);
-		if (drawType == DRAW_TYPE.CURVE0) {
+		if (drawType == DRAW_TYPE.PENCIL)			drawPencil(graphics);
+		else if (drawType == DRAW_TYPE.FILL)		fill(img, dstPt);
+		else if (drawType == DRAW_TYPE.ERASE)		erase(graphics);
+		else if (drawType == DRAW_TYPE.EXTRACTOR)	extractor(graphics);
+		else if (drawType == DRAW_TYPE.LINE)		drawLine(graphics);
+		else if (drawType == DRAW_TYPE.CURVE0) {
 			drawLine(graphics);
 			curvePt1 = srcPt;
 			curvePt2 = dstPt;
 		}
-		if (drawType == DRAW_TYPE.CURVE1)		drawCurve(graphics);
-		if (drawType == DRAW_TYPE.CURVE2)		drawCurve(graphics);
+		else if (drawType == DRAW_TYPE.CURVE1)		drawCurve(graphics);
+		else if (drawType == DRAW_TYPE.CURVE2)		drawCurve(graphics);
 
-		if (drawType == DRAW_TYPE.TRIANGLE)		drawTriangle(graphics);
-		if (drawType == DRAW_TYPE.RECTANGLE)	drawRectangle(graphics);
-		if (drawType == DRAW_TYPE.OVAL)			drawOval(graphics);
+		else if (drawType == DRAW_TYPE.TRIANGLE)	drawTriangle(graphics);
+		else if (drawType == DRAW_TYPE.RECTANGLE)	drawRectangle(graphics);
+		else if (drawType == DRAW_TYPE.OVAL)		drawOval(graphics);
 
-		if (drawType == DRAW_TYPE.SCALE);
-		if (drawType == DRAW_TYPE.LEAN);
-		if (drawType == DRAW_TYPE.ROTATE);
+		else if (drawType == DRAW_TYPE.AREA0); //아무것도 그리지 않는다
+		else if (drawType == DRAW_TYPE.AREA1) {
+			//이미지가 이동한 것을 그린다
+		}
+		
+		else if (drawType == DRAW_TYPE.CTRL_X);
+		else if (drawType == DRAW_TYPE.CTRL_C);
+		else if (drawType == DRAW_TYPE.CTRL_V);
+		
+		else if (drawType == DRAW_TYPE.SCALE);
+		else if (drawType == DRAW_TYPE.LEAN);
+		else if (drawType == DRAW_TYPE.ROTATE);
 		
 		DRAW_TYPE editingTypes[] = { 
 				DRAW_TYPE.CTRL_X   , DRAW_TYPE.CTRL_V   , 
@@ -303,7 +328,25 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		this.getGraphics().drawImage(img, 0, 0, 700, 500, this);
+		this.getGraphics().drawImage(img, 0, 0, 750, 500, this);
 	}
 
+	class ImgArea extends BufferedImage {
+		Point location;
+		
+		public ImgArea(int width, int height, int imageType) {
+			super(width, height, imageType);
+			location = new Point(0, 0);
+		}
+		public ImgArea() {
+			this(Math.abs(srcPt.x - dstPt.x),
+					Math.abs(srcPt.y - dstPt.y),
+					imageType);
+			location = new Point(srcPt.x < dstPt.x ? srcPt.x : dstPt.x, srcPt.y < dstPt.y ? srcPt.y : dstPt.y);
+		}
+		
+		public Point getLocation() { return location; }
+		public void setLocation(Point location) { this.location = location; }
+	}
+	
 }

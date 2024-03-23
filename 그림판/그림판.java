@@ -46,7 +46,7 @@ public class 그림판 extends JFrame implements ActionListener {
 	private JMenuItem[] toolItems = new JMenuItem[5];
 	private JMenuItem[] figureItems = new JMenuItem[5];
 	private JMenuItem[] sizeItems = new JMenuItem[3];
-	private ShortcutButton[] shortcutButtons = new ShortcutButton[14];
+	private ShortcutButton[] shortcutButtons = new ShortcutButton[15];
 	private MyCanvas canvas;
 	private String filePath;
 	private boolean fileSaved;
@@ -382,20 +382,21 @@ public class 그림판 extends JFrame implements ActionListener {
 			case 0: newFile();	break; // 새 파일
 			case 1: openFile();	break; // 파일 불러오기
 			case 2: saveFile();	break; // 파일 저장
-			case 3: canvas.setDrawType(DRAW_TYPE.PENCIL);		break;
-			case 4: canvas.setDrawType(DRAW_TYPE.FILL);			break;
-			case 5: canvas.setDrawType(DRAW_TYPE.ERASE);		break;
-			case 6: canvas.setDrawType(DRAW_TYPE.EXTRACTOR);	break;
-			case 7: canvas.setDrawType(DRAW_TYPE.LINE);			break;
-			case 8: canvas.setDrawType(DRAW_TYPE.CURVE0);		break;
-			case 9: canvas.setDrawType(DRAW_TYPE.TRIANGLE);		break;
-			case 10: canvas.setDrawType(DRAW_TYPE.RECTANGLE);	break;
-			case 11: canvas.setDrawType(DRAW_TYPE.OVAL);		break;
-			case 12:
+			case 3:
+			case 4: canvas.setDrawType(DRAW_TYPE.PENCIL);		break;
+			case 5: canvas.setDrawType(DRAW_TYPE.FILL);			break;
+			case 6: canvas.setDrawType(DRAW_TYPE.ERASE);		break;
+			case 7: canvas.setDrawType(DRAW_TYPE.EXTRACTOR);	break;
+			case 8: canvas.setDrawType(DRAW_TYPE.LINE);			break;
+			case 9: canvas.setDrawType(DRAW_TYPE.CURVE0);		break;
+			case 10: canvas.setDrawType(DRAW_TYPE.TRIANGLE);		break;
+			case 11: canvas.setDrawType(DRAW_TYPE.RECTANGLE);	break;
+			case 12: canvas.setDrawType(DRAW_TYPE.OVAL);		break;
+			case 13:
 				Color c = JColorChooser.showDialog(null, "펜 색 결정", canvas.getPenColor());
 				canvas.setPenColor(c);
 				break;
-			case 13: canvas.setDrawType(DRAW_TYPE.SCALE);		break;
+			case 14: canvas.setDrawType(DRAW_TYPE.SCALE);		break;
 			}
 		}
 		@Override
