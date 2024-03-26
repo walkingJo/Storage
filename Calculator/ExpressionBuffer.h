@@ -51,7 +51,7 @@ private:
 	void addElement(ElementType type);
 	void deleteElement();
 	
-	bool isNumberFloat();
+	bool isNumberHasDot();
 	
 	bool isElementNum();
 	bool isElementPrefix();

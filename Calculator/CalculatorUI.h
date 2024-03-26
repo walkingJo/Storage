@@ -54,6 +54,7 @@ private:
 		else if (order == '-') exprBuff.addInfixFunc("-");
 		else if (order == '*') exprBuff.addInfixFunc("*");
 		else if (order == '/') exprBuff.addInfixFunc("/");
+		else if (order == '^') exprBuff.addInfixFunc("^");
 		else if (order == '!') exprBuff.addPostfixFunc("!");
 		else if ('A' <= order && order <= 'Z' || 'a' <= order && order <= 'z') {
 			//calculator.addTBDChar(order) >> ?

@@ -60,7 +60,7 @@ void ExpressionBuffer::deleteElement() {
 		elementCount--;
 	}
 }
-bool ExpressionBuffer::isNumberFloat() {
+bool ExpressionBuffer::isNumberHasDot() {
 	assert(isElementNum());
 	if (elements[elementCount - 1].str.find('.') != string::npos)
 		return true;
@@ -122,7 +122,7 @@ ExpressionBuffer::ExpressionBuffer() {
 }
 string ExpressionBuffer::calculate() {
 	Calculator calc = Calculator(this);
-	return calc.calculate();
+	return calc.calculate().str;
 }
 string ExpressionBuffer::getTotalExpression() {
 	string result = "";
@@ -171,7 +171,7 @@ void ExpressionBuffer::backspace() {
 			deleteElement();
 			break;
 		}
-	if (isElementNum() && !isNumberFloat())
+	if (isElementNum() && !isNumberHasDot())
 		elements[elementCount - 1].type = ElementType::INT_NUM;
 }
 
@@ -231,7 +231,7 @@ void ExpressionBuffer::addNum(string num) {
 		return;
 
 	elements[elementCount - 1].str = num;
-	if (isNumberFloat())
+	if (isNumberHasDot())
 		elements[elementCount - 1].type = ElementType::FLOAT_NUM;
 }
 void ExpressionBuffer::addDot() {
@@ -251,7 +251,8 @@ void ExpressionBuffer::addDot() {
 		addChar('0');
 	if (!getLastHasDot())
 		addChar('.');*/
-	if (isElementNum());
+	if (isElementNum())
+		elements[elementCount - 1].type = ElementType::FLOAT_NUM;
 	else if (isElementPrefix() || isElementInfix() || elementCount == 0)
 		addElement(ElementType::FLOAT_NUM);
 	else
@@ -259,7 +260,7 @@ void ExpressionBuffer::addDot() {
 
 	if (elements[elementCount - 1].str.length() == 0)
 		addChar('0');
-	if (!isNumberFloat())
+	if (!isNumberHasDot())
 		addChar('.');
 }
 
