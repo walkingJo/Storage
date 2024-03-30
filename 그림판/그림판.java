@@ -288,13 +288,7 @@ public class 그림판 extends JFrame implements ActionListener {
 		else if (e.getSource() == fileItems[3]) saveNewFile(); // 다른 이름으로 저장
 		else if (e.getSource() == fileItems[4]) showAttribute(); // 속성
 		
-		else if (e.getSource() == editItems[0]) {
-			canvas.ctrlX(); canvas.repaint();
-			
-//			canCtrlX = false; setCtrlXEnabled(canCtrlX);
-//			canCtrlC = false; setCtrlCEnabled(canCtrlC);
-//			canCtrlV = true; setCtrlVEnabled(canCtrlV);
-		}
+		else if (e.getSource() == editItems[0]) { canvas.ctrlX(); canvas.repaint(); }
 		else if (e.getSource() == editItems[1]) { canvas.ctrlC(); canvas.repaint(); }
 		else if (e.getSource() == editItems[2]) { canvas.ctrlV(); canvas.repaint(); }
 

@@ -347,10 +347,20 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		}
 	}
 
+	/*
+	 * ctrlX, ctrlC, ctrlV 를 사용했을 때도 editItem이 활성화 & 비활성화 되도록 조치
+	 * 			ctrlX	ctrlC	ctrlV
+	 * canX		X		O		O
+	 * canC		X		O		O
+	 * canV		O		O		O
+	 */
 	public void ctrlX() {
 		if(!canCtrlX) return;
 		
 		clipboard = area;
+		canCtrlX = false; 그림판app.setCtrlXEnabled(canCtrlX);
+		canCtrlC = false; 그림판app.setCtrlCEnabled(canCtrlC);
+		canCtrlV = true; 그림판app.setCtrlVEnabled(canCtrlV);
 		
 		drawType = DRAW_TYPE.AREA0;
 		
@@ -368,6 +378,10 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		if(!canCtrlV) return;
 		
 		//
+
+		canCtrlX = true; 그림판app.setCtrlXEnabled(canCtrlX);
+		canCtrlC = true; 그림판app.setCtrlCEnabled(canCtrlC);
+		canCtrlV = true; 그림판app.setCtrlVEnabled(canCtrlV);
 		
 		drawType = DRAW_TYPE.AREA1;
 
