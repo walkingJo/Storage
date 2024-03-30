@@ -108,6 +108,7 @@ public class 그림판 extends JFrame implements ActionListener {
 			editItems[i] = new JMenuItem(editItemName[i], editItemShortcuts[i]);
 			editItems[i].setAccelerator(KeyStroke.getKeyStroke(editItemShortcuts[i], ActionEvent.CTRL_MASK));
 			editItems[i].addActionListener(this);
+			editItems[i].setEnabled(false);
 			editMenu.add(editItems[i]);
 		}
 		bar.add(editMenu);
@@ -262,6 +263,16 @@ public class 그림판 extends JFrame implements ActionListener {
 		AttributeDialog ad = new AttributeDialog (this, attrb);
 	}
 	
+	public void setCtrlXEnabled(boolean b) {
+		editItems[0].setEnabled(b);
+	}
+	public void setCtrlCEnabled(boolean b) {
+		editItems[1].setEnabled(b);
+	}
+	public void setCtrlVEnabled(boolean b) {
+		editItems[2].setEnabled(b);
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		/*
@@ -277,9 +288,15 @@ public class 그림판 extends JFrame implements ActionListener {
 		else if (e.getSource() == fileItems[3]) saveNewFile(); // 다른 이름으로 저장
 		else if (e.getSource() == fileItems[4]) showAttribute(); // 속성
 		
-		else if (e.getSource() == editItems[0]) canvas.setDrawType(DRAW_TYPE.CTRL_X);
-		else if (e.getSource() == editItems[1]) canvas.setDrawType(DRAW_TYPE.CTRL_C);
-		else if (e.getSource() == editItems[2]) canvas.setDrawType(DRAW_TYPE.CTRL_V);
+		else if (e.getSource() == editItems[0]) {
+			canvas.ctrlX(); canvas.repaint();
+			
+//			canCtrlX = false; setCtrlXEnabled(canCtrlX);
+//			canCtrlC = false; setCtrlCEnabled(canCtrlC);
+//			canCtrlV = true; setCtrlVEnabled(canCtrlV);
+		}
+		else if (e.getSource() == editItems[1]) { canvas.ctrlC(); canvas.repaint(); }
+		else if (e.getSource() == editItems[2]) { canvas.ctrlV(); canvas.repaint(); }
 
 		else if (e.getSource() == toolItems[0]) canvas.setDrawType(DRAW_TYPE.PENCIL);
 		else if (e.getSource() == toolItems[1]) canvas.setDrawType(DRAW_TYPE.FILL);

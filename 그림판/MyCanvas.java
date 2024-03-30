@@ -27,16 +27,20 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 	private BufferedImage img;
 	private BufferedImage tempImg;
 	private int imageType = BufferedImage.TYPE_INT_ARGB;
+	private ImgArea area;
+	private ImgArea clipboard = null;
+	private boolean canCtrlX = false;
+	private boolean canCtrlC = false;
+	private boolean canCtrlV = false;
+	
 	public enum DRAW_TYPE {
 		PENCIL, FILL, ERASE, EXTRACTOR, LINE,
 		CURVE0, CURVE1, CURVE2,
 		TRIANGLE, RECTANGLE, OVAL,
 		
 		AREA0, AREA1, //영역 드래그 타입명
-		CTRL_X, CTRL_C, CTRL_V,
 		SCALE, LEAN, ROTATE,
-		}
-	private ImgArea area;// = new ImgArea(0, 0, imageType);
+	}
 	private DRAW_TYPE drawType = DRAW_TYPE.PENCIL;
 	private DRAW_TYPE oldDrawType = drawType;
 	private Color penColor = Color.blue;
@@ -71,7 +75,8 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 //		else if (drawType == DRAW_TYPE.AREA0);
 		else if (drawType == DRAW_TYPE.AREA1) {
 			//area.set location
-			dstPt = e.getLocationOnScreen();
+//			dstPt = e.getLocationOnScreen();
+			dstPt = new Point(e.getX(), e.getY());
 
 			Point areaPt = area.getLocation();
 			area.setLocation(new Point(
@@ -107,28 +112,32 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 	}
 	@Override
 	public void mouseReleased(MouseEvent e) {
+		canCtrlX = false;
+		canCtrlC = false;
+		
 		if (drawType == DRAW_TYPE.CURVE0)		drawType = DRAW_TYPE.CURVE1;
 		else if (drawType == DRAW_TYPE.CURVE1)	drawType = DRAW_TYPE.CURVE2;
 		else if (drawType == DRAW_TYPE.CURVE2) {drawType = DRAW_TYPE.CURVE0;
 			copyImg(tempImg, img);
 		} else if (drawType == DRAW_TYPE.AREA0) { //타입이 영역 드래그0이라면, 드래그한 영역을 저장할 것
-			//이미지 저장
-			area = new ImgArea();
-			for (int col = 0; col < area.getHeight(); ++col) {
-				for (int row = 0; row < area.getWidth(); ++row) {
-					
-					area.setRGB(row, col, img.getRGB(row + area.getLocation().x, col + area.getLocation().y));
-					img.setRGB(row + area.getLocation().x, col + area.getLocation().y, 0x000000FF);
-				}
+			if (srcPt.x != dstPt.x && srcPt.y != dstPt.y) {
+				Point newSrcPt = clampPt(srcPt);
+				Point newDstPt = clampPt(dstPt);
+				area = new ImgArea(newSrcPt, newDstPt, img);
+				//및 img의 해당 영역 삭제
+				canCtrlX = true; 
+				canCtrlC = true;
+				drawType = DRAW_TYPE.AREA1;
 			}
-			//및 img의 해당 영역 삭제
-			drawType = DRAW_TYPE.AREA1;
 		} else if (drawType == DRAW_TYPE.AREA1) {
 			drawType = DRAW_TYPE.AREA0;
 			copyImg(tempImg, img);
 		}
 		else
 			copyImg(tempImg, img);
+		
+		그림판app.setCtrlXEnabled(canCtrlX);
+		그림판app.setCtrlCEnabled(canCtrlC);
 	}
 	@Override
 	public void mouseEntered(MouseEvent e) { }
@@ -156,22 +165,18 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		else if (drawType == DRAW_TYPE.RECTANGLE)	drawRectangle(graphics);
 		else if (drawType == DRAW_TYPE.OVAL)		drawOval(graphics);
 
-		else if (drawType == DRAW_TYPE.AREA0)		drawRectangle(graphics);
+		else if (drawType == DRAW_TYPE.AREA0)		drawDottedRectangle(graphics);
 			//아무것도 그리지 않는다
 		else if (drawType == DRAW_TYPE.AREA1) {
 			//이미지가 이동한 것을 그린다
+			area.drawImg(img);
 		}
-		
-		else if (drawType == DRAW_TYPE.CTRL_X);
-		else if (drawType == DRAW_TYPE.CTRL_C);
-		else if (drawType == DRAW_TYPE.CTRL_V);
 		
 		else if (drawType == DRAW_TYPE.SCALE);
 		else if (drawType == DRAW_TYPE.LEAN);
 		else if (drawType == DRAW_TYPE.ROTATE);
 		
-		DRAW_TYPE editingTypes[] = { 
-				DRAW_TYPE.CTRL_X   , DRAW_TYPE.CTRL_V   , 
+		DRAW_TYPE editingTypes[] = {
 				DRAW_TYPE.PENCIL   , DRAW_TYPE.FILL     ,
 				DRAW_TYPE.ERASE    , DRAW_TYPE.LINE     ,
 				DRAW_TYPE.CURVE0   , DRAW_TYPE.CURVE1   , DRAW_TYPE.CURVE2   ,
@@ -194,6 +199,15 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		int y = (int) ((1 - t) * src.y + t * dst.y);
 		return new Point(x, y);
 	}
+	private int clamp(int value, int min, int max) {
+		int temp = (min > value ? min : value);
+		return temp > max ? max : temp;
+	}
+	private Point clampPt(Point pt) {
+		return new Point(
+				clamp(pt.x, 0, 750 - 1),
+				clamp(pt.y, 0, 500-1));
+	}
 	private void circle(Graphics graphics, Point centor) {
 		graphics.fillOval(centor.x - pensize, centor.y - pensize, pensize, pensize);
 	}
@@ -202,6 +216,29 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		for (float t = 0; t <= 1; t += 1 / length) {
 			Point drawPoint = lerp(src, dst, t);
 			circle(graphics, drawPoint);
+		}
+	}
+	private void dottedLine(Graphics graphics, Point src, Point dst) {
+		if (src.x == dst.x && src.y != dst.y) {
+			int x = src.x;
+			int y1 = src.y < dst.y ? src.y : dst.y;
+			int y2 = src.y > dst.y ? src.y : dst.y;
+			for (int y = y1; y <= y2; ++y) {
+				if (y % 8 < 4)
+					graphics.fillRect(x, y, 2, 2);
+			}
+		}
+		else if (src.x != dst.x && src.y == dst.y) {
+			int x1 = src.x < dst.x ? src.x : dst.x;
+			int x2 = src.x > dst.x ? src.x : dst.x;
+			int y = src.y;
+			for (int x = x1; x <= x2; ++x) {
+				if (x % 8 < 4)
+					graphics.fillRect(x, y, 2, 2);
+			}
+		}
+		else {
+			graphics.fillRect(src.x, src.y, 2, 2);
 		}
 	}
 	private void copyImg(BufferedImage srcImg, BufferedImage dstImg) {
@@ -284,6 +321,16 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		line(graphics, dstPt, pt1);
 		line(graphics, dstPt, pt2);
 	}
+	private void drawDottedRectangle(Graphics graphics) {
+		graphics.setColor(Color.black);
+		Point pt1 = new Point(srcPt.x, dstPt.y);
+		Point pt2 = new Point(dstPt.x, srcPt.y);
+		dottedLine(graphics, srcPt, pt1);
+		dottedLine(graphics, srcPt, pt2);
+		dottedLine(graphics, dstPt, pt1);
+		dottedLine(graphics, dstPt, pt2);
+		graphics.setColor(penColor);
+	}
 	private void drawOval(Graphics graphics) {
 		Point m = new Point((srcPt.x + dstPt.x) / 2, (srcPt.y + dstPt.y) / 2);
 		float a = Math.abs(srcPt.x - m.x);
@@ -299,21 +346,33 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 			circle(graphics, new Point(-x + m.x, y + m.y));
 		}
 	}
-	
-	public void setDrawType(DRAW_TYPE typenum) {
-		oldDrawType = drawType;
-		drawType = typenum;
+
+	public void ctrlX() {
+		if(!canCtrlX) return;
+		
+		clipboard = area;
+		
+		drawType = DRAW_TYPE.AREA0;
+		
+		그림판app.setFileSaved(false);
 	}
-	public void setPenColor(Color color) {
-		penColor = color;
-	} // 펜 색 조절
-	public Color getPenColor() {
-		return penColor;
-	} // 펜 색 반환
-	public void setPensize(int size) {
-		pensize = size;
-	} // 펜 크기 조절
-	public int getPensize() { return pensize; }
+	public void ctrlC() {
+		if(!canCtrlC) return;
+		
+		ctrlX();
+		ctrlV();
+		
+		그림판app.setFileSaved(true);
+	}
+	public void ctrlV() {
+		if(!canCtrlV) return;
+		
+		//
+		
+		drawType = DRAW_TYPE.AREA1;
+
+		그림판app.setFileSaved(false);
+	}
 	
 	public void setNewImage(File file) {
 		reset();
@@ -344,6 +403,24 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		g.drawImage(img, 0, 0, 750, 500, this);
 	}
 
+	public void setDrawType(DRAW_TYPE typenum) {
+		oldDrawType = drawType;
+		drawType = typenum;
+	}
+	public void setPenColor(Color color) {
+		penColor = color;
+	} // 펜 색 조절
+	public Color getPenColor() {
+		return penColor;
+	} // 펜 색 반환
+	public void setPensize(int size) {
+		pensize = size;
+	} // 펜 크기 조절
+	public int getPensize() { return pensize; }
+	public boolean canCtrlX() { return canCtrlX; }
+	public boolean canCtrlC() { return canCtrlC; }
+	public boolean canCtrlV() { return canCtrlV; }
+	
 	/*
 	 * Ctrl+X
 	 * Ctrl+C
@@ -366,16 +443,36 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 class ImgArea extends BufferedImage {
 	private Point location;
 	
-	public ImgArea(int width, int height, int imageType) {
-		super(width, height, imageType);
-	
-		location = new Point(0, 0);
-	}
-	public ImgArea() {
+	public ImgArea(Point srcPt, Point dstPt, BufferedImage img) {
 		super(Math.abs(srcPt.x - dstPt.x),
 				Math.abs(srcPt.y - dstPt.y),
-				imageType);
-		location = new Point(srcPt.x < dstPt.x ? srcPt.x : dstPt.x, srcPt.y < dstPt.y ? srcPt.y : dstPt.y);
+				BufferedImage.TYPE_INT_ARGB);
+		location = new Point(
+				srcPt.x < dstPt.x ? srcPt.x : dstPt.x,
+				srcPt.y < dstPt.y ? srcPt.y : dstPt.y);
+
+		copyImg(srcPt, dstPt, img);
+	}
+	private void copyImg(Point srcPt, Point dstPt, BufferedImage img) {
+		for (int row = 0; row < getHeight(); ++row) {
+			for (int col = 0; col < getWidth(); ++col) {
+				int rgb = img.getRGB(col + location.x, row + location.y);
+				setRGB(col, row, rgb);
+				img.setRGB(col + location.x, row + location.y, Color.white.getRGB());
+			}
+		}
+	}
+
+	public void drawImg(BufferedImage img) {
+		for (int row = 0; row < getHeight(); ++row) {
+			for (int col = 0; col < getWidth(); ++col) {
+				int rgb = getRGB(col, row);
+				int x = col + location.x;
+				int y = row + location.y;
+				if (0 <= x && x < 750 && 0 <= y && y < 500)
+					img.setRGB(x, y, rgb);
+			}
+		}
 	}
 	
 	public Point getLocation() { return location; }
