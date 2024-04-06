@@ -165,10 +165,8 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		else if (drawType == DRAW_TYPE.EXTRACTOR)	extractor(graphics);
 		else if (drawType == DRAW_TYPE.LINE)		drawLine(graphics);
 		else if (drawType == DRAW_TYPE.CURVE0) {
-			drawLine(graphics);
 			curvePt1 = srcPt;
-			curvePt2 = dstPt;
-		}
+			curvePt2 = dstPt;						drawCurve(graphics); }
 		else if (drawType == DRAW_TYPE.CURVE1)		drawCurve(graphics);
 		else if (drawType == DRAW_TYPE.CURVE2)		drawCurve(graphics);
 
@@ -176,18 +174,13 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		else if (drawType == DRAW_TYPE.RECTANGLE)	drawRectangle(graphics);
 		else if (drawType == DRAW_TYPE.OVAL)		drawOval(graphics);
 
-		else if (drawType == DRAW_TYPE.AREA0)
-			drawDottedRectangle(graphics);
-			//아무것도 그리지 않는다
+		else if (drawType == DRAW_TYPE.AREA0)		drawDottedRectangle(graphics); //아무것도 그리지 않는다
 		else if (drawType == DRAW_TYPE.AREA1) {
 			//이미지가 이동한 것을 그린다
 			area.drawImg(img);
 			drawAreaWithDottedRect(img, area);
 		} 
-		else if (drawType == DRAW_TYPE.AREA9) {
-			area.drawImg(img);
-//			drawAreaWithDottedRect(img, area);
-		}
+		else if (drawType == DRAW_TYPE.AREA9)		area.drawImg(img);
 		
 		else if (drawType == DRAW_TYPE.SCALE);
 		else if (drawType == DRAW_TYPE.LEAN);
@@ -310,7 +303,7 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		line(graphics, srcPt, dstPt);
 	}
 	private void drawCurve(Graphics graphics) {
-		for (float t = 0.0f; t <= 1; t += 0.001f) {			
+		for (float t = 0.0f; t <= 1; t += 0.1f) {			
 			Point lerpedPt11 = lerp(srcPt, curvePt1, t);
 			Point lerpedPt12 = lerp(curvePt1, curvePt2, t);
 			Point lerpedPt13 = lerp(curvePt2, dstPt, t);
@@ -452,9 +445,20 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		g.drawImage(img, 0, 0, 750, 500, this);
 	}
 
-	public void setDrawType(DRAW_TYPE typenum) {
+	public void setDrawType(DRAW_TYPE type) {
+		if (drawType == DRAW_TYPE.AREA1) {
+			drawType = DRAW_TYPE.AREA9;
+			draw(img);
+		} else if (drawType == DRAW_TYPE.CURVE1 ||
+				drawType == DRAW_TYPE.CURVE2) {
+			drawType = DRAW_TYPE.CURVE2;
+			draw(img);
+			drawType = DRAW_TYPE.CURVE0;
+		}
+		//저 위 draw()함수 사용할 때, draw(tempTmg) + swapImg(); 로 수정하기
+		
 		oldDrawType = drawType;
-		drawType = typenum;
+		drawType = type;
 	}
 	public void setPenColor(Color color) {
 		penColor = color;
