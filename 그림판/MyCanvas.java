@@ -13,6 +13,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
+import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 
 import java.lang.Math;
 import java.util.LinkedList;
@@ -28,18 +29,17 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 	private BufferedImage tempImg;
 	private int imageType = BufferedImage.TYPE_INT_ARGB;
 	private ImgArea area;
-	private ImgArea clipboard = null;
 	private boolean canCtrlX = false;
 	private boolean canCtrlC = false;
 	private boolean canCtrlV = false;
 	
 	public enum DRAW_TYPE {
-		PENCIL, FILL, ERASE, EXTRACTOR, LINE,
-		CURVE0, CURVE1, CURVE2,
-		TRIANGLE, RECTANGLE, OVAL,
+		PENCIL  , FILL     , ERASE , EXTRACTOR, LINE,
+		CURVE0  , CURVE1   , CURVE2,
+		TRIANGLE, RECTANGLE, OVAL  ,
 		
-		AREA0, AREA1, //영역 드래그 타입명
-		SCALE, LEAN, ROTATE,
+		AREA0   , AREA1    , AREA9 , //영역 드래그 타입명
+		SCALE   , LEAN     , ROTATE,
 	}
 	private DRAW_TYPE drawType = DRAW_TYPE.PENCIL;
 	private DRAW_TYPE oldDrawType = drawType;
@@ -69,14 +69,11 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		if (drawType == DRAW_TYPE.CURVE1)
-			curvePt1 = new Point(e.getX(), e.getY());
+			curvePt1 = e.getPoint();
 		else if (drawType == DRAW_TYPE.CURVE2)
-			curvePt2 = new Point(e.getX(), e.getY());
-//		else if (drawType == DRAW_TYPE.AREA0);
+			curvePt2 = e.getPoint();
 		else if (drawType == DRAW_TYPE.AREA1) {
-			//area.set location
-//			dstPt = e.getLocationOnScreen();
-			dstPt = new Point(e.getX(), e.getY());
+			dstPt = e.getPoint();
 
 			Point areaPt = area.getLocation();
 			area.setLocation(new Point(
@@ -85,8 +82,9 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 
 			srcPt = dstPt;
 		}
+		else if (drawType == DRAW_TYPE.AREA9);
 		else
-			dstPt = new Point(e.getX(), e.getY());
+			dstPt = e.getPoint();
 		
 		//연필이나 재우개일 경우 : 연필이나 지우개는 이전 프레임의 끝점이 다음 프레임의 시작점이 되므로 srcPt 조정
 		if (drawType == DRAW_TYPE.PENCIL || drawType == DRAW_TYPE.ERASE) {
@@ -104,9 +102,15 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 	@Override
 	public void mousePressed(MouseEvent e) {
 		if (drawType != DRAW_TYPE.CURVE1 && drawType != DRAW_TYPE.CURVE2) {
-			dstPt = srcPt = new Point(e.getX(), e.getY());
+			dstPt = srcPt =e.getPoint();
 			if (drawType != DRAW_TYPE.CURVE0)
 				copyImg(img, tempImg);
+			/*
+			 * if (drawType == DRAW_TYPE.AREA1 && !area.isInsideOfArea(e.getPoint()))
+			 * drawType = DRAW_TYPE.AREA9;
+			 */
+			if (drawType == DRAW_TYPE.AREA1 && !area.isInsideOfArea(e.getPoint()))
+				drawType = DRAW_TYPE.AREA9;
 		}
 		draw(tempImg);
 	}
@@ -130,9 +134,16 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 				drawType = DRAW_TYPE.AREA1;
 			}
 		} else if (drawType == DRAW_TYPE.AREA1) {
+//			drawType = DRAW_TYPE.AREA0;
+//			copyImg(tempImg, img);
+		} else if (drawType == DRAW_TYPE.AREA9) {
 			drawType = DRAW_TYPE.AREA0;
 			copyImg(tempImg, img);
 		}
+			/*
+			 * else if (drawType == DRAW_TYPE.AREA9) { drawType = DRAW_TYPE.AREA0;
+			 * copyImg(tempImg, img); }
+			 */
 		else
 			copyImg(tempImg, img);
 		
@@ -165,11 +176,17 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		else if (drawType == DRAW_TYPE.RECTANGLE)	drawRectangle(graphics);
 		else if (drawType == DRAW_TYPE.OVAL)		drawOval(graphics);
 
-		else if (drawType == DRAW_TYPE.AREA0)		drawDottedRectangle(graphics);
+		else if (drawType == DRAW_TYPE.AREA0)
+			drawDottedRectangle(graphics);
 			//아무것도 그리지 않는다
 		else if (drawType == DRAW_TYPE.AREA1) {
 			//이미지가 이동한 것을 그린다
 			area.drawImg(img);
+			drawAreaWithDottedRect(img, area);
+		} 
+		else if (drawType == DRAW_TYPE.AREA9) {
+			area.drawImg(img);
+//			drawAreaWithDottedRect(img, area);
 		}
 		
 		else if (drawType == DRAW_TYPE.SCALE);
@@ -331,6 +348,22 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		dottedLine(graphics, dstPt, pt2);
 		graphics.setColor(penColor);
 	}
+	private void drawDottedRectangle(Graphics graphics, Point srcPt, Point dstPt) {
+		graphics.setColor(Color.black);
+		Point pt1 = new Point(srcPt.x, dstPt.y);
+		Point pt2 = new Point(dstPt.x, srcPt.y);
+		dottedLine(graphics, srcPt, pt1);
+		dottedLine(graphics, srcPt, pt2);
+		dottedLine(graphics, dstPt, pt1);
+		dottedLine(graphics, dstPt, pt2);
+		graphics.setColor(penColor);
+	}
+	private void drawAreaWithDottedRect(BufferedImage img, ImgArea area) {
+		area.drawImg(img);
+		Point rectSrc = area.getLocation();
+		Point rectDst = new Point(rectSrc.x + area.getWidth(), rectSrc.y + area.getHeight());
+		drawDottedRectangle(img.getGraphics(), rectSrc, rectDst);
+	}
 	private void drawOval(Graphics graphics) {
 		Point m = new Point((srcPt.x + dstPt.x) / 2, (srcPt.y + dstPt.y) / 2);
 		float a = Math.abs(srcPt.x - m.x);
@@ -357,7 +390,9 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 	public void ctrlX() {
 		if(!canCtrlX) return;
 		
-		clipboard = area;
+		//area의 정보를 클립보드로 복사한다
+//		BufferedImage clipboard = area;
+		
 		canCtrlX = false; 그림판app.setCtrlXEnabled(canCtrlX);
 		canCtrlC = false; 그림판app.setCtrlCEnabled(canCtrlC);
 		canCtrlV = true; 그림판app.setCtrlVEnabled(canCtrlV);
@@ -377,7 +412,7 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 	public void ctrlV() {
 		if(!canCtrlV) return;
 		
-		//
+		//클립보드의 이미지를 area로 복사한다
 
 		canCtrlX = true; 그림판app.setCtrlXEnabled(canCtrlX);
 		canCtrlC = true; 그림판app.setCtrlCEnabled(canCtrlC);
@@ -487,6 +522,14 @@ class ImgArea extends BufferedImage {
 					img.setRGB(x, y, rgb);
 			}
 		}
+	}
+	
+	public boolean isInsideOfArea(Point mousePt) {
+		if (location.x <= mousePt.x && mousePt.x < location.x + getWidth() &&
+			location.y <= mousePt.y && mousePt.y < location.y + getWidth())
+			return true;
+		else
+			return false;
 	}
 	
 	public Point getLocation() { return location; }
