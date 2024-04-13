@@ -13,7 +13,6 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
-import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 
 import java.lang.Math;
 import java.util.LinkedList;
@@ -82,7 +81,6 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 
 			srcPt = dstPt;
 		}
-		else if (drawType == DRAW_TYPE.AREA9);
 		else
 			dstPt = e.getPoint();
 		
@@ -102,15 +100,19 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 	@Override
 	public void mousePressed(MouseEvent e) {
 		if (drawType != DRAW_TYPE.CURVE1 && drawType != DRAW_TYPE.CURVE2) {
-			dstPt = srcPt =e.getPoint();
+			dstPt = srcPt = e.getPoint();
 			if (drawType != DRAW_TYPE.CURVE0)
 				copyImg(img, tempImg);
 			/*
 			 * if (drawType == DRAW_TYPE.AREA1 && !area.isInsideOfArea(e.getPoint()))
 			 * drawType = DRAW_TYPE.AREA9;
 			 */
-			if (drawType == DRAW_TYPE.AREA1 && !area.isInsideOfArea(e.getPoint()))
-				drawType = DRAW_TYPE.AREA9;
+			if (drawType == DRAW_TYPE.AREA1 && !area.isInsideOfArea(e.getPoint())) {
+//				drawType = DRAW_TYPE.AREA9;
+				draw(tempImg);
+				copyImg(tempImg, img);
+				drawType = DRAW_TYPE.AREA0;
+			}
 		}
 		draw(tempImg);
 	}
@@ -134,13 +136,10 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 				drawType = DRAW_TYPE.AREA1;
 			}
 		} else if (drawType == DRAW_TYPE.AREA1) {
-//			drawType = DRAW_TYPE.AREA0;
-//			copyImg(tempImg, img);
-		} else if (drawType == DRAW_TYPE.AREA9) {
-			drawType = DRAW_TYPE.AREA0;
-			copyImg(tempImg, img);
-		}
-			/*
+			drawType = DRAW_TYPE.AREA9;
+			draw(tempImg);
+			drawType = DRAW_TYPE.AREA1;
+		} /*
 			 * else if (drawType == DRAW_TYPE.AREA9) { drawType = DRAW_TYPE.AREA0;
 			 * copyImg(tempImg, img); }
 			 */
@@ -178,9 +177,13 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		else if (drawType == DRAW_TYPE.AREA1) {
 			//이미지가 이동한 것을 그린다
 			area.drawImg(img);
+//			drawAreaWithDottedRect(img, area);
+		}
+		else if (drawType == DRAW_TYPE.AREA9) {
+			area.drawImg(img);
 			drawAreaWithDottedRect(img, area);
-		} 
-		else if (drawType == DRAW_TYPE.AREA9)		area.drawImg(img);
+		}
+//		else if (drawType == DRAW_TYPE.AREA9)		area.drawImg(img);
 		
 		else if (drawType == DRAW_TYPE.SCALE);
 		else if (drawType == DRAW_TYPE.LEAN);
@@ -197,7 +200,6 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 			if (drawType == dt)
 				그림판app.setFileSaved(false);
 		
-		// 여기에서 커서 이미지 그리기
 		this.getGraphics().drawImage(img, 0, 0, 750, 500, this);
 	}
 	
@@ -303,7 +305,7 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		line(graphics, srcPt, dstPt);
 	}
 	private void drawCurve(Graphics graphics) {
-		for (float t = 0.0f; t <= 1; t += 0.1f) {			
+		for (float t = 0.0f; t <= 1; t += 0.001f) {
 			Point lerpedPt11 = lerp(srcPt, curvePt1, t);
 			Point lerpedPt12 = lerp(curvePt1, curvePt2, t);
 			Point lerpedPt13 = lerp(curvePt2, dstPt, t);
@@ -332,14 +334,7 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		line(graphics, dstPt, pt2);
 	}
 	private void drawDottedRectangle(Graphics graphics) {
-		graphics.setColor(Color.black);
-		Point pt1 = new Point(srcPt.x, dstPt.y);
-		Point pt2 = new Point(dstPt.x, srcPt.y);
-		dottedLine(graphics, srcPt, pt1);
-		dottedLine(graphics, srcPt, pt2);
-		dottedLine(graphics, dstPt, pt1);
-		dottedLine(graphics, dstPt, pt2);
-		graphics.setColor(penColor);
+		drawDottedRectangle(graphics, srcPt, dstPt);
 	}
 	private void drawDottedRectangle(Graphics graphics, Point srcPt, Point dstPt) {
 		graphics.setColor(Color.black);
@@ -447,8 +442,13 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 
 	public void setDrawType(DRAW_TYPE type) {
 		if (drawType == DRAW_TYPE.AREA1) {
-			drawType = DRAW_TYPE.AREA9;
+//			drawType = DRAW_TYPE.AREA9;
+
+//			draw(tempImg);
+//			copyImg(tempImg, img);
+
 			draw(img);
+			drawType = DRAW_TYPE.AREA0;
 		} else if (drawType == DRAW_TYPE.CURVE1 ||
 				drawType == DRAW_TYPE.CURVE2) {
 			drawType = DRAW_TYPE.CURVE2;
