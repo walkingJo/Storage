@@ -397,8 +397,9 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 	public void ctrlC() {
 		if(!canCtrlC) return;
 		
-		ctrlX();
-		ctrlV();
+		//단순히 Ctrl+X, Ctrl+V를 사용하는 것이 아닌, 개별적으로 코드를 작성하자
+//		ctrlX();
+//		ctrlV();
 		
 		그림판app.setFileSaved(true);
 	}
