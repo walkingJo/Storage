@@ -24,48 +24,48 @@
    - 점선은 드래그 도중에는 보이지 않도록
 
 2. 클립보드 기능 추가
-    - 클립보드로 이미지 붙여넣기
-       - ```java
-       BufferedImage img = ...;
-       TransferableImage trans = new TransferableImage(img);
+   - 클립보드로 이미지 붙여넣기
+      - ```java
+        BufferedImage img = ...;
+        TransferableImage trans = new TransferableImage(img);
 
-       Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-       c.setContents(trans, this); //setContents(Transferable contents, ClipboardOwner owner)
-       ```
-       - ```java
-       private class TransferableImage implements Transferable {
-          Image i;
-          public TransferableImage(Image i) {
-             this.i = i;
-          }
-          @Override
-          public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-             if (flavor.equals(DataFlavor.imageFlavor) && i != null) {
-                return i;
-             } else { /** 띄어쓰기 작업은 여기부터 */
-                throw new UnsupportedFlavorException(flavor);
+        Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+        c.setContents(trans, this); //setContents(Transferable contents, ClipboardOwner owner)
+        ```
+      - ```java
+        private class TransferableImage implements Transferable {
+            Image i;
+            public TransferableImage(Image i) {
+                this.i = i;
             }
-        }
-        @Override
-        public DataFlavor[] getTransferDataFlavors() {
-            DataFlavor[] flavors = new DataFlavor[1];
-            flavors[0] = DataFlavor.imageFlavor;
-            return flavors;
-        }
-        @Override
-        public boolean isDataFlavorSupported(DataFlavor flavor) {
-            DataFlavor[] flavors = getTransferDataFlavors();
-            for (int i = 0; i < flavors.length; i++) {
-                if (flavor.equals(flavors[i])) {
-                    return true;
+            @Override
+            public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+                if (flavor.equals(DataFlavor.imageFlavor) && i != null) {
+                    return i;
+                } else {
+                   throw new UnsupportedFlavorException(flavor);
                 }
             }
-            return false;
+            @Override
+            public DataFlavor[] getTransferDataFlavors() {
+               DataFlavor[] flavors = new DataFlavor[1];
+               flavors[0] = DataFlavor.imageFlavor;
+               return flavors;
+            }
+            @Override
+            public boolean isDataFlavorSupported(DataFlavor flavor) {
+                DataFlavor[] flavors = getTransferDataFlavors();
+                for (int i = 0; i < flavors.length; i++) {
+                    if (flavor.equals(flavors[i])) {
+                        return true;
+                    }
+                }
+                return false;
+            }
         }
-    }
-    ```
-    - 클립보드에서 이미지 가져오기
-    - ```java
+        ```
+   - 클립보드에서 이미지 가져오기
+      - ```java
         try {
             Transferable content = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
             if (content == null); //클립보드에 아무것도 없음 ← 실행되지 않도록 예외처리
