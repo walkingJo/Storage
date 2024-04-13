@@ -26,17 +26,13 @@
 2. 클립보드 기능 추가
 ```java
 //클립보드로 이미지 붙여넣기
-try {
-    BufferedImage img = ...;
-    TransferableImage trans = new TransferableImage(img);
+BufferedImage img = ...;
+TransferableImage trans = new TransferableImage(img);
 
-    Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-    c.setContents(trans, this); //setContents(Transferable contents, ClipboardOwner owner)
-} catch (AWTException e) {
-    e.printStackTrace();
-    //System.exit(1);
-}
-
+Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+c.setContents(trans, this); //setContents(Transferable contents, ClipboardOwner owner)
+```
+```java
 private class TransferableImage implements Transferable {
     Image i;
     public TransferableImage(Image i) {
@@ -71,7 +67,10 @@ private class TransferableImage implements Transferable {
 ```java
 //클립보드에서 이미지 가져오기
 try {
-    //...
+    Transferable content = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+    if (content == null); //클립보드에 아무것도 없음 ← 실행되지 않도록 예외처리
+    if (!content.isDataFlavorSupported(DataFlavor.imageFlavor)); //클립보드에 이미지가 없음 ← 실행되지 않도록 예외처리
+    BufferedImage img = (BufferedImage) content.getTransferData(DataFlavor.imageFlavor);
 } catch (AWTException e) {
     e.printStackTrace();
 }
