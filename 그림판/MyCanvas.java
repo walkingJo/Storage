@@ -20,6 +20,8 @@ import java.util.Queue;
 
 public class MyCanvas extends JPanel implements MouseListener, MouseMotionListener {
 	private 그림판 그림판app;
+	private ClipBoardAdapter cbAdapter;
+	
 	private Point srcPt;
 	private Point dstPt;
 	private Point curvePt1, curvePt2;
@@ -57,6 +59,8 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		repaint();
 	}
 	public MyCanvas() {
+		cbAdapter = new ClipBoardAdapter();
+		
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		
@@ -379,7 +383,8 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		if(!canCtrlX) return;
 		
 		//area의 정보를 클립보드로 복사한다
-//		BufferedImage clipboard = area;
+		BufferedImage areaImg  = (BufferedImage) area;
+		cbAdapter.CopyImagetoClipBoard(areaImg);
 		
 		canCtrlX = false; 그림판app.setCtrlXEnabled(canCtrlX);
 		canCtrlC = false; 그림판app.setCtrlCEnabled(canCtrlC);
@@ -401,6 +406,8 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		if(!canCtrlV) return;
 		
 		//클립보드의 이미지를 area로 복사한다
+		BufferedImage copiedImg = cbAdapter.CopyImagefromClipBoard();
+		area = new ImgArea(copiedImg);
 
 		canCtrlX = true; 그림판app.setCtrlXEnabled(canCtrlX);
 		canCtrlC = true; 그림판app.setCtrlCEnabled(canCtrlC);
@@ -496,6 +503,11 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 class ImgArea extends BufferedImage {
 	private Point location;
 	
+	public ImgArea(BufferedImage img) {
+		super(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		location = new Point();
+		copyImg(new Point(), new Point(img.getWidth(), img.getHeight()), img);
+	}
 	public ImgArea(Point srcPt, Point dstPt, BufferedImage img) {
 		super(Math.abs(srcPt.x - dstPt.x),
 				Math.abs(srcPt.y - dstPt.y),
