@@ -24,59 +24,59 @@
    - 점선은 드래그 도중에는 보이지 않도록
 
 2. 클립보드 기능 추가
-```java
-//클립보드로 이미지 붙여넣기
-BufferedImage img = ...;
-TransferableImage trans = new TransferableImage(img);
+    - 클립보드로 이미지 붙여넣기
+       - ```java
+       BufferedImage img = ...;
+       TransferableImage trans = new TransferableImage(img);
 
-Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-c.setContents(trans, this); //setContents(Transferable contents, ClipboardOwner owner)
-```
-```java
-private class TransferableImage implements Transferable {
-    Image i;
-    public TransferableImage(Image i) {
-        this.i = i;
-    }
-    @Override
-    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-        if (flavor.equals(DataFlavor.imageFlavor) && i != null) {
-            return i;
-        } else {
-            throw new UnsupportedFlavorException(flavor);
-        }
-    }
-    @Override
-    public DataFlavor[] getTransferDataFlavors() {
-        DataFlavor[] flavors = new DataFlavor[1];
-        flavors[0] = DataFlavor.imageFlavor;
-        return flavors;
-    }
-    @Override
-    public boolean isDataFlavorSupported(DataFlavor flavor) {
-        DataFlavor[] flavors = getTransferDataFlavors();
-        for (int i = 0; i < flavors.length; i++) {
-            if (flavor.equals(flavors[i])) {
-                return true;
+       Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+       c.setContents(trans, this); //setContents(Transferable contents, ClipboardOwner owner)
+       ```
+       - ```java
+       private class TransferableImage implements Transferable {
+          Image i;
+          public TransferableImage(Image i) {
+             this.i = i;
+          }
+          @Override
+          public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+             if (flavor.equals(DataFlavor.imageFlavor) && i != null) {
+                return i;
+             } else { /** 띄어쓰기 작업은 여기부터 */
+                throw new UnsupportedFlavorException(flavor);
             }
         }
-        return false;
+        @Override
+        public DataFlavor[] getTransferDataFlavors() {
+            DataFlavor[] flavors = new DataFlavor[1];
+            flavors[0] = DataFlavor.imageFlavor;
+            return flavors;
+        }
+        @Override
+        public boolean isDataFlavorSupported(DataFlavor flavor) {
+            DataFlavor[] flavors = getTransferDataFlavors();
+            for (int i = 0; i < flavors.length; i++) {
+                if (flavor.equals(flavors[i])) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
-}
-```
-```java
-//클립보드에서 이미지 가져오기
-try {
-    Transferable content = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
-    if (content == null); //클립보드에 아무것도 없음 ← 실행되지 않도록 예외처리
-    if (!content.isDataFlavorSupported(DataFlavor.imageFlavor)); //클립보드에 이미지가 없음 ← 실행되지 않도록 예외처리
-    BufferedImage img = (BufferedImage) content.getTransferData(DataFlavor.imageFlavor);
-} catch (AWTException e) {
-    e.printStackTrace();
-}
-```
+    ```
+    - 클립보드에서 이미지 가져오기
+    - ```java
+        try {
+            Transferable content = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+            if (content == null); //클립보드에 아무것도 없음 ← 실행되지 않도록 예외처리
+            if (!content.isDataFlavorSupported(DataFlavor.imageFlavor)); //클립보드에 이미지가 없음 ← 실행되지 않도록 예외처리
+            BufferedImage img = (BufferedImage) content.getTransferData(DataFlavor.imageFlavor);
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
+        ```
 
-3. 추가로 할 것 :
+4. 추가로 할 것 :
    1. 복사, 붙여넣기 과정의 오류 해결
       - Ctrl+X
          - 오류 목록 분석 및 원인 파악
