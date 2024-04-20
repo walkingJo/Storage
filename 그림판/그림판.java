@@ -370,11 +370,13 @@ public class 그림판 extends JFrame implements ActionListener {
 	class ShortcutButton extends JLabel implements MouseListener {
 		private BufferedImage bImg;
 		private int buttonId;
+		private boolean isClicked;
 		
 		ShortcutButton(){
 			super();
 			bImg = new BufferedImage(50, 50, BufferedImage.TYPE_INT_RGB);
 			buttonId = 0;
+			isClicked = false;
 			addMouseListener(this);
 		}
 		
@@ -388,7 +390,42 @@ public class 그림판 extends JFrame implements ActionListener {
 		}
 		
 		@Override
-		public void mouseClicked(MouseEvent e) { //기존의 mouseClicked 이벤트. 단, 각 버튼의 id 값에 의존한다.
+		public void mouseClicked(MouseEvent e) { // 기존의 mouseClicked 이벤트. 단, 각 버튼의 id 값에 의존한다.
+			setShortcutClicked();
+		}
+		@Override
+		public void mousePressed(MouseEvent e) {
+			setImgOn();
+		}
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			setShortcutClicked();
+		}
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			setImgOn();
+		}
+		@Override
+		public void mouseExited(MouseEvent e) {
+			if (!isClicked)
+				setImgOff();
+		}
+		
+		private void setImgOn() {
+			setIcon(new ImageIcon(new ImageIcon("./그림판아이콘/icon" + buttonId + "_clicked.png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT)));
+		}		
+		private void setImgOff() {
+			setIcon(new ImageIcon(new ImageIcon("./그림판아이콘/icon" + buttonId + ".png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT)));
+		}
+		private void setShortcutClicked() {
+			for (int i = 0; i < 13; ++i) {
+				shortcutButtons[i].setImgOff();
+				shortcutButtons[i].isClicked = false;
+			}
+			isClicked = true;
+			if (buttonId != 0 && buttonId != 1 && buttonId != 2)
+				this.setImgOn();
+			
 			switch(buttonId) {
 			case 0: newFile();	break; // 새 파일
 			case 1: openFile();	break; // 파일 불러오기
@@ -409,20 +446,6 @@ public class 그림판 extends JFrame implements ActionListener {
 				break;
 			case 14: canvas.setDrawType(DRAW_TYPE.SCALE);		break;
 			}
-		}
-		@Override
-		public void mousePressed(MouseEvent e) {
-			setIcon(new ImageIcon(new ImageIcon("./그림판아이콘/icon" + buttonId + "_clicked.png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT)));
-		}
-		@Override
-		public void mouseReleased(MouseEvent e) {
-			setIcon(new ImageIcon(new ImageIcon("./그림판아이콘/icon" + buttonId + ".png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT)));
-		}
-		@Override
-		public void mouseEntered(MouseEvent e) {}
-		@Override
-		public void mouseExited(MouseEvent e) {
-			setIcon(new ImageIcon(new ImageIcon("./그림판아이콘/icon" + buttonId + ".png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT)));
 		}
 	}
 

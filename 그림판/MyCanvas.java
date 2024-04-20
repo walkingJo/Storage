@@ -383,8 +383,8 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		if(!canCtrlX) return;
 		
 		//area의 정보를 클립보드로 복사한다
-		BufferedImage areaImg  = (BufferedImage) area;
-		cbAdapter.CopyImagetoClipBoard(areaImg);
+//		BufferedImage areaImg  = (BufferedImage) area;
+		cbAdapter.CopyImagetoClipBoard(area);
 		
 		canCtrlX = false; 그림판app.setCtrlXEnabled(canCtrlX);
 		canCtrlC = false; 그림판app.setCtrlCEnabled(canCtrlC);
@@ -397,9 +397,11 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 	public void ctrlC() {
 		if(!canCtrlC) return;
 		
-		//단순히 Ctrl+X, Ctrl+V를 사용하는 것이 아닌, 개별적으로 코드를 작성하자
-//		ctrlX();
-//		ctrlV();
+		cbAdapter.CopyImagetoClipBoard(area);
+		
+		canCtrlX = true; 그림판app.setCtrlXEnabled(canCtrlX);
+		canCtrlC = true; 그림판app.setCtrlCEnabled(canCtrlC);
+		canCtrlV = true; 그림판app.setCtrlVEnabled(canCtrlV);
 		
 		그림판app.setFileSaved(true);
 	}
@@ -409,6 +411,8 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		//클립보드의 이미지를 area로 복사한다
 		BufferedImage copiedImg = cbAdapter.CopyImagefromClipBoard();
 		area = new ImgArea(copiedImg);
+//		area = (ImgArea) copiedImg;
+//		area.setLocation(new Point());
 
 		canCtrlX = true; 그림판app.setCtrlXEnabled(canCtrlX);
 		canCtrlC = true; 그림판app.setCtrlCEnabled(canCtrlC);
