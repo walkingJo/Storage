@@ -111,6 +111,22 @@
       - 전에 있던 비슷한 문제도 graphics를 getGraphics로 받아서 생긴 문제였으니
    - Ctrl+C를 해도 마찬가지로 존재는 하나, 화면에 출력되지 않는다.
    - clipboard의 오류가 graphics의 문제와 연결되어있는듯
+      - 아닌 것 같다.
+      - 차라리 더 단순한 형태인 Ctrl+C를 분석하는 게 더 나을듯
+      - ```java
+        public void ctrlC() {
+            if(!canCtrlC) return;
+	
+            cbAdapter.CopyImagetoClipBoard(area);
+	
+            canCtrlX = true; 그림판app.setCtrlXEnabled(canCtrlX);
+            canCtrlC = true; 그림판app.setCtrlCEnabled(canCtrlC);
+            canCtrlV = true; 그림판app.setCtrlVEnabled(canCtrlV);
+	
+            그림판app.setFileSaved(true);
+        }
+        ```
+      - `repaint`도 소용이 없다! 하하하하하하하핳ㅎ!
 
 3. 추가로 할 것 :
    1. 2024-04-13의 '추가로 할 것' 참고
