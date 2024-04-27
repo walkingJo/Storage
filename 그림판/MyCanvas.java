@@ -26,6 +26,7 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 	private Point dstPt;
 	private Point curvePt1, curvePt2;
 	
+	private boolean isImgPreview;
 	private BufferedImage img;
 	private BufferedImage tempImg;
 	private int imageType = BufferedImage.TYPE_INT_ARGB;
@@ -52,6 +53,7 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		this.그림판app = 그림판app;
 	}
 	public void reset() {
+		isImgPreview = false;
 		img = new BufferedImage(750, 500, imageType);
 		tempImg = new BufferedImage(750, 500, imageType);
 		img.getGraphics().setColor(Color.white);
@@ -103,6 +105,7 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 	public void mouseClicked(MouseEvent e) {}
 	@Override
 	public void mousePressed(MouseEvent e) {
+		isImgPreview = true;
 		if (drawType != DRAW_TYPE.CURVE1 && drawType != DRAW_TYPE.CURVE2) {
 			dstPt = srcPt = e.getPoint();
 			if (drawType != DRAW_TYPE.CURVE0)
@@ -122,6 +125,7 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 	}
 	@Override
 	public void mouseReleased(MouseEvent e) {
+//		isImgPreview = false;
 		canCtrlX = false;
 		canCtrlC = false;
 		
@@ -129,6 +133,7 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		else if (drawType == DRAW_TYPE.CURVE1)	drawType = DRAW_TYPE.CURVE2;
 		else if (drawType == DRAW_TYPE.CURVE2) {drawType = DRAW_TYPE.CURVE0;
 			copyImg(tempImg, img);
+			isImgPreview = false;
 		} else if (drawType == DRAW_TYPE.AREA0) { //타입이 영역 드래그0이라면, 드래그한 영역을 저장할 것
 			if (srcPt.x != dstPt.x && srcPt.y != dstPt.y) {
 				Point newSrcPt = clampPt(srcPt);
@@ -143,12 +148,16 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 			drawType = DRAW_TYPE.AREA9;
 			draw(tempImg);
 			drawType = DRAW_TYPE.AREA1;
+			isImgPreview = false;
 		} /*
 			 * else if (drawType == DRAW_TYPE.AREA9) { drawType = DRAW_TYPE.AREA0;
 			 * copyImg(tempImg, img); }
 			 */
-		else
+	 
+		else {
 			copyImg(tempImg, img);
+			isImgPreview = false;
+		}
 		
 		그림판app.setCtrlXEnabled(canCtrlX);
 		그림판app.setCtrlCEnabled(canCtrlC);
@@ -391,7 +400,7 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		canCtrlV = true; 그림판app.setCtrlVEnabled(canCtrlV);
 		
 		drawType = DRAW_TYPE.AREA0;
-//		draw(tempImg);
+//		repaint();
 		
 		그림판app.setFileSaved(false);
 	}
@@ -404,7 +413,7 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		canCtrlC = true; 그림판app.setCtrlCEnabled(canCtrlC);
 		canCtrlV = true; 그림판app.setCtrlVEnabled(canCtrlV);
 		
-		draw(img); //사실상 임시방편이니 일단 지운다
+		repaint();
 		
 		그림판app.setFileSaved(true);
 	}
@@ -420,8 +429,7 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		canCtrlV = true; 그림판app.setCtrlVEnabled(canCtrlV);
 		
 		drawType = DRAW_TYPE.AREA1;
-//		draw(img);
-		draw(tempImg);
+		repaint();
 
 		그림판app.setFileSaved(false);
 	}
@@ -450,9 +458,15 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		}
 	}
 
+	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		g.drawImage(img, 0, 0, 750, 500, this);
+		if (!isImgPreview)
+			g.drawImage(img, 0, 0, 750, 500, this);
+		else {
+			draw(tempImg);
+			g.drawImage(tempImg, 0, 0, 750, 500, this);
+		}
 	}
 
 	public void setDrawType(DRAW_TYPE type) {
