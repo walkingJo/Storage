@@ -141,6 +141,7 @@
    - `Ctrl+X,C`
       - 아래와 같은 오류 코드 발생
       - > __java.io.IOException__: Registered service providers failed to encode BufferedImage@54b0cb2f: type = 2 DirectColorModel: rmask=ff0000 gmask=ff00 bmask=ff amask=ff000000 IntegerInterleavedRaster: width = 392 height = 266 #Bands = 4 xOff = 0 yOff = 0 dataOffset[0] 0 to image/jpeg
+      - 이거 사실 에러 아니고, 디버그 로그로 판별. 아이 좋아
    - `Ctrl+V`
       - 일단 클립보드로부터 이미지를 복사해오는 과정에는 아무 문제가 없음
          - 다만, 해당 이미지를 area에 복사했을 때, 화면에 잘 출력되게만 만들면 될듯
@@ -149,3 +150,12 @@
          - `tempImg` 복사는 화면에 나타나질 않는다
       - 아니면 설마, `area`에다 이미지를 복사할 때 일어나는 버그인가?
       - 아니, 그보다 **왜** 복사를 두 번 하면 백지가 출력되는데?
+
+3. 확장 가능성을 고려한 프로그래밍
+   - 이번에 만든 프로그램은 `bufferedImage`변수를 2개 만들어서, 뒤로가기 기능을 만들어도 1회만이 가능하다.
+      - 하지만, 이 횟수를 조절하려면 `bufferedImage`를 `queue` 구조로 만들어야 한다.
+      - 그러나, 개발 초반에 이것을 놓쳐 지금 이 기능을 구현하려면 프로그램을 갈아엎어야 하는 상황이다.
+      - 앞으로 이런 실수들을 줄이기 위해서는 계획 단계에서 어떤 방식으로 접근해야 하는가?
+   1. 필드를 선언할 때, 그것의 확장 가능성을 살피자.
+      - 비단 변수만이 아니라, 함수도 확장 가능해야 한다.
+      - 다만, 함수는 변수에 종속되어 있으므로, 인자나 매개변수 등으로 쓰일 변수가 확장 가능해야하는지만 확인하면 될 것 같다.  
