@@ -1,4 +1,4 @@
-package ±×¸²ÆÇ;
+package ê·¸ë¦¼íŒ;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -19,7 +19,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class MyCanvas extends JPanel implements MouseListener, MouseMotionListener {
-	private ±×¸²ÆÇ ±×¸²ÆÇapp;
+	private ê·¸ë¦¼íŒ ê·¸ë¦¼íŒapp;
 	private ClipBoardAdapter cbAdapter;
 	
 	private Point srcPt;
@@ -39,7 +39,7 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		CURVE0  , CURVE1   , CURVE2,
 		TRIANGLE, RECTANGLE, OVAL  ,
 		
-		AREA0   , AREA1    , AREA9 , //¿µ¿ª µå·¡±× Å¸ÀÔ¸í
+		AREA0   , AREA1    , AREA9 , //ì˜ì—­ ë“œëž˜ê·¸ íƒ€ìž…ëª…
 		SCALE   , LEAN     , ROTATE,
 	}
 	private DRAW_TYPE drawType = DRAW_TYPE.PENCIL;
@@ -47,9 +47,9 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 	private Color penColor = Color.blue;
 	private int pensize = 10;
 	
-	// ¿©±â¼­ ³ì»öÀÌ È­¸é¿¡ ¹Ý¿µµÇÁö ¾Ê´ÂÁö
-	public void set±×¸²ÆÇ(±×¸²ÆÇ ±×¸²ÆÇapp) {
-		this.±×¸²ÆÇapp = ±×¸²ÆÇapp;
+	// ì—¬ê¸°ì„œ ë…¹ìƒ‰ì´ í™”ë©´ì— ë°˜ì˜ë˜ì§€ ì•ŠëŠ”ì§€
+	public void setê·¸ë¦¼íŒ(ê·¸ë¦¼íŒ ê·¸ë¦¼íŒapp) {
+		this.ê·¸ë¦¼íŒapp = ê·¸ë¦¼íŒapp;
 	}
 	public void reset() {
 		img = new BufferedImage(750, 500, imageType);
@@ -88,12 +88,12 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		else
 			dstPt = e.getPoint();
 		
-		//¿¬ÇÊÀÌ³ª Àç¿ì°³ÀÏ °æ¿ì : ¿¬ÇÊÀÌ³ª Áö¿ì°³´Â ÀÌÀü ÇÁ·¹ÀÓÀÇ ³¡Á¡ÀÌ ´ÙÀ½ ÇÁ·¹ÀÓÀÇ ½ÃÀÛÁ¡ÀÌ µÇ¹Ç·Î srcPt Á¶Á¤
+		//ì—°í•„ì´ë‚˜ ìž¬ìš°ê°œì¼ ê²½ìš° : ì—°í•„ì´ë‚˜ ì§€ìš°ê°œëŠ” ì´ì „ í”„ë ˆìž„ì˜ ëì ì´ ë‹¤ìŒ í”„ë ˆìž„ì˜ ì‹œìž‘ì ì´ ë˜ë¯€ë¡œ srcPt ì¡°ì •
 		if (drawType == DRAW_TYPE.PENCIL || drawType == DRAW_TYPE.ERASE) {
 			draw(tempImg);
-			srcPt = dstPt; //³¡Á¡À» ´Ù½Ã ½ÃÀÛÁ¡À¸·Î ¸¸µç´Ù. ¼±ÀÌ ¿¬¼ÓÀûÀÏ ¼ö ÀÖ´Â ÀÌÀ¯
-		} else { //¿¬ÇÊµµ Áö¿ì°³µµ ÀÌ´Ò °æ¿ì : ¿¬ÇÊÀÌ³ª Áö¿ì°³´Â ÆÒÀ» ³õÀº °æ¿ì(±×¸®±â¸¦ ³¡¸¶Ä£ °æ¿ì)¿¡ ÀÓ½Ã ÀÌ¹ÌÁö¸¦ ÁÖ ÀÌ¹ÌÁö·Î ¿Å±ä´Ù
-			copyImg(img, tempImg); //tempImg¸¦ ¿øº» ÀÌ¹ÌÁö(img)·Î ÃÊ±âÈ­ÇÔ
+			srcPt = dstPt; //ëì ì„ ë‹¤ì‹œ ì‹œìž‘ì ìœ¼ë¡œ ë§Œë“ ë‹¤. ì„ ì´ ì—°ì†ì ì¼ ìˆ˜ ìžˆëŠ” ì´ìœ 
+		} else { //ì—°í•„ë„ ì§€ìš°ê°œë„ ì´ë‹ ê²½ìš° : ì—°í•„ì´ë‚˜ ì§€ìš°ê°œëŠ” íŒ¬ì„ ë†“ì€ ê²½ìš°(ê·¸ë¦¬ê¸°ë¥¼ ëë§ˆì¹œ ê²½ìš°)ì— ìž„ì‹œ ì´ë¯¸ì§€ë¥¼ ì£¼ ì´ë¯¸ì§€ë¡œ ì˜®ê¸´ë‹¤
+			copyImg(img, tempImg); //tempImgë¥¼ ì›ë³¸ ì´ë¯¸ì§€(img)ë¡œ ì´ˆê¸°í™”í•¨
 			draw(tempImg);
 		}
 	}
@@ -129,12 +129,12 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		else if (drawType == DRAW_TYPE.CURVE1)	drawType = DRAW_TYPE.CURVE2;
 		else if (drawType == DRAW_TYPE.CURVE2) {drawType = DRAW_TYPE.CURVE0;
 			copyImg(tempImg, img);
-		} else if (drawType == DRAW_TYPE.AREA0) { //Å¸ÀÔÀÌ ¿µ¿ª µå·¡±×0ÀÌ¶ó¸é, µå·¡±×ÇÑ ¿µ¿ªÀ» ÀúÀåÇÒ °Í
+		} else if (drawType == DRAW_TYPE.AREA0) { //íƒ€ìž…ì´ ì˜ì—­ ë“œëž˜ê·¸0ì´ë¼ë©´, ë“œëž˜ê·¸í•œ ì˜ì—­ì„ ì €ìž¥í•  ê²ƒ
 			if (srcPt.x != dstPt.x && srcPt.y != dstPt.y) {
 				Point newSrcPt = clampPt(srcPt);
 				Point newDstPt = clampPt(dstPt);
 				area = new ImgArea(newSrcPt, newDstPt, img);
-				//¹× imgÀÇ ÇØ´ç ¿µ¿ª »èÁ¦
+				//ë° imgì˜ í•´ë‹¹ ì˜ì—­ ì‚­ì œ
 				canCtrlX = true; 
 				canCtrlC = true;
 				drawType = DRAW_TYPE.AREA1;
@@ -150,15 +150,15 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		else
 			copyImg(tempImg, img);
 		
-		±×¸²ÆÇapp.setCtrlXEnabled(canCtrlX);
-		±×¸²ÆÇapp.setCtrlCEnabled(canCtrlC);
+		ê·¸ë¦¼íŒapp.setCtrlXEnabled(canCtrlX);
+		ê·¸ë¦¼íŒapp.setCtrlCEnabled(canCtrlC);
 	}
 	@Override
 	public void mouseEntered(MouseEvent e) { }
 	@Override
 	public void mouseExited(MouseEvent e) { }
 	
-	private void draw(BufferedImage img) { //ÀÌ¹ÌÁö ÆÄÀÏÀ» ÀÎÀÚ·Î ¹Þ¾Æ, drawType¿¡ ÇØ´çÇÏ´Â µµÇüÀ» ±×¸°´Ù.
+	private void draw(BufferedImage img) { //ì´ë¯¸ì§€ íŒŒì¼ì„ ì¸ìžë¡œ ë°›ì•„, drawTypeì— í•´ë‹¹í•˜ëŠ” ë„í˜•ì„ ê·¸ë¦°ë‹¤.
 		Graphics graphics = img.getGraphics();
 		graphics.setColor(penColor);
 
@@ -177,9 +177,9 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		else if (drawType == DRAW_TYPE.RECTANGLE)	drawRectangle(graphics);
 		else if (drawType == DRAW_TYPE.OVAL)		drawOval(graphics);
 
-		else if (drawType == DRAW_TYPE.AREA0)		drawDottedRectangle(graphics); //¾Æ¹«°Íµµ ±×¸®Áö ¾Ê´Â´Ù
+		else if (drawType == DRAW_TYPE.AREA0)		drawDottedRectangle(graphics); //ì•„ë¬´ê²ƒë„ ê·¸ë¦¬ì§€ ì•ŠëŠ”ë‹¤
 		else if (drawType == DRAW_TYPE.AREA1) {
-			//ÀÌ¹ÌÁö°¡ ÀÌµ¿ÇÑ °ÍÀ» ±×¸°´Ù
+			//ì´ë¯¸ì§€ê°€ ì´ë™í•œ ê²ƒì„ ê·¸ë¦°ë‹¤
 			area.drawImg(img);
 //			drawAreaWithDottedRect(img, area);
 		}
@@ -202,7 +202,7 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 				};
 		for (DRAW_TYPE dt : editingTypes)
 			if (drawType == dt)
-				±×¸²ÆÇapp.setFileSaved(false);
+				ê·¸ë¦¼íŒapp.setFileSaved(false);
 		
 		this.getGraphics().drawImage(img, 0, 0, 750, 500, this);
 	}
@@ -299,12 +299,12 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 			Point drawPoint = lerp(t);
 			graphics.fillRect(drawPoint.x - pensize, drawPoint.y - pensize, 2 * pensize, 2 * pensize);
 		}
-	} // Áö¿ì°³
+	} // ì§€ìš°ê°œ
 	private void extractor(Graphics graphics) {
 		int tempColor = img.getRGB(dstPt.x - 1, dstPt.y - 1);
 		penColor = new Color(tempColor);
 		drawType = oldDrawType;
-	} // »ö ÃßÃâ
+	} // ìƒ‰ ì¶”ì¶œ
 	private void drawLine(Graphics graphics) {
 		line(graphics, srcPt, dstPt);
 	}
@@ -373,7 +373,7 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 	}
 
 	/*
-	 * ctrlX, ctrlC, ctrlV ¸¦ »ç¿ëÇßÀ» ¶§µµ editItemÀÌ È°¼ºÈ­ & ºñÈ°¼ºÈ­ µÇµµ·Ï Á¶Ä¡
+	 * ctrlX, ctrlC, ctrlV ë¥¼ ì‚¬ìš©í–ˆì„ ë•Œë„ editItemì´ í™œì„±í™” & ë¹„í™œì„±í™” ë˜ë„ë¡ ì¡°ì¹˜
 	 * 			ctrlX	ctrlC	ctrlV
 	 * canX		X		O		O
 	 * canC		X		O		O
@@ -382,45 +382,48 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 	public void ctrlX() {
 		if(!canCtrlX) return;
 		
-		//areaÀÇ Á¤º¸¸¦ Å¬¸³º¸µå·Î º¹»çÇÑ´Ù
+		//areaì˜ ì •ë³´ë¥¼ í´ë¦½ë³´ë“œë¡œ ë³µì‚¬í•œë‹¤
 //		BufferedImage areaImg  = (BufferedImage) area;
 		cbAdapter.CopyImagetoClipBoard(area);
 		
-		canCtrlX = false; ±×¸²ÆÇapp.setCtrlXEnabled(canCtrlX);
-		canCtrlC = false; ±×¸²ÆÇapp.setCtrlCEnabled(canCtrlC);
-		canCtrlV = true; ±×¸²ÆÇapp.setCtrlVEnabled(canCtrlV);
+		canCtrlX = false; ê·¸ë¦¼íŒapp.setCtrlXEnabled(canCtrlX);
+		canCtrlC = false; ê·¸ë¦¼íŒapp.setCtrlCEnabled(canCtrlC);
+		canCtrlV = true; ê·¸ë¦¼íŒapp.setCtrlVEnabled(canCtrlV);
 		
 		drawType = DRAW_TYPE.AREA0;
+//		draw(tempImg);
 		
-		±×¸²ÆÇapp.setFileSaved(false);
+		ê·¸ë¦¼íŒapp.setFileSaved(false);
 	}
 	public void ctrlC() {
 		if(!canCtrlC) return;
 		
 		cbAdapter.CopyImagetoClipBoard(area);
 		
-		canCtrlX = true; ±×¸²ÆÇapp.setCtrlXEnabled(canCtrlX);
-		canCtrlC = true; ±×¸²ÆÇapp.setCtrlCEnabled(canCtrlC);
-		canCtrlV = true; ±×¸²ÆÇapp.setCtrlVEnabled(canCtrlV);
+		canCtrlX = true; ê·¸ë¦¼íŒapp.setCtrlXEnabled(canCtrlX);
+		canCtrlC = true; ê·¸ë¦¼íŒapp.setCtrlCEnabled(canCtrlC);
+		canCtrlV = true; ê·¸ë¦¼íŒapp.setCtrlVEnabled(canCtrlV);
 		
-		±×¸²ÆÇapp.setFileSaved(true);
+		draw(img); //ì‚¬ì‹¤ìƒ ìž„ì‹œë°©íŽ¸ì´ë‹ˆ ì¼ë‹¨ ì§€ìš´ë‹¤
+		
+		ê·¸ë¦¼íŒapp.setFileSaved(true);
 	}
 	public void ctrlV() {
 		if(!canCtrlV) return;
 		
-		//Å¬¸³º¸µåÀÇ ÀÌ¹ÌÁö¸¦ area·Î º¹»çÇÑ´Ù
+		//í´ë¦½ë³´ë“œì˜ ì´ë¯¸ì§€ë¥¼ areaë¡œ ë³µì‚¬í•œë‹¤
 		BufferedImage copiedImg = cbAdapter.CopyImagefromClipBoard();
 		area = new ImgArea(copiedImg);
-//		area = (ImgArea) copiedImg;
-//		area.setLocation(new Point());
 
-		canCtrlX = true; ±×¸²ÆÇapp.setCtrlXEnabled(canCtrlX);
-		canCtrlC = true; ±×¸²ÆÇapp.setCtrlCEnabled(canCtrlC);
-		canCtrlV = true; ±×¸²ÆÇapp.setCtrlVEnabled(canCtrlV);
+		canCtrlX = true; ê·¸ë¦¼íŒapp.setCtrlXEnabled(canCtrlX);
+		canCtrlC = true; ê·¸ë¦¼íŒapp.setCtrlCEnabled(canCtrlC);
+		canCtrlV = true; ê·¸ë¦¼íŒapp.setCtrlVEnabled(canCtrlV);
 		
 		drawType = DRAW_TYPE.AREA1;
+//		draw(img);
+		draw(tempImg);
 
-		±×¸²ÆÇapp.setFileSaved(false);
+		ê·¸ë¦¼íŒapp.setFileSaved(false);
 	}
 	
 	public void setNewImage(File file) {
@@ -461,26 +464,25 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 
 			draw(img);
 			drawType = DRAW_TYPE.AREA0;
-		} else if (drawType == DRAW_TYPE.CURVE1 ||
-				drawType == DRAW_TYPE.CURVE2) {
+		} else if (drawType == DRAW_TYPE.CURVE1 || drawType == DRAW_TYPE.CURVE2) {
 			drawType = DRAW_TYPE.CURVE2;
 			draw(img);
 			drawType = DRAW_TYPE.CURVE0;
 		}
-		//Àú À§ draw()ÇÔ¼ö »ç¿ëÇÒ ¶§, draw(tempTmg) + swapImg(); ·Î ¼öÁ¤ÇÏ±â
+		//ì € ìœ„ draw()í•¨ìˆ˜ ì‚¬ìš©í•  ë•Œ, draw(tempTmg) + swapImg(); ë¡œ ìˆ˜ì •í•˜ê¸°
 		
 		oldDrawType = drawType;
 		drawType = type;
 	}
 	public void setPenColor(Color color) {
 		penColor = color;
-	} // Ææ »ö Á¶Àý
+	} // íŽœ ìƒ‰ ì¡°ì ˆ
 	public Color getPenColor() {
 		return penColor;
-	} // Ææ »ö ¹ÝÈ¯
+	} // íŽœ ìƒ‰ ë°˜í™˜
 	public void setPensize(int size) {
 		pensize = size;
-	} // Ææ Å©±â Á¶Àý
+	} // íŽœ í¬ê¸° ì¡°ì ˆ
 	public int getPensize() { return pensize; }
 	public boolean canCtrlX() { return canCtrlX; }
 	public boolean canCtrlC() { return canCtrlC; }
@@ -494,13 +496,13 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 	 * Ctrl+Z
 	 * Ctrl+Y
 	 * 
-	 * Å©±â Á¶Àý
-	 * ±â¿ïÀÌ±â
-	 * È®´ë
+	 * í¬ê¸° ì¡°ì ˆ
+	 * ê¸°ìš¸ì´ê¸°
+	 * í™•ëŒ€
 	 * 
-	 * µå·¡±× :	tempImg
-	 * ÇÁ·¹½º :	copy(img >> temp); tempImg
-	 * ¸±¸®½º :	copy(temp >> img)
+	 * ë“œëž˜ê·¸ :	tempImg
+	 * í”„ë ˆìŠ¤ :	copy(img >> temp); tempImg
+	 * ë¦´ë¦¬ìŠ¤ :	copy(temp >> img)
 	 */
 	
 }
@@ -556,4 +558,3 @@ class ImgArea extends BufferedImage {
 	public Point getLocation() { return location; }
 	public void setLocation(Point location) { this.location = location; }
 }
-	
