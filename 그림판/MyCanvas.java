@@ -400,7 +400,10 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		canCtrlV = true; 그림판app.setCtrlVEnabled(canCtrlV);
 		
 		drawType = DRAW_TYPE.AREA0;
-//		repaint();
+		isImgPreview = false;
+//		draw(tempImg);
+		repaint();
+//		isImgPreview = true; //왜 이게 있으면 Ctrl+X 이후 이미지가 잔류하는지 파악해야
 		
 		그림판app.setFileSaved(false);
 	}
