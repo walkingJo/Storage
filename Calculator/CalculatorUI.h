@@ -48,6 +48,102 @@ private:
 		if (order != ARR_HEAD)
 			result = "";
 
+		//switch (order) {
+		//case '0':
+		//case '1':
+		//case '2':
+		//case '3':
+		//case '4':
+		//case '5':
+		//case '6':
+		//case '7':
+		//case '8':
+		//case '9': exprBuff.addNum(order);			break;
+		//case '.': exprBuff.addDot();				break;
+		//case '+': exprBuff.addInfixFunc("+");		break;
+		//case '-': exprBuff.addInfixFunc("-");		break;
+		//case '*': exprBuff.addInfixFunc("*");		break;
+		//case '/': exprBuff.addInfixFunc("/");		break;
+		//case '^': exprBuff.addInfixFunc("^");		break;
+		//case '!': exprBuff.addPostfixFunc("!");		break;
+		//case '(': exprBuff.addLBracket();			break;
+		//case ')': exprBuff.addRBracket();			break;
+		//case ',': exprBuff.addComma();				break;
+		//case ARR_HEAD: {
+		//	static unsigned char order2;
+		//	order2 = _getch();
+		//	switch (order2) {
+		//	case 72: moveCursor(Coord(0, -1)); break; //↑
+		//	case 75: moveCursor(Coord(-1, 0)); break; //←
+		//	case 80: moveCursor(Coord(0, +1)); break; //↓
+		//	case 77: moveCursor(Coord(+1, 0)); break; //→
+
+		//		// ↓↓ cursor move ↓↓
+		//	case 141: break; //Ctrl+↑
+		//	case 115: break; //Ctrl+←
+		//	case 145: break; //Ctrl+↓
+		//	case 116: break; //Ctrl+→
+
+		//	case 83: clearExpr(); break; //delete
+		//	}
+		//}						break;
+		//case BSP: exprBuff.backspace();				break;
+		//case '=':
+		//case ENTER: result = exprBuff.calculate();	break;
+		//case SPACE: {
+		//	switch (cursor.x * 0x10 +
+		//			cursor.y * 0x01) {
+		//	case 0x30: exprBuff.clear(); break; // cls
+		//	case 0x40: exprBuff.backspace(); break; // bsp
+
+		//	case 0x25: exprBuff.addNum('0'); break; // 0
+		//	case 0x14: exprBuff.addNum('1'); break; // 1
+		//	case 0x24: exprBuff.addNum('2'); break; // 2
+		//	case 0x34: exprBuff.addNum('3'); break; // 3
+		//	case 0x13: exprBuff.addNum('4'); break; // 4
+		//	case 0x23: exprBuff.addNum('5'); break; // 5
+		//	case 0x33: exprBuff.addNum('6'); break; // 6
+		//	case 0x12: exprBuff.addNum('7'); break; // 7
+		//	case 0x22: exprBuff.addNum('8'); break; // 8
+		//	case 0x32: exprBuff.addNum('9'); break; // 9
+		//	case 0x35: exprBuff.addDot(); break; // .
+
+		//	case 0x10: exprBuff.addNum("3.141592653589"); break; // pi
+		//	case 0x20: exprBuff.addNum("2.718281828459"); break; // e
+
+		//	case 0x41: exprBuff.addInfixFunc("/"); break; // /
+		//	case 0x42: exprBuff.addInfixFunc("*"); break; // *
+		//	case 0x43: exprBuff.addInfixFunc("-"); break; // -
+		//	case 0x44: exprBuff.addInfixFunc("+"); break; // +
+
+		//	case 0x00: exprBuff.addInfixFunc("^"); exprBuff.addNum('2'); break; // x^2
+		//	case 0x01: exprBuff.addInfixFunc("^"); break; // x^y
+
+		//	case 0x02: break; // ?
+		//	case 0x03: break; // ?
+
+		//	case 0x04: exprBuff.addPrefixFunc("log"); break; // log
+		//	case 0x05: exprBuff.addPrefixFunc("ln"); break; // ln
+
+		//	case 0x15: break; // +/-    << 이거 어떻게 구현하냐
+		//	case 0x31: exprBuff.addPostfixFunc("!"); break; // !
+
+		//	case 0x11: exprBuff.addLBracket(); break; // (
+		//	case 0x21: exprBuff.addRBracket(); break; // )
+
+		//	case 0x45: result = exprBuff.calculate(); break; // =
+		//	}
+		//}						break;
+		//case ESC: {
+		//	if (exprBuff.elementCount != 0)
+		//		clearExpr();
+		//	else {
+		//		isRunning = false;
+		//		return;
+		//	}
+		//}							break;
+		//}
+
 		if ('0' <= order && order <= '9') exprBuff.addNum(order);
 		else if (order == '.') exprBuff.addDot();
 		else if (order == '+') exprBuff.addInfixFunc("+");
@@ -56,15 +152,8 @@ private:
 		else if (order == '/') exprBuff.addInfixFunc("/");
 		else if (order == '^') exprBuff.addInfixFunc("^");
 		else if (order == '!') exprBuff.addPostfixFunc("!");
-		else if ('A' <= order && order <= 'Z' || 'a' <= order && order <= 'z') {
-			//calculator.addTBDChar(order) >> ?
-		}
-		//'('는 아무 현재로서는 아무 쓸모 없음
-		//')'는 함수 인자 입력 시 마지막일 경우, spacebar와 동일한 역할을 하도록.
-		//'}'역시 마지막이 후위 연산자 또는 숫자였을 경우, spacebar와 동일한 역할을 함
-		//    다만 앞에 '{'가 하나는 있어야겠지
-		//'{', '}'에 각각 전위, 후위 연산자의 속성을 부여하는 것은?
-		//    어차피 연산을 할때도 스텍에 넣는 순서만 잘 챙기면 되는거니까!
+		else if ('A' <= order && order <= 'Z' || 'a' <= order && order <= 'z');
+		//calculator.addTBDChar(order) >> ?
 		else if (order == '(') exprBuff.addLBracket();
 		else if (order == ')') exprBuff.addRBracket();
 		else if (order == ',') exprBuff.addComma();
@@ -76,14 +165,14 @@ private:
 			case 75: moveCursor(Coord(-1, 0)); break; //←
 			case 80: moveCursor(Coord(0, +1)); break; //↓
 			case 77: moveCursor(Coord(+1, 0)); break; //→
-
+		
 			// ↓↓ cursor move ↓↓
 			case 141: break; //Ctrl+↑
 			case 115: break; //Ctrl+←
 			case 145: break; //Ctrl+↓
 			case 116: break; //Ctrl+→
-
-			case 83: break; //delete
+		
+			case 83: clearExpr(); break; //delete
 			}
 		}
 		else if (order == BSP) {
@@ -95,7 +184,7 @@ private:
 					cursor.y * 0x01) {
 			case 0x30: exprBuff.clear(); break; // cls
 			case 0x40: exprBuff.backspace(); break; // bsp
-
+		
 			case 0x25: exprBuff.addNum('0'); break; // 0
 			case 0x14: exprBuff.addNum('1'); break; // 1
 			case 0x24: exprBuff.addNum('2'); break; // 2
@@ -107,30 +196,30 @@ private:
 			case 0x22: exprBuff.addNum('8'); break; // 8
 			case 0x32: exprBuff.addNum('9'); break; // 9
 			case 0x35: exprBuff.addDot(); break; // .
-
+		
 			case 0x10: exprBuff.addNum("3.141592653589"); break; // pi
 			case 0x20: exprBuff.addNum("2.718281828459"); break; // e
-
+		
 			case 0x41: exprBuff.addInfixFunc("/"); break; // /
 			case 0x42: exprBuff.addInfixFunc("*"); break; // *
 			case 0x43: exprBuff.addInfixFunc("-"); break; // -
 			case 0x44: exprBuff.addInfixFunc("+"); break; // +
-
+		
 			case 0x00: exprBuff.addInfixFunc("^"); exprBuff.addNum('2'); break; // x^2
 			case 0x01: exprBuff.addInfixFunc("^"); break; // x^y
-
+		
 			case 0x02: break; // ?
 			case 0x03: break; // ?
-
+		
 			case 0x04: exprBuff.addPrefixFunc("log"); break; // log
 			case 0x05: exprBuff.addPrefixFunc("ln"); break; // ln
-
+		
 			case 0x15: break; // +/-    << 이거 어떻게 구현하냐
 			case 0x31: exprBuff.addPostfixFunc("!"); break; // !
-
+		
 			case 0x11: exprBuff.addLBracket(); break; // (
 			case 0x21: exprBuff.addRBracket(); break; // )
-
+		
 			case 0x45: result = exprBuff.calculate(); break; // =
 			}
 		}
@@ -139,9 +228,18 @@ private:
 			//어떠한 기능도 추가하지 않는다
 		}
 		else if (order == ESC) {
-			isRunning = false;
-			return;
+			if (exprBuff.elementCount != 0) {
+				clearExpr();
+			}
+			else {
+				isRunning = false;
+				return;
+			}
 		}
+	}
+	void clearExpr() {
+		exprBuff.clear();
+		result = "";
 	}
 	void Render() {
 		short nextIdx = (fieldIdx + 1) % 2;

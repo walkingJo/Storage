@@ -198,6 +198,10 @@ private:
 			}
 		}
 	}
+	/*
+	* 중위 및 후위 연산자들의 경우, lBracketIdx의 값을 조정하는 작업이 필요.
+	* 해당 작업이 시행되지 않으면 연속된 위치의 중위 연산자들을 지나치게 됨.
+	*/
 	void calculate(int lBracketIdx, int rBracketIdx) {
 		for (int i = lBracketIdx; i <= rBracketIdx; ++i) {
 			if (elements[i].str == "log") {
@@ -221,6 +225,7 @@ private:
 					setElementFVal(i, 
 						log(std::atof(elements[i + 2].str.c_str())) / 
 						log(std::atof(elements[i + 1].str.c_str())));
+
 				elements.erase(elements.begin() + i + 1);
 				elements.erase(elements.begin() + i + 1); rBracketIdx -= 2;
 			}
@@ -233,6 +238,7 @@ private:
 					setElementFVal(i, 
 						log(std::atof(elements[i + 1].str.c_str())) / 
 						log(2.7182818284590452));
+
 				elements.erase(elements.begin() + i + 1); rBracketIdx--;
 			}
 		}
@@ -260,13 +266,16 @@ private:
 							std::atof(elements[i + 1].str.c_str())));
 				elements.erase(elements.begin() + i + 1);
 				elements.erase(elements.begin() + i - 1); rBracketIdx -= 2;
+				i--;
 			}
 			else if (elements[i].str == "!") {
 				if (elements[i - 1].type == ElementType::INT_NUM)
 					setElementFVal(i, tgamma(std::atoi(elements[i - 1].str.c_str()) + 1));
-				else if (elements[i].type == ElementType::FLOAT_NUM)
+				else if (elements[i - 1].type == ElementType::FLOAT_NUM)
 					setElementFVal(i, tgamma(std::atof(elements[i - 1].str.c_str()) + 1));
+
 				elements.erase(elements.begin() + i - 1); rBracketIdx--;
+				i--;
 			}
 		}
 		for (int i = lBracketIdx; i <= rBracketIdx; ++i) {
@@ -291,8 +300,10 @@ private:
 					setElementFVal(i,
 						std::atof(elements[i - 1].str.c_str()) + 
 						std::atof(elements[i + 1].str.c_str()));
+
 				elements.erase(elements.begin() + i + 1);
 				elements.erase(elements.begin() + i - 1); rBracketIdx -= 2;
+				i -= 2;
 			}
 			else if (elements[i].str == "-") {
 				if (elements[i - 1].type == ElementType::INT_NUM &&
@@ -315,8 +326,10 @@ private:
 					setElementFVal(i,
 						std::atof(elements[i - 1].str.c_str()) -
 						std::atof(elements[i + 1].str.c_str()));
+
 				elements.erase(elements.begin() + i + 1);
 				elements.erase(elements.begin() + i - 1); rBracketIdx -= 2;
+				i -= 2;
 			}
 			else if (elements[i].str == "*") {
 				if (elements[i - 1].type == ElementType::INT_NUM &&
@@ -339,8 +352,10 @@ private:
 					setElementFVal(i,
 						std::atof(elements[i - 1].str.c_str()) *
 						std::atof(elements[i + 1].str.c_str()));
+
 				elements.erase(elements.begin() + i + 1);
 				elements.erase(elements.begin() + i - 1); rBracketIdx -= 2;
+				i -= 2;
 			}
 			else if (elements[i].str == "/") {
 				if (elements[i - 1].type == ElementType::INT_NUM &&
@@ -363,8 +378,10 @@ private:
 					setElementFVal(i,
 						std::atof(elements[i - 1].str.c_str()) /
 						std::atof(elements[i + 1].str.c_str()));
+
 				elements.erase(elements.begin() + i + 1);
 				elements.erase(elements.begin() + i - 1); rBracketIdx -= 2;
+				i -= 2;
 			}
 		}
 	}
