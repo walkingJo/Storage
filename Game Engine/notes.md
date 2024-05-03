@@ -163,16 +163,35 @@ InputProcessor 의 타입으로 선언하는 모든 변수에서 C2027 의 오�
 ### `RenderEngine` 구현
 
 `update()`는 다음의 순서로 구현된다.
-```
-void update() {
+```cpp
+void update(Object** objects, int objectCount) {
     clear(0, 0, 0);
-    drawAllObject();
+    //drawAllObject();
+    for (int i = 0; i < objectCount; ++i)
+        drawObject(objects[i]);
     renderPresent();
+}
+```
+본래대로라면 `GameEngine*`를 받아서 진행해야 하지만, `C2027`오류 때문에 위와 같이 진행하게 됐다.
+
+---
+
+### `Model::rotate()` 구현
+
+`rotate()`는 아래와 같이 구현했다. 변수의 값을 바꾸는 동시에 반환값이 존재한다.
+```
+Vector3 rotate(const Vector3& axis, float radian) {
+    //https://jebae.github.io/quaternion-rotation
+    Vector3 qv = sin(radian / 2.0f) * axis;
+    float   qw = cos(radian / 2.0f);
+    *this += 2.0f * Vector3::Cross(qv, Vector3::Cross(qv, *this) + qw * *this);
+
+    return *this;
 }
 ```
 
 ---
 
-### `Model::rotate()` 구현
+### `Model`의 부모-자식간의 연결을 어떻게 정의할 것인가?
 
 ...
