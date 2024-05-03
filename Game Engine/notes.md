@@ -192,6 +192,15 @@ Vector3 rotate(const Vector3& axis, float radian) {
 
 ---
 
-### `Model`의 부모-자식간의 연결을 어떻게 정의할 것인가?
+### 현재 남은 작업들
 
-...
+- `Model`의 부모-자식간 연결의 정하기
+- `Object`세부 사항 구현
+- `GameManager`의 테스트 케이스 구성
+  - 카메라 1개 | 오브젝트 3개 | 광원 1개
+- `GraphicEngine`의 렌더링 기능 구현
+  - 기저변환, 사영변환
+  - 깊이 버퍼 활용
+  - 광원 효과 구현
+- `PhysicsEngine`의 충돌 판정 및 중력 등 구성
+  - 충돌 정보 전달 방식 정하기
