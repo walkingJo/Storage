@@ -2,21 +2,18 @@
 #ifndef GRAPHIC_ENGINE_H
 #define GRAPHIC_ENGINE_H
 
-#include "GameEngine.h"
+#include <SDL.h>
 
 class GraphicEngine {
 public:
 	GraphicEngine() {
 		window = nullptr;
 		renderer = nullptr;
-		engine = nullptr;
 		depthBuffer = nullptr;
 	}
 
-	void init(class GameEngine* engine) {
-		this->engine = engine;
-
-		window = SDL_CreateWindow("Project Name", 0, -1, ScreenWidth, ScreenHeight, 0);
+	void init() {
+		window = SDL_CreateWindow(projectTitle, 100+0, 100-1, ScreenWidth, ScreenHeight, 0);
 		if (!window) {
 			SDL_Log("Failed to create window: %s", SDL_GetError());
 			throw;
@@ -34,12 +31,21 @@ public:
 				depthBuffer[row][col] = ScreenFar;
 		}
 	}
-	void update() {
-		return;
+	/*void update(GameEngine* engine) {
+		clear(0x4E, 0xC9, 0xB0);
+		for (int i = 0; i < engine->livingObjectsCount; ++i)
+			drawObject(engine->livingObjects[i]);
+		renderPresent();
+	}*/
+	void update(Object** objects, int objectCount) {
+		clear(0x4E, 0xC9, 0xB0);
+		for (int i = 0; i < objectCount; ++i)
+			drawObject(objects[i]);
+		renderPresent();
 	}
+
 private:
-	class GameEngine* engine;
-	//engine->livingObjects
+	const char* projectTitle = "3D Game Engine Project";
 
 #pragma region Rendering Fields
 	int ScreenWidth{/*1920*/800 };
@@ -51,6 +57,25 @@ private:
 	SDL_Renderer* renderer;
 	float** depthBuffer;
 #pragma endregion
+
+	void clear(int r, int g, int b) {
+		SDL_SetRenderDrawColor(renderer, r, g, b, 255);
+		SDL_RenderClear(renderer);
+		for (int row = 0; row < ScreenHeight; ++row) {
+			for (int col = 0; col < ScreenWidth; ++col) {
+				depthBuffer[row][col] = ScreenFar;
+			}
+		}
+	}
+	void drawModel(Model* model) {
+		return;
+	}
+	void drawObject(Object* object) {
+		return;
+	}
+	void renderPresent() {
+		SDL_RenderPresent(renderer);
+	}
 };
 
 #endif // !GRAPHIC_ENGINE_H

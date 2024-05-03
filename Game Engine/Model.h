@@ -10,6 +10,7 @@ class Model {
 public:
 	Model(Vector3 centor, Vector3* vertices, int verCount, int* indices, int idxCount) {
 		this->centor = centor;
+		this->direction = Vector3::UnitY;
 		
 		this->verSize = verCount;
 		this->vertices = new Vector3[verSize];
@@ -23,6 +24,7 @@ public:
 	}
 	Model(Vector3 centor, std::vector<Vector3> vertices, std::vector<int> indices) {
 		this->centor = centor;
+		this->direction = Vector3::UnitY;
 
 		this->verSize = (int)vertices.size();
 		this->vertices = new Vector3[verSize];
@@ -39,22 +41,18 @@ public:
 		delete indices;
 	}
 
-	//이거 오브젝트가 움직일 때마다 모델을 항상 움직이게 만들 것인지,
-	//아니면 그때그때 이동 및 회전을 적용한 객체를 생성할 것인지
-	//	-> 그러면 centor 요소를 삭제할 수 있다!
 	void move(const Vector3& movement) {
-		//
+		centor += movement;
 	}
 	void moveTo(const Vector3& location) {
-		//
+		centor = location;
 	}
-	//오브젝트가 회전하는 상황 가정 :
-	//기본 회전 -> 중심과 축, 각을 통해 회전
-	//부모 오브젝트에 의한 회전 -> 특수한 함수를 정의해 회전
-	//중심 이외의 회전 중심을 사용하고 싶은 경우 : ...
-	//부모 오브젝트와의 연결은 어떻게 표현 -> 매우 중요
 	void rotate(const Vector3& axis, float radian) {
-		//
+		direction.rotate(axis, radian);
+	}
+	void rotate(const Vector3& axis, float radian, const Vector3& rotateCentor) {
+		rotate(axis, radian);
+		centor = (centor - rotateCentor).rotate(axis, radian) + rotateCentor;
 	}
 	void scale(float xScale, float yScale, float zScale) {
 		for (int i = 0; i < verSize; ++i) {
@@ -97,6 +95,7 @@ public:
 		return temp;
 	}
 
+#pragma region preprocessed model
 	static const Model Tetrahedron;		//4
 	static const Model Cube;			//6
 	static const Model Octahedron;		//8
@@ -105,20 +104,23 @@ public:
 
 	static const Model Cylinder;
 	static const Model Sphere;
+#pragma endregion
+
 private:
 	Vector3 centor;
+	Vector3 direction;
 	Vector3* vertices;	short verSize;
 	short* indices;		short idxSize;
 };
 
-#pragma region preprocessed models
+#pragma region preprocessed model data
 constexpr float pi = 3.1415926535f;
 
 static std::vector<Vector3> tetrahedronVertices = {
-	Vector3(0, 1.0f, 0),
-	Vector3(0, -0.3333333333f, 0.9428090415f),
-	Vector3(+0.8164965809f, -0.3333333333f, -0.4714045207f),
-	Vector3(-0.8164965809f, -0.3333333333f, -0.4714045207f),
+	Vector3(0, 0, 1.0f),
+	Vector3(+0.0000000000f, +0.9428090415f, -0.3333333333f),
+	Vector3(+0.8164965809f, -0.4714045207f, -0.3333333333f),
+	Vector3(-0.8164965809f, -0.4714045207f, -0.3333333333f),
 };
 static std::vector<int> tetrahedronIndices = {
 	0, 1, 2,
@@ -130,12 +132,12 @@ const Model Model::Tetrahedron(Vector3::Zero, tetrahedronVertices, tetrahedronIn
 
 static std::vector<Vector3> cubeVertices = {
 	Vector3(+0.5773502691f, +0.5773502691f, +0.5773502691f),
-	Vector3(+0.5773502691f, +0.5773502691f, -0.5773502691f),
 	Vector3(+0.5773502691f, -0.5773502691f, +0.5773502691f),
+	Vector3(+0.5773502691f, +0.5773502691f, -0.5773502691f),
 	Vector3(+0.5773502691f, -0.5773502691f, -0.5773502691f),
 	Vector3(-0.5773502691f, +0.5773502691f, +0.5773502691f),
-	Vector3(-0.5773502691f, +0.5773502691f, -0.5773502691f),
 	Vector3(-0.5773502691f, -0.5773502691f, +0.5773502691f),
+	Vector3(-0.5773502691f, +0.5773502691f, -0.5773502691f),
 	Vector3(-0.5773502691f, -0.5773502691f, -0.5773502691f),
 };
 static std::vector<int> cubeIndices = {
@@ -158,12 +160,12 @@ static std::vector<int> cubeIndices = {
 const Model Model::Cube(Vector3::Zero, cubeVertices, cubeIndices);
 
 static std::vector<Vector3> octahedronVertices = {
-	Vector3(0, 0, 1),
-	Vector3(0, 1, 0),
-	Vector3(1, 0, 0),
-	Vector3(0, 0, -1),
-	Vector3(0, -1, 0),
-	Vector3(-1, 0, 0)
+	Vector3(+0, +1, +0),
+	Vector3(+0, +0, +1),
+	Vector3(+1, +0, +0),
+	Vector3(+0, -1, +0),
+	Vector3(+0, +0, -1),
+	Vector3(-1, +0, +0)
 };
 static std::vector<int> octahedronIndices = {
 	0, 1, 2,
@@ -182,18 +184,18 @@ const Model Model::Octahedron(Vector3::Zero, octahedronVertices, octahedronIndic
 //const Model Model::Dodecahedron;
 
 static std::vector<Vector3> icosahedronVertices = {
-	Vector3(0, +1, 0),
-	Vector3(cos(0.2f * pi), +0.4316157797f, sin(0.2f * pi)),
-	Vector3(cos(0.4f * pi), -0.4316157797f, sin(0.4f * pi)),
-	Vector3(cos(0.6f * pi), +0.4316157797f, sin(0.6f * pi)),
-	Vector3(cos(0.8f * pi), -0.4316157797f, sin(0.8f * pi)),
-	Vector3(cos(1.0f * pi), +0.4316157797f, sin(1.0f * pi)),
-	Vector3(cos(1.2f * pi), -0.4316157797f, sin(1.2f * pi)),
-	Vector3(cos(1.4f * pi), +0.4316157797f, sin(1.4f * pi)),
-	Vector3(cos(1.6f * pi), -0.4316157797f, sin(1.6f * pi)),
-	Vector3(cos(1.8f * pi), +0.4316157797f, sin(1.8f * pi)),
-	Vector3(cos(2.0f * pi), -0.4316157797f, sin(2.0f * pi)),
-	Vector3(0, -1, 0),
+	Vector3(0, 0, +1),
+	Vector3(cos(0.2f * pi), sin(0.2f * pi), +0.4316157797f),
+	Vector3(cos(0.4f * pi), sin(0.4f * pi), -0.4316157797f),
+	Vector3(cos(0.6f * pi), sin(0.6f * pi), +0.4316157797f),
+	Vector3(cos(0.8f * pi), sin(0.8f * pi), -0.4316157797f),
+	Vector3(cos(1.0f * pi), sin(1.0f * pi), +0.4316157797f),
+	Vector3(cos(1.2f * pi), sin(1.2f * pi), -0.4316157797f),
+	Vector3(cos(1.4f * pi), sin(1.4f * pi), +0.4316157797f),
+	Vector3(cos(1.6f * pi), sin(1.6f * pi), -0.4316157797f),
+	Vector3(cos(1.8f * pi), sin(1.8f * pi), +0.4316157797f),
+	Vector3(cos(2.0f * pi), sin(2.0f * pi), -0.4316157797f),
+	Vector3(0, 0, -1),
 };
 static std::vector<int> icosahedronIndices = {
 	 0,  1,  3,
@@ -220,43 +222,43 @@ static std::vector<int> icosahedronIndices = {
 const Model Model::Icosahedron(Vector3::Zero, icosahedronVertices, icosahedronIndices);
 
 static std::vector<Vector3> cylinderVertices = {
-	Vector3(0, +1.0f, 0),
+	Vector3(0, 0, +1.0f),
 
-	Vector3(cos( 0 * pi / 8.0f), +1.0f, sin( 0 * pi / 8.0f)),
-	Vector3(cos( 1 * pi / 8.0f), +1.0f, sin( 1 * pi / 8.0f)),
-	Vector3(cos( 2 * pi / 8.0f), +1.0f, sin( 2 * pi / 8.0f)),
-	Vector3(cos( 3 * pi / 8.0f), +1.0f, sin( 3 * pi / 8.0f)),
-	Vector3(cos( 4 * pi / 8.0f), +1.0f, sin( 4 * pi / 8.0f)),
-	Vector3(cos( 5 * pi / 8.0f), +1.0f, sin( 5 * pi / 8.0f)),
-	Vector3(cos( 6 * pi / 8.0f), +1.0f, sin( 6 * pi / 8.0f)),
-	Vector3(cos( 7 * pi / 8.0f), +1.0f, sin( 7 * pi / 8.0f)),
-	Vector3(cos( 8 * pi / 8.0f), +1.0f, sin( 8 * pi / 8.0f)),
-	Vector3(cos( 9 * pi / 8.0f), +1.0f, sin( 9 * pi / 8.0f)),
-	Vector3(cos(10 * pi / 8.0f), +1.0f, sin(10 * pi / 8.0f)),
-	Vector3(cos(11 * pi / 8.0f), +1.0f, sin(11 * pi / 8.0f)),
-	Vector3(cos(12 * pi / 8.0f), +1.0f, sin(12 * pi / 8.0f)),
-	Vector3(cos(13 * pi / 8.0f), +1.0f, sin(13 * pi / 8.0f)),
-	Vector3(cos(14 * pi / 8.0f), +1.0f, sin(14 * pi / 8.0f)),
-	Vector3(cos(15 * pi / 8.0f), +1.0f, sin(15 * pi / 8.0f)),
+	Vector3(cos( 0 * pi / 8.0f), sin( 0 * pi / 8.0f), +1.0f),
+	Vector3(cos( 1 * pi / 8.0f), sin( 1 * pi / 8.0f), +1.0f),
+	Vector3(cos( 2 * pi / 8.0f), sin( 2 * pi / 8.0f), +1.0f),
+	Vector3(cos( 3 * pi / 8.0f), sin( 3 * pi / 8.0f), +1.0f),
+	Vector3(cos( 4 * pi / 8.0f), sin( 4 * pi / 8.0f), +1.0f),
+	Vector3(cos( 5 * pi / 8.0f), sin( 5 * pi / 8.0f), +1.0f),
+	Vector3(cos( 6 * pi / 8.0f), sin( 6 * pi / 8.0f), +1.0f),
+	Vector3(cos( 7 * pi / 8.0f), sin( 7 * pi / 8.0f), +1.0f),
+	Vector3(cos( 8 * pi / 8.0f), sin( 8 * pi / 8.0f), +1.0f),
+	Vector3(cos( 9 * pi / 8.0f), sin( 9 * pi / 8.0f), +1.0f),
+	Vector3(cos(10 * pi / 8.0f), sin(10 * pi / 8.0f), +1.0f),
+	Vector3(cos(11 * pi / 8.0f), sin(11 * pi / 8.0f), +1.0f),
+	Vector3(cos(12 * pi / 8.0f), sin(12 * pi / 8.0f), +1.0f),
+	Vector3(cos(13 * pi / 8.0f), sin(13 * pi / 8.0f), +1.0f),
+	Vector3(cos(14 * pi / 8.0f), sin(14 * pi / 8.0f), +1.0f),
+	Vector3(cos(15 * pi / 8.0f), sin(15 * pi / 8.0f), +1.0f),
 
-	Vector3(cos( 0 * pi / 8.0f), -1.0f, sin( 0 * pi / 8.0f)),
-	Vector3(cos( 1 * pi / 8.0f), -1.0f, sin( 1 * pi / 8.0f)),
-	Vector3(cos( 2 * pi / 8.0f), -1.0f, sin( 2 * pi / 8.0f)),
-	Vector3(cos( 3 * pi / 8.0f), -1.0f, sin( 3 * pi / 8.0f)),
-	Vector3(cos( 4 * pi / 8.0f), -1.0f, sin( 4 * pi / 8.0f)),
-	Vector3(cos( 5 * pi / 8.0f), -1.0f, sin( 5 * pi / 8.0f)),
-	Vector3(cos( 6 * pi / 8.0f), -1.0f, sin( 6 * pi / 8.0f)),
-	Vector3(cos( 7 * pi / 8.0f), -1.0f, sin( 7 * pi / 8.0f)),
-	Vector3(cos( 8 * pi / 8.0f), -1.0f, sin( 8 * pi / 8.0f)),
-	Vector3(cos( 9 * pi / 8.0f), -1.0f, sin( 9 * pi / 8.0f)),
-	Vector3(cos(10 * pi / 8.0f), -1.0f, sin(10 * pi / 8.0f)),
-	Vector3(cos(11 * pi / 8.0f), -1.0f, sin(11 * pi / 8.0f)),
-	Vector3(cos(12 * pi / 8.0f), -1.0f, sin(12 * pi / 8.0f)),
-	Vector3(cos(13 * pi / 8.0f), -1.0f, sin(13 * pi / 8.0f)),
-	Vector3(cos(14 * pi / 8.0f), -1.0f, sin(14 * pi / 8.0f)),
-	Vector3(cos(15 * pi / 8.0f), -1.0f, sin(15 * pi / 8.0f)),
+	Vector3(cos( 0 * pi / 8.0f), sin( 0 * pi / 8.0f), -1.0f),
+	Vector3(cos( 1 * pi / 8.0f), sin( 1 * pi / 8.0f), -1.0f),
+	Vector3(cos( 2 * pi / 8.0f), sin( 2 * pi / 8.0f), -1.0f),
+	Vector3(cos( 3 * pi / 8.0f), sin( 3 * pi / 8.0f), -1.0f),
+	Vector3(cos( 4 * pi / 8.0f), sin( 4 * pi / 8.0f), -1.0f),
+	Vector3(cos( 5 * pi / 8.0f), sin( 5 * pi / 8.0f), -1.0f),
+	Vector3(cos( 6 * pi / 8.0f), sin( 6 * pi / 8.0f), -1.0f),
+	Vector3(cos( 7 * pi / 8.0f), sin( 7 * pi / 8.0f), -1.0f),
+	Vector3(cos( 8 * pi / 8.0f), sin( 8 * pi / 8.0f), -1.0f),
+	Vector3(cos( 9 * pi / 8.0f), sin( 9 * pi / 8.0f), -1.0f),
+	Vector3(cos(10 * pi / 8.0f), sin(10 * pi / 8.0f), -1.0f),
+	Vector3(cos(11 * pi / 8.0f), sin(11 * pi / 8.0f), -1.0f),
+	Vector3(cos(12 * pi / 8.0f), sin(12 * pi / 8.0f), -1.0f),
+	Vector3(cos(13 * pi / 8.0f), sin(13 * pi / 8.0f), -1.0f),
+	Vector3(cos(14 * pi / 8.0f), sin(14 * pi / 8.0f), -1.0f),
+	Vector3(cos(15 * pi / 8.0f), sin(15 * pi / 8.0f), -1.0f),
 
-	Vector3(0, -1.0f, 0),
+	Vector3(0, 0, -1.0f),
 };
 static std::vector<int> cylinderIndices = {
 	 1,  2,  0,
@@ -347,208 +349,208 @@ const Model Model::Cylinder(Vector3::Zero, cylinderVertices, cylinderIndices);
 
 static std::vector<Vector3> sphereVertices = {
 	// index : 0
-	Vector3(0, sin(+6 * pi / 12.0f), 0),
+	Vector3(0, 0, sin(+6 * pi / 12.0f)),
 
 	// index : 1~16
-	Vector3(cos(+5 * pi / 12.0f) * cos( 0 * pi / 8.0f), sin(+5 * pi / 12.0f), cos(+5 * pi / 12.0f) * sin( 0 * pi / 8.0f)),
-	Vector3(cos(+5 * pi / 12.0f) * cos( 1 * pi / 8.0f), sin(+5 * pi / 12.0f), cos(+5 * pi / 12.0f) * sin( 1 * pi / 8.0f)),
-	Vector3(cos(+5 * pi / 12.0f) * cos( 2 * pi / 8.0f), sin(+5 * pi / 12.0f), cos(+5 * pi / 12.0f) * sin( 2 * pi / 8.0f)),
-	Vector3(cos(+5 * pi / 12.0f) * cos( 3 * pi / 8.0f), sin(+5 * pi / 12.0f), cos(+5 * pi / 12.0f) * sin( 3 * pi / 8.0f)),
-	Vector3(cos(+5 * pi / 12.0f) * cos( 4 * pi / 8.0f), sin(+5 * pi / 12.0f), cos(+5 * pi / 12.0f) * sin( 4 * pi / 8.0f)),
-	Vector3(cos(+5 * pi / 12.0f) * cos( 5 * pi / 8.0f), sin(+5 * pi / 12.0f), cos(+5 * pi / 12.0f) * sin( 5 * pi / 8.0f)),
-	Vector3(cos(+5 * pi / 12.0f) * cos( 6 * pi / 8.0f), sin(+5 * pi / 12.0f), cos(+5 * pi / 12.0f) * sin( 6 * pi / 8.0f)),
-	Vector3(cos(+5 * pi / 12.0f) * cos( 7 * pi / 8.0f), sin(+5 * pi / 12.0f), cos(+5 * pi / 12.0f) * sin( 7 * pi / 8.0f)),
-	Vector3(cos(+5 * pi / 12.0f) * cos( 8 * pi / 8.0f), sin(+5 * pi / 12.0f), cos(+5 * pi / 12.0f) * sin( 8 * pi / 8.0f)),
-	Vector3(cos(+5 * pi / 12.0f) * cos( 9 * pi / 8.0f), sin(+5 * pi / 12.0f), cos(+5 * pi / 12.0f) * sin( 9 * pi / 8.0f)),
-	Vector3(cos(+5 * pi / 12.0f) * cos(10 * pi / 8.0f), sin(+5 * pi / 12.0f), cos(+5 * pi / 12.0f) * sin(10 * pi / 8.0f)),
-	Vector3(cos(+5 * pi / 12.0f) * cos(11 * pi / 8.0f), sin(+5 * pi / 12.0f), cos(+5 * pi / 12.0f) * sin(11 * pi / 8.0f)),
-	Vector3(cos(+5 * pi / 12.0f) * cos(12 * pi / 8.0f), sin(+5 * pi / 12.0f), cos(+5 * pi / 12.0f) * sin(12 * pi / 8.0f)),
-	Vector3(cos(+5 * pi / 12.0f) * cos(13 * pi / 8.0f), sin(+5 * pi / 12.0f), cos(+5 * pi / 12.0f) * sin(13 * pi / 8.0f)),
-	Vector3(cos(+5 * pi / 12.0f) * cos(14 * pi / 8.0f), sin(+5 * pi / 12.0f), cos(+5 * pi / 12.0f) * sin(14 * pi / 8.0f)),
-	Vector3(cos(+5 * pi / 12.0f) * cos(15 * pi / 8.0f), sin(+5 * pi / 12.0f), cos(+5 * pi / 12.0f) * sin(15 * pi / 8.0f)),
+	Vector3(cos(+5 * pi / 12.0f) * cos( 0 * pi / 8.0f), cos(+5 * pi / 12.0f) * sin( 0 * pi / 8.0f), sin(+5 * pi / 12.0f)),
+	Vector3(cos(+5 * pi / 12.0f) * cos( 1 * pi / 8.0f), cos(+5 * pi / 12.0f) * sin( 1 * pi / 8.0f), sin(+5 * pi / 12.0f)),
+	Vector3(cos(+5 * pi / 12.0f) * cos( 2 * pi / 8.0f), cos(+5 * pi / 12.0f) * sin( 2 * pi / 8.0f), sin(+5 * pi / 12.0f)),
+	Vector3(cos(+5 * pi / 12.0f) * cos( 3 * pi / 8.0f), cos(+5 * pi / 12.0f) * sin( 3 * pi / 8.0f), sin(+5 * pi / 12.0f)),
+	Vector3(cos(+5 * pi / 12.0f) * cos( 4 * pi / 8.0f), cos(+5 * pi / 12.0f) * sin( 4 * pi / 8.0f), sin(+5 * pi / 12.0f)),
+	Vector3(cos(+5 * pi / 12.0f) * cos( 5 * pi / 8.0f), cos(+5 * pi / 12.0f) * sin( 5 * pi / 8.0f), sin(+5 * pi / 12.0f)),
+	Vector3(cos(+5 * pi / 12.0f) * cos( 6 * pi / 8.0f), cos(+5 * pi / 12.0f) * sin( 6 * pi / 8.0f), sin(+5 * pi / 12.0f)),
+	Vector3(cos(+5 * pi / 12.0f) * cos( 7 * pi / 8.0f), cos(+5 * pi / 12.0f) * sin( 7 * pi / 8.0f), sin(+5 * pi / 12.0f)),
+	Vector3(cos(+5 * pi / 12.0f) * cos( 8 * pi / 8.0f), cos(+5 * pi / 12.0f) * sin( 8 * pi / 8.0f), sin(+5 * pi / 12.0f)),
+	Vector3(cos(+5 * pi / 12.0f) * cos( 9 * pi / 8.0f), cos(+5 * pi / 12.0f) * sin( 9 * pi / 8.0f), sin(+5 * pi / 12.0f)),
+	Vector3(cos(+5 * pi / 12.0f) * cos(10 * pi / 8.0f), cos(+5 * pi / 12.0f) * sin(10 * pi / 8.0f), sin(+5 * pi / 12.0f)),
+	Vector3(cos(+5 * pi / 12.0f) * cos(11 * pi / 8.0f), cos(+5 * pi / 12.0f) * sin(11 * pi / 8.0f), sin(+5 * pi / 12.0f)),
+	Vector3(cos(+5 * pi / 12.0f) * cos(12 * pi / 8.0f), cos(+5 * pi / 12.0f) * sin(12 * pi / 8.0f), sin(+5 * pi / 12.0f)),
+	Vector3(cos(+5 * pi / 12.0f) * cos(13 * pi / 8.0f), cos(+5 * pi / 12.0f) * sin(13 * pi / 8.0f), sin(+5 * pi / 12.0f)),
+	Vector3(cos(+5 * pi / 12.0f) * cos(14 * pi / 8.0f), cos(+5 * pi / 12.0f) * sin(14 * pi / 8.0f), sin(+5 * pi / 12.0f)),
+	Vector3(cos(+5 * pi / 12.0f) * cos(15 * pi / 8.0f), cos(+5 * pi / 12.0f) * sin(15 * pi / 8.0f), sin(+5 * pi / 12.0f)),
 
 	// index : 17~32
-	Vector3(cos(+4 * pi / 12.0f) * cos( 0 * pi / 8.0f), sin(+4 * pi / 12.0f), cos(+4 * pi / 12.0f) * sin( 0 * pi / 8.0f)),
-	Vector3(cos(+4 * pi / 12.0f) * cos( 1 * pi / 8.0f), sin(+4 * pi / 12.0f), cos(+4 * pi / 12.0f) * sin( 1 * pi / 8.0f)),
-	Vector3(cos(+4 * pi / 12.0f) * cos( 2 * pi / 8.0f), sin(+4 * pi / 12.0f), cos(+4 * pi / 12.0f) * sin( 2 * pi / 8.0f)),
-	Vector3(cos(+4 * pi / 12.0f) * cos( 3 * pi / 8.0f), sin(+4 * pi / 12.0f), cos(+4 * pi / 12.0f) * sin( 3 * pi / 8.0f)),
-	Vector3(cos(+4 * pi / 12.0f) * cos( 4 * pi / 8.0f), sin(+4 * pi / 12.0f), cos(+4 * pi / 12.0f) * sin( 4 * pi / 8.0f)),
-	Vector3(cos(+4 * pi / 12.0f) * cos( 5 * pi / 8.0f), sin(+4 * pi / 12.0f), cos(+4 * pi / 12.0f) * sin( 5 * pi / 8.0f)),
-	Vector3(cos(+4 * pi / 12.0f) * cos( 6 * pi / 8.0f), sin(+4 * pi / 12.0f), cos(+4 * pi / 12.0f) * sin( 6 * pi / 8.0f)),
-	Vector3(cos(+4 * pi / 12.0f) * cos( 7 * pi / 8.0f), sin(+4 * pi / 12.0f), cos(+4 * pi / 12.0f) * sin( 7 * pi / 8.0f)),
-	Vector3(cos(+4 * pi / 12.0f) * cos( 8 * pi / 8.0f), sin(+4 * pi / 12.0f), cos(+4 * pi / 12.0f) * sin( 8 * pi / 8.0f)),
-	Vector3(cos(+4 * pi / 12.0f) * cos( 9 * pi / 8.0f), sin(+4 * pi / 12.0f), cos(+4 * pi / 12.0f) * sin( 9 * pi / 8.0f)),
-	Vector3(cos(+4 * pi / 12.0f) * cos(10 * pi / 8.0f), sin(+4 * pi / 12.0f), cos(+4 * pi / 12.0f) * sin(10 * pi / 8.0f)),
-	Vector3(cos(+4 * pi / 12.0f) * cos(11 * pi / 8.0f), sin(+4 * pi / 12.0f), cos(+4 * pi / 12.0f) * sin(11 * pi / 8.0f)),
-	Vector3(cos(+4 * pi / 12.0f) * cos(12 * pi / 8.0f), sin(+4 * pi / 12.0f), cos(+4 * pi / 12.0f) * sin(12 * pi / 8.0f)),
-	Vector3(cos(+4 * pi / 12.0f) * cos(13 * pi / 8.0f), sin(+4 * pi / 12.0f), cos(+4 * pi / 12.0f) * sin(13 * pi / 8.0f)),
-	Vector3(cos(+4 * pi / 12.0f) * cos(14 * pi / 8.0f), sin(+4 * pi / 12.0f), cos(+4 * pi / 12.0f) * sin(14 * pi / 8.0f)),
-	Vector3(cos(+4 * pi / 12.0f) * cos(15 * pi / 8.0f), sin(+4 * pi / 12.0f), cos(+4 * pi / 12.0f) * sin(15 * pi / 8.0f)),
+	Vector3(cos(+4 * pi / 12.0f) * cos( 0 * pi / 8.0f), cos(+4 * pi / 12.0f) * sin( 0 * pi / 8.0f), sin(+4 * pi / 12.0f)),
+	Vector3(cos(+4 * pi / 12.0f) * cos( 1 * pi / 8.0f), cos(+4 * pi / 12.0f) * sin( 1 * pi / 8.0f), sin(+4 * pi / 12.0f)),
+	Vector3(cos(+4 * pi / 12.0f) * cos( 2 * pi / 8.0f), cos(+4 * pi / 12.0f) * sin( 2 * pi / 8.0f), sin(+4 * pi / 12.0f)),
+	Vector3(cos(+4 * pi / 12.0f) * cos( 3 * pi / 8.0f), cos(+4 * pi / 12.0f) * sin( 3 * pi / 8.0f), sin(+4 * pi / 12.0f)),
+	Vector3(cos(+4 * pi / 12.0f) * cos( 4 * pi / 8.0f), cos(+4 * pi / 12.0f) * sin( 4 * pi / 8.0f), sin(+4 * pi / 12.0f)),
+	Vector3(cos(+4 * pi / 12.0f) * cos( 5 * pi / 8.0f), cos(+4 * pi / 12.0f) * sin( 5 * pi / 8.0f), sin(+4 * pi / 12.0f)),
+	Vector3(cos(+4 * pi / 12.0f) * cos( 6 * pi / 8.0f), cos(+4 * pi / 12.0f) * sin( 6 * pi / 8.0f), sin(+4 * pi / 12.0f)),
+	Vector3(cos(+4 * pi / 12.0f) * cos( 7 * pi / 8.0f), cos(+4 * pi / 12.0f) * sin( 7 * pi / 8.0f), sin(+4 * pi / 12.0f)),
+	Vector3(cos(+4 * pi / 12.0f) * cos( 8 * pi / 8.0f), cos(+4 * pi / 12.0f) * sin( 8 * pi / 8.0f), sin(+4 * pi / 12.0f)),
+	Vector3(cos(+4 * pi / 12.0f) * cos( 9 * pi / 8.0f), cos(+4 * pi / 12.0f) * sin( 9 * pi / 8.0f), sin(+4 * pi / 12.0f)),
+	Vector3(cos(+4 * pi / 12.0f) * cos(10 * pi / 8.0f), cos(+4 * pi / 12.0f) * sin(10 * pi / 8.0f), sin(+4 * pi / 12.0f)),
+	Vector3(cos(+4 * pi / 12.0f) * cos(11 * pi / 8.0f), cos(+4 * pi / 12.0f) * sin(11 * pi / 8.0f), sin(+4 * pi / 12.0f)),
+	Vector3(cos(+4 * pi / 12.0f) * cos(12 * pi / 8.0f), cos(+4 * pi / 12.0f) * sin(12 * pi / 8.0f), sin(+4 * pi / 12.0f)),
+	Vector3(cos(+4 * pi / 12.0f) * cos(13 * pi / 8.0f), cos(+4 * pi / 12.0f) * sin(13 * pi / 8.0f), sin(+4 * pi / 12.0f)),
+	Vector3(cos(+4 * pi / 12.0f) * cos(14 * pi / 8.0f), cos(+4 * pi / 12.0f) * sin(14 * pi / 8.0f), sin(+4 * pi / 12.0f)),
+	Vector3(cos(+4 * pi / 12.0f) * cos(15 * pi / 8.0f), cos(+4 * pi / 12.0f) * sin(15 * pi / 8.0f), sin(+4 * pi / 12.0f)),
 
 	// index : 33~48
-	Vector3(cos(+3 * pi / 12.0f) * cos( 0 * pi / 8.0f), sin(+3 * pi / 12.0f), cos(+3 * pi / 12.0f) * sin( 0 * pi / 8.0f)),
-	Vector3(cos(+3 * pi / 12.0f) * cos( 1 * pi / 8.0f), sin(+3 * pi / 12.0f), cos(+3 * pi / 12.0f) * sin( 1 * pi / 8.0f)),
-	Vector3(cos(+3 * pi / 12.0f) * cos( 2 * pi / 8.0f), sin(+3 * pi / 12.0f), cos(+3 * pi / 12.0f) * sin( 2 * pi / 8.0f)),
-	Vector3(cos(+3 * pi / 12.0f) * cos( 3 * pi / 8.0f), sin(+3 * pi / 12.0f), cos(+3 * pi / 12.0f) * sin( 3 * pi / 8.0f)),
-	Vector3(cos(+3 * pi / 12.0f) * cos( 4 * pi / 8.0f), sin(+3 * pi / 12.0f), cos(+3 * pi / 12.0f) * sin( 4 * pi / 8.0f)),
-	Vector3(cos(+3 * pi / 12.0f) * cos( 5 * pi / 8.0f), sin(+3 * pi / 12.0f), cos(+3 * pi / 12.0f) * sin( 5 * pi / 8.0f)),
-	Vector3(cos(+3 * pi / 12.0f) * cos( 6 * pi / 8.0f), sin(+3 * pi / 12.0f), cos(+3 * pi / 12.0f) * sin( 6 * pi / 8.0f)),
-	Vector3(cos(+3 * pi / 12.0f) * cos( 7 * pi / 8.0f), sin(+3 * pi / 12.0f), cos(+3 * pi / 12.0f) * sin( 7 * pi / 8.0f)),
-	Vector3(cos(+3 * pi / 12.0f) * cos( 8 * pi / 8.0f), sin(+3 * pi / 12.0f), cos(+3 * pi / 12.0f) * sin( 8 * pi / 8.0f)),
-	Vector3(cos(+3 * pi / 12.0f) * cos( 9 * pi / 8.0f), sin(+3 * pi / 12.0f), cos(+3 * pi / 12.0f) * sin( 9 * pi / 8.0f)),
-	Vector3(cos(+3 * pi / 12.0f) * cos(10 * pi / 8.0f), sin(+3 * pi / 12.0f), cos(+3 * pi / 12.0f) * sin(10 * pi / 8.0f)),
-	Vector3(cos(+3 * pi / 12.0f) * cos(11 * pi / 8.0f), sin(+3 * pi / 12.0f), cos(+3 * pi / 12.0f) * sin(11 * pi / 8.0f)),
-	Vector3(cos(+3 * pi / 12.0f) * cos(12 * pi / 8.0f), sin(+3 * pi / 12.0f), cos(+3 * pi / 12.0f) * sin(12 * pi / 8.0f)),
-	Vector3(cos(+3 * pi / 12.0f) * cos(13 * pi / 8.0f), sin(+3 * pi / 12.0f), cos(+3 * pi / 12.0f) * sin(13 * pi / 8.0f)),
-	Vector3(cos(+3 * pi / 12.0f) * cos(14 * pi / 8.0f), sin(+3 * pi / 12.0f), cos(+3 * pi / 12.0f) * sin(14 * pi / 8.0f)),
-	Vector3(cos(+3 * pi / 12.0f) * cos(15 * pi / 8.0f), sin(+3 * pi / 12.0f), cos(+3 * pi / 12.0f) * sin(15 * pi / 8.0f)),
+	Vector3(cos(+3 * pi / 12.0f) * cos( 0 * pi / 8.0f), cos(+3 * pi / 12.0f) * sin( 0 * pi / 8.0f), sin(+3 * pi / 12.0f)),
+	Vector3(cos(+3 * pi / 12.0f) * cos( 1 * pi / 8.0f), cos(+3 * pi / 12.0f) * sin( 1 * pi / 8.0f), sin(+3 * pi / 12.0f)),
+	Vector3(cos(+3 * pi / 12.0f) * cos( 2 * pi / 8.0f), cos(+3 * pi / 12.0f) * sin( 2 * pi / 8.0f), sin(+3 * pi / 12.0f)),
+	Vector3(cos(+3 * pi / 12.0f) * cos( 3 * pi / 8.0f), cos(+3 * pi / 12.0f) * sin( 3 * pi / 8.0f), sin(+3 * pi / 12.0f)),
+	Vector3(cos(+3 * pi / 12.0f) * cos( 4 * pi / 8.0f), cos(+3 * pi / 12.0f) * sin( 4 * pi / 8.0f), sin(+3 * pi / 12.0f)),
+	Vector3(cos(+3 * pi / 12.0f) * cos( 5 * pi / 8.0f), cos(+3 * pi / 12.0f) * sin( 5 * pi / 8.0f), sin(+3 * pi / 12.0f)),
+	Vector3(cos(+3 * pi / 12.0f) * cos( 6 * pi / 8.0f), cos(+3 * pi / 12.0f) * sin( 6 * pi / 8.0f), sin(+3 * pi / 12.0f)),
+	Vector3(cos(+3 * pi / 12.0f) * cos( 7 * pi / 8.0f), cos(+3 * pi / 12.0f) * sin( 7 * pi / 8.0f), sin(+3 * pi / 12.0f)),
+	Vector3(cos(+3 * pi / 12.0f) * cos( 8 * pi / 8.0f), cos(+3 * pi / 12.0f) * sin( 8 * pi / 8.0f), sin(+3 * pi / 12.0f)),
+	Vector3(cos(+3 * pi / 12.0f) * cos( 9 * pi / 8.0f), cos(+3 * pi / 12.0f) * sin( 9 * pi / 8.0f), sin(+3 * pi / 12.0f)),
+	Vector3(cos(+3 * pi / 12.0f) * cos(10 * pi / 8.0f), cos(+3 * pi / 12.0f) * sin(10 * pi / 8.0f), sin(+3 * pi / 12.0f)),
+	Vector3(cos(+3 * pi / 12.0f) * cos(11 * pi / 8.0f), cos(+3 * pi / 12.0f) * sin(11 * pi / 8.0f), sin(+3 * pi / 12.0f)),
+	Vector3(cos(+3 * pi / 12.0f) * cos(12 * pi / 8.0f), cos(+3 * pi / 12.0f) * sin(12 * pi / 8.0f), sin(+3 * pi / 12.0f)),
+	Vector3(cos(+3 * pi / 12.0f) * cos(13 * pi / 8.0f), cos(+3 * pi / 12.0f) * sin(13 * pi / 8.0f), sin(+3 * pi / 12.0f)),
+	Vector3(cos(+3 * pi / 12.0f) * cos(14 * pi / 8.0f), cos(+3 * pi / 12.0f) * sin(14 * pi / 8.0f), sin(+3 * pi / 12.0f)),
+	Vector3(cos(+3 * pi / 12.0f) * cos(15 * pi / 8.0f), cos(+3 * pi / 12.0f) * sin(15 * pi / 8.0f), sin(+3 * pi / 12.0f)),
 
 	// index : 49~64
-	Vector3(cos(+2 * pi / 12.0f) * cos( 0 * pi / 8.0f), sin(+2 * pi / 12.0f), cos(+2 * pi / 12.0f) * sin( 0 * pi / 8.0f)),
-	Vector3(cos(+2 * pi / 12.0f) * cos( 1 * pi / 8.0f), sin(+2 * pi / 12.0f), cos(+2 * pi / 12.0f) * sin( 1 * pi / 8.0f)),
-	Vector3(cos(+2 * pi / 12.0f) * cos( 2 * pi / 8.0f), sin(+2 * pi / 12.0f), cos(+2 * pi / 12.0f) * sin( 2 * pi / 8.0f)),
-	Vector3(cos(+2 * pi / 12.0f) * cos( 3 * pi / 8.0f), sin(+2 * pi / 12.0f), cos(+2 * pi / 12.0f) * sin( 3 * pi / 8.0f)),
-	Vector3(cos(+2 * pi / 12.0f) * cos( 4 * pi / 8.0f), sin(+2 * pi / 12.0f), cos(+2 * pi / 12.0f) * sin( 4 * pi / 8.0f)),
-	Vector3(cos(+2 * pi / 12.0f) * cos( 5 * pi / 8.0f), sin(+2 * pi / 12.0f), cos(+2 * pi / 12.0f) * sin( 5 * pi / 8.0f)),
-	Vector3(cos(+2 * pi / 12.0f) * cos( 6 * pi / 8.0f), sin(+2 * pi / 12.0f), cos(+2 * pi / 12.0f) * sin( 6 * pi / 8.0f)),
-	Vector3(cos(+2 * pi / 12.0f) * cos( 7 * pi / 8.0f), sin(+2 * pi / 12.0f), cos(+2 * pi / 12.0f) * sin( 7 * pi / 8.0f)),
-	Vector3(cos(+2 * pi / 12.0f) * cos( 8 * pi / 8.0f), sin(+2 * pi / 12.0f), cos(+2 * pi / 12.0f) * sin( 8 * pi / 8.0f)),
-	Vector3(cos(+2 * pi / 12.0f) * cos( 9 * pi / 8.0f), sin(+2 * pi / 12.0f), cos(+2 * pi / 12.0f) * sin( 9 * pi / 8.0f)),
-	Vector3(cos(+2 * pi / 12.0f) * cos(10 * pi / 8.0f), sin(+2 * pi / 12.0f), cos(+2 * pi / 12.0f) * sin(10 * pi / 8.0f)),
-	Vector3(cos(+2 * pi / 12.0f) * cos(11 * pi / 8.0f), sin(+2 * pi / 12.0f), cos(+2 * pi / 12.0f) * sin(11 * pi / 8.0f)),
-	Vector3(cos(+2 * pi / 12.0f) * cos(12 * pi / 8.0f), sin(+2 * pi / 12.0f), cos(+2 * pi / 12.0f) * sin(12 * pi / 8.0f)),
-	Vector3(cos(+2 * pi / 12.0f) * cos(13 * pi / 8.0f), sin(+2 * pi / 12.0f), cos(+2 * pi / 12.0f) * sin(13 * pi / 8.0f)),
-	Vector3(cos(+2 * pi / 12.0f) * cos(14 * pi / 8.0f), sin(+2 * pi / 12.0f), cos(+2 * pi / 12.0f) * sin(14 * pi / 8.0f)),
-	Vector3(cos(+2 * pi / 12.0f) * cos(15 * pi / 8.0f), sin(+2 * pi / 12.0f), cos(+2 * pi / 12.0f) * sin(15 * pi / 8.0f)),
+	Vector3(cos(+2 * pi / 12.0f) * cos( 0 * pi / 8.0f), cos(+2 * pi / 12.0f) * sin( 0 * pi / 8.0f), sin(+2 * pi / 12.0f)),
+	Vector3(cos(+2 * pi / 12.0f) * cos( 1 * pi / 8.0f), cos(+2 * pi / 12.0f) * sin( 1 * pi / 8.0f), sin(+2 * pi / 12.0f)),
+	Vector3(cos(+2 * pi / 12.0f) * cos( 2 * pi / 8.0f), cos(+2 * pi / 12.0f) * sin( 2 * pi / 8.0f), sin(+2 * pi / 12.0f)),
+	Vector3(cos(+2 * pi / 12.0f) * cos( 3 * pi / 8.0f), cos(+2 * pi / 12.0f) * sin( 3 * pi / 8.0f), sin(+2 * pi / 12.0f)),
+	Vector3(cos(+2 * pi / 12.0f) * cos( 4 * pi / 8.0f), cos(+2 * pi / 12.0f) * sin( 4 * pi / 8.0f), sin(+2 * pi / 12.0f)),
+	Vector3(cos(+2 * pi / 12.0f) * cos( 5 * pi / 8.0f), cos(+2 * pi / 12.0f) * sin( 5 * pi / 8.0f), sin(+2 * pi / 12.0f)),
+	Vector3(cos(+2 * pi / 12.0f) * cos( 6 * pi / 8.0f), cos(+2 * pi / 12.0f) * sin( 6 * pi / 8.0f), sin(+2 * pi / 12.0f)),
+	Vector3(cos(+2 * pi / 12.0f) * cos( 7 * pi / 8.0f), cos(+2 * pi / 12.0f) * sin( 7 * pi / 8.0f), sin(+2 * pi / 12.0f)),
+	Vector3(cos(+2 * pi / 12.0f) * cos( 8 * pi / 8.0f), cos(+2 * pi / 12.0f) * sin( 8 * pi / 8.0f), sin(+2 * pi / 12.0f)),
+	Vector3(cos(+2 * pi / 12.0f) * cos( 9 * pi / 8.0f), cos(+2 * pi / 12.0f) * sin( 9 * pi / 8.0f), sin(+2 * pi / 12.0f)),
+	Vector3(cos(+2 * pi / 12.0f) * cos(10 * pi / 8.0f), cos(+2 * pi / 12.0f) * sin(10 * pi / 8.0f), sin(+2 * pi / 12.0f)),
+	Vector3(cos(+2 * pi / 12.0f) * cos(11 * pi / 8.0f), cos(+2 * pi / 12.0f) * sin(11 * pi / 8.0f), sin(+2 * pi / 12.0f)),
+	Vector3(cos(+2 * pi / 12.0f) * cos(12 * pi / 8.0f), cos(+2 * pi / 12.0f) * sin(12 * pi / 8.0f), sin(+2 * pi / 12.0f)),
+	Vector3(cos(+2 * pi / 12.0f) * cos(13 * pi / 8.0f), cos(+2 * pi / 12.0f) * sin(13 * pi / 8.0f), sin(+2 * pi / 12.0f)),
+	Vector3(cos(+2 * pi / 12.0f) * cos(14 * pi / 8.0f), cos(+2 * pi / 12.0f) * sin(14 * pi / 8.0f), sin(+2 * pi / 12.0f)),
+	Vector3(cos(+2 * pi / 12.0f) * cos(15 * pi / 8.0f), cos(+2 * pi / 12.0f) * sin(15 * pi / 8.0f), sin(+2 * pi / 12.0f)),
 
 	// index : 65~80
-	Vector3(cos(+1 * pi / 12.0f) * cos( 0 * pi / 8.0f), sin(+1 * pi / 12.0f), cos(+1 * pi / 12.0f) * sin( 0 * pi / 8.0f)),
-	Vector3(cos(+1 * pi / 12.0f) * cos( 1 * pi / 8.0f), sin(+1 * pi / 12.0f), cos(+1 * pi / 12.0f) * sin( 1 * pi / 8.0f)),
-	Vector3(cos(+1 * pi / 12.0f) * cos( 2 * pi / 8.0f), sin(+1 * pi / 12.0f), cos(+1 * pi / 12.0f) * sin( 2 * pi / 8.0f)),
-	Vector3(cos(+1 * pi / 12.0f) * cos( 3 * pi / 8.0f), sin(+1 * pi / 12.0f), cos(+1 * pi / 12.0f) * sin( 3 * pi / 8.0f)),
-	Vector3(cos(+1 * pi / 12.0f) * cos( 4 * pi / 8.0f), sin(+1 * pi / 12.0f), cos(+1 * pi / 12.0f) * sin( 4 * pi / 8.0f)),
-	Vector3(cos(+1 * pi / 12.0f) * cos( 5 * pi / 8.0f), sin(+1 * pi / 12.0f), cos(+1 * pi / 12.0f) * sin( 5 * pi / 8.0f)),
-	Vector3(cos(+1 * pi / 12.0f) * cos( 6 * pi / 8.0f), sin(+1 * pi / 12.0f), cos(+1 * pi / 12.0f) * sin( 6 * pi / 8.0f)),
-	Vector3(cos(+1 * pi / 12.0f) * cos( 7 * pi / 8.0f), sin(+1 * pi / 12.0f), cos(+1 * pi / 12.0f) * sin( 7 * pi / 8.0f)),
-	Vector3(cos(+1 * pi / 12.0f) * cos( 8 * pi / 8.0f), sin(+1 * pi / 12.0f), cos(+1 * pi / 12.0f) * sin( 8 * pi / 8.0f)),
-	Vector3(cos(+1 * pi / 12.0f) * cos( 9 * pi / 8.0f), sin(+1 * pi / 12.0f), cos(+1 * pi / 12.0f) * sin( 9 * pi / 8.0f)),
-	Vector3(cos(+1 * pi / 12.0f) * cos(10 * pi / 8.0f), sin(+1 * pi / 12.0f), cos(+1 * pi / 12.0f) * sin(10 * pi / 8.0f)),
-	Vector3(cos(+1 * pi / 12.0f) * cos(11 * pi / 8.0f), sin(+1 * pi / 12.0f), cos(+1 * pi / 12.0f) * sin(11 * pi / 8.0f)),
-	Vector3(cos(+1 * pi / 12.0f) * cos(12 * pi / 8.0f), sin(+1 * pi / 12.0f), cos(+1 * pi / 12.0f) * sin(12 * pi / 8.0f)),
-	Vector3(cos(+1 * pi / 12.0f) * cos(13 * pi / 8.0f), sin(+1 * pi / 12.0f), cos(+1 * pi / 12.0f) * sin(13 * pi / 8.0f)),
-	Vector3(cos(+1 * pi / 12.0f) * cos(14 * pi / 8.0f), sin(+1 * pi / 12.0f), cos(+1 * pi / 12.0f) * sin(14 * pi / 8.0f)),
-	Vector3(cos(+1 * pi / 12.0f) * cos(15 * pi / 8.0f), sin(+1 * pi / 12.0f), cos(+1 * pi / 12.0f) * sin(15 * pi / 8.0f)),
+	Vector3(cos(+1 * pi / 12.0f) * cos( 0 * pi / 8.0f), cos(+1 * pi / 12.0f) * sin( 0 * pi / 8.0f), sin(+1 * pi / 12.0f)),
+	Vector3(cos(+1 * pi / 12.0f) * cos( 1 * pi / 8.0f), cos(+1 * pi / 12.0f) * sin( 1 * pi / 8.0f), sin(+1 * pi / 12.0f)),
+	Vector3(cos(+1 * pi / 12.0f) * cos( 2 * pi / 8.0f), cos(+1 * pi / 12.0f) * sin( 2 * pi / 8.0f), sin(+1 * pi / 12.0f)),
+	Vector3(cos(+1 * pi / 12.0f) * cos( 3 * pi / 8.0f), cos(+1 * pi / 12.0f) * sin( 3 * pi / 8.0f), sin(+1 * pi / 12.0f)),
+	Vector3(cos(+1 * pi / 12.0f) * cos( 4 * pi / 8.0f), cos(+1 * pi / 12.0f) * sin( 4 * pi / 8.0f), sin(+1 * pi / 12.0f)),
+	Vector3(cos(+1 * pi / 12.0f) * cos( 5 * pi / 8.0f), cos(+1 * pi / 12.0f) * sin( 5 * pi / 8.0f), sin(+1 * pi / 12.0f)),
+	Vector3(cos(+1 * pi / 12.0f) * cos( 6 * pi / 8.0f), cos(+1 * pi / 12.0f) * sin( 6 * pi / 8.0f), sin(+1 * pi / 12.0f)),
+	Vector3(cos(+1 * pi / 12.0f) * cos( 7 * pi / 8.0f), cos(+1 * pi / 12.0f) * sin( 7 * pi / 8.0f), sin(+1 * pi / 12.0f)),
+	Vector3(cos(+1 * pi / 12.0f) * cos( 8 * pi / 8.0f), cos(+1 * pi / 12.0f) * sin( 8 * pi / 8.0f), sin(+1 * pi / 12.0f)),
+	Vector3(cos(+1 * pi / 12.0f) * cos( 9 * pi / 8.0f), cos(+1 * pi / 12.0f) * sin( 9 * pi / 8.0f), sin(+1 * pi / 12.0f)),
+	Vector3(cos(+1 * pi / 12.0f) * cos(10 * pi / 8.0f), cos(+1 * pi / 12.0f) * sin(10 * pi / 8.0f), sin(+1 * pi / 12.0f)),
+	Vector3(cos(+1 * pi / 12.0f) * cos(11 * pi / 8.0f), cos(+1 * pi / 12.0f) * sin(11 * pi / 8.0f), sin(+1 * pi / 12.0f)),
+	Vector3(cos(+1 * pi / 12.0f) * cos(12 * pi / 8.0f), cos(+1 * pi / 12.0f) * sin(12 * pi / 8.0f), sin(+1 * pi / 12.0f)),
+	Vector3(cos(+1 * pi / 12.0f) * cos(13 * pi / 8.0f), cos(+1 * pi / 12.0f) * sin(13 * pi / 8.0f), sin(+1 * pi / 12.0f)),
+	Vector3(cos(+1 * pi / 12.0f) * cos(14 * pi / 8.0f), cos(+1 * pi / 12.0f) * sin(14 * pi / 8.0f), sin(+1 * pi / 12.0f)),
+	Vector3(cos(+1 * pi / 12.0f) * cos(15 * pi / 8.0f), cos(+1 * pi / 12.0f) * sin(15 * pi / 8.0f), sin(+1 * pi / 12.0f)),
 
 	// index : 81~96
-	Vector3(cos(+0 * pi / 12.0f) * cos( 0 * pi / 8.0f), sin(+0 * pi / 12.0f), cos(+0 * pi / 12.0f) * sin( 0 * pi / 8.0f)),
-	Vector3(cos(+0 * pi / 12.0f) * cos( 1 * pi / 8.0f), sin(+0 * pi / 12.0f), cos(+0 * pi / 12.0f) * sin( 1 * pi / 8.0f)),
-	Vector3(cos(+0 * pi / 12.0f) * cos( 2 * pi / 8.0f), sin(+0 * pi / 12.0f), cos(+0 * pi / 12.0f) * sin( 2 * pi / 8.0f)),
-	Vector3(cos(+0 * pi / 12.0f) * cos( 3 * pi / 8.0f), sin(+0 * pi / 12.0f), cos(+0 * pi / 12.0f) * sin( 3 * pi / 8.0f)),
-	Vector3(cos(+0 * pi / 12.0f) * cos( 4 * pi / 8.0f), sin(+0 * pi / 12.0f), cos(+0 * pi / 12.0f) * sin( 4 * pi / 8.0f)),
-	Vector3(cos(+0 * pi / 12.0f) * cos( 5 * pi / 8.0f), sin(+0 * pi / 12.0f), cos(+0 * pi / 12.0f) * sin( 5 * pi / 8.0f)),
-	Vector3(cos(+0 * pi / 12.0f) * cos( 6 * pi / 8.0f), sin(+0 * pi / 12.0f), cos(+0 * pi / 12.0f) * sin( 6 * pi / 8.0f)),
-	Vector3(cos(+0 * pi / 12.0f) * cos( 7 * pi / 8.0f), sin(+0 * pi / 12.0f), cos(+0 * pi / 12.0f) * sin( 7 * pi / 8.0f)),
-	Vector3(cos(+0 * pi / 12.0f) * cos( 8 * pi / 8.0f), sin(+0 * pi / 12.0f), cos(+0 * pi / 12.0f) * sin( 8 * pi / 8.0f)),
-	Vector3(cos(+0 * pi / 12.0f) * cos( 9 * pi / 8.0f), sin(+0 * pi / 12.0f), cos(+0 * pi / 12.0f) * sin( 9 * pi / 8.0f)),
-	Vector3(cos(+0 * pi / 12.0f) * cos(10 * pi / 8.0f), sin(+0 * pi / 12.0f), cos(+0 * pi / 12.0f) * sin(10 * pi / 8.0f)),
-	Vector3(cos(+0 * pi / 12.0f) * cos(11 * pi / 8.0f), sin(+0 * pi / 12.0f), cos(+0 * pi / 12.0f) * sin(11 * pi / 8.0f)),
-	Vector3(cos(+0 * pi / 12.0f) * cos(12 * pi / 8.0f), sin(+0 * pi / 12.0f), cos(+0 * pi / 12.0f) * sin(12 * pi / 8.0f)),
-	Vector3(cos(+0 * pi / 12.0f) * cos(13 * pi / 8.0f), sin(+0 * pi / 12.0f), cos(+0 * pi / 12.0f) * sin(13 * pi / 8.0f)),
-	Vector3(cos(+0 * pi / 12.0f) * cos(14 * pi / 8.0f), sin(+0 * pi / 12.0f), cos(+0 * pi / 12.0f) * sin(14 * pi / 8.0f)),
-	Vector3(cos(+0 * pi / 12.0f) * cos(15 * pi / 8.0f), sin(+0 * pi / 12.0f), cos(+0 * pi / 12.0f) * sin(15 * pi / 8.0f)),
+	Vector3(cos(+0 * pi / 12.0f) * cos( 0 * pi / 8.0f), cos(+0 * pi / 12.0f) * sin( 0 * pi / 8.0f), sin(+0 * pi / 12.0f)),
+	Vector3(cos(+0 * pi / 12.0f) * cos( 1 * pi / 8.0f), cos(+0 * pi / 12.0f) * sin( 1 * pi / 8.0f), sin(+0 * pi / 12.0f)),
+	Vector3(cos(+0 * pi / 12.0f) * cos( 2 * pi / 8.0f), cos(+0 * pi / 12.0f) * sin( 2 * pi / 8.0f), sin(+0 * pi / 12.0f)),
+	Vector3(cos(+0 * pi / 12.0f) * cos( 3 * pi / 8.0f), cos(+0 * pi / 12.0f) * sin( 3 * pi / 8.0f), sin(+0 * pi / 12.0f)),
+	Vector3(cos(+0 * pi / 12.0f) * cos( 4 * pi / 8.0f), cos(+0 * pi / 12.0f) * sin( 4 * pi / 8.0f), sin(+0 * pi / 12.0f)),
+	Vector3(cos(+0 * pi / 12.0f) * cos( 5 * pi / 8.0f), cos(+0 * pi / 12.0f) * sin( 5 * pi / 8.0f), sin(+0 * pi / 12.0f)),
+	Vector3(cos(+0 * pi / 12.0f) * cos( 6 * pi / 8.0f), cos(+0 * pi / 12.0f) * sin( 6 * pi / 8.0f), sin(+0 * pi / 12.0f)),
+	Vector3(cos(+0 * pi / 12.0f) * cos( 7 * pi / 8.0f), cos(+0 * pi / 12.0f) * sin( 7 * pi / 8.0f), sin(+0 * pi / 12.0f)),
+	Vector3(cos(+0 * pi / 12.0f) * cos( 8 * pi / 8.0f), cos(+0 * pi / 12.0f) * sin( 8 * pi / 8.0f), sin(+0 * pi / 12.0f)),
+	Vector3(cos(+0 * pi / 12.0f) * cos( 9 * pi / 8.0f), cos(+0 * pi / 12.0f) * sin( 9 * pi / 8.0f), sin(+0 * pi / 12.0f)),
+	Vector3(cos(+0 * pi / 12.0f) * cos(10 * pi / 8.0f), cos(+0 * pi / 12.0f) * sin(10 * pi / 8.0f), sin(+0 * pi / 12.0f)),
+	Vector3(cos(+0 * pi / 12.0f) * cos(11 * pi / 8.0f), cos(+0 * pi / 12.0f) * sin(11 * pi / 8.0f), sin(+0 * pi / 12.0f)),
+	Vector3(cos(+0 * pi / 12.0f) * cos(12 * pi / 8.0f), cos(+0 * pi / 12.0f) * sin(12 * pi / 8.0f), sin(+0 * pi / 12.0f)),
+	Vector3(cos(+0 * pi / 12.0f) * cos(13 * pi / 8.0f), cos(+0 * pi / 12.0f) * sin(13 * pi / 8.0f), sin(+0 * pi / 12.0f)),
+	Vector3(cos(+0 * pi / 12.0f) * cos(14 * pi / 8.0f), cos(+0 * pi / 12.0f) * sin(14 * pi / 8.0f), sin(+0 * pi / 12.0f)),
+	Vector3(cos(+0 * pi / 12.0f) * cos(15 * pi / 8.0f), cos(+0 * pi / 12.0f) * sin(15 * pi / 8.0f), sin(+0 * pi / 12.0f)),
 
 	// index : 97~112
-	Vector3(cos(-1 * pi / 12.0f) * cos( 0 * pi / 8.0f), sin(-1 * pi / 12.0f), cos(-1 * pi / 12.0f) * sin( 0 * pi / 8.0f)),
-	Vector3(cos(-1 * pi / 12.0f) * cos( 1 * pi / 8.0f), sin(-1 * pi / 12.0f), cos(-1 * pi / 12.0f) * sin( 1 * pi / 8.0f)),
-	Vector3(cos(-1 * pi / 12.0f) * cos( 2 * pi / 8.0f), sin(-1 * pi / 12.0f), cos(-1 * pi / 12.0f) * sin( 2 * pi / 8.0f)),
-	Vector3(cos(-1 * pi / 12.0f) * cos( 3 * pi / 8.0f), sin(-1 * pi / 12.0f), cos(-1 * pi / 12.0f) * sin( 3 * pi / 8.0f)),
-	Vector3(cos(-1 * pi / 12.0f) * cos( 4 * pi / 8.0f), sin(-1 * pi / 12.0f), cos(-1 * pi / 12.0f) * sin( 4 * pi / 8.0f)),
-	Vector3(cos(-1 * pi / 12.0f) * cos( 5 * pi / 8.0f), sin(-1 * pi / 12.0f), cos(-1 * pi / 12.0f) * sin( 5 * pi / 8.0f)),
-	Vector3(cos(-1 * pi / 12.0f) * cos( 6 * pi / 8.0f), sin(-1 * pi / 12.0f), cos(-1 * pi / 12.0f) * sin( 6 * pi / 8.0f)),
-	Vector3(cos(-1 * pi / 12.0f) * cos( 7 * pi / 8.0f), sin(-1 * pi / 12.0f), cos(-1 * pi / 12.0f) * sin( 7 * pi / 8.0f)),
-	Vector3(cos(-1 * pi / 12.0f) * cos( 8 * pi / 8.0f), sin(-1 * pi / 12.0f), cos(-1 * pi / 12.0f) * sin( 8 * pi / 8.0f)),
-	Vector3(cos(-1 * pi / 12.0f) * cos( 9 * pi / 8.0f), sin(-1 * pi / 12.0f), cos(-1 * pi / 12.0f) * sin( 9 * pi / 8.0f)),
-	Vector3(cos(-1 * pi / 12.0f) * cos(10 * pi / 8.0f), sin(-1 * pi / 12.0f), cos(-1 * pi / 12.0f) * sin(10 * pi / 8.0f)),
-	Vector3(cos(-1 * pi / 12.0f) * cos(11 * pi / 8.0f), sin(-1 * pi / 12.0f), cos(-1 * pi / 12.0f) * sin(11 * pi / 8.0f)),
-	Vector3(cos(-1 * pi / 12.0f) * cos(12 * pi / 8.0f), sin(-1 * pi / 12.0f), cos(-1 * pi / 12.0f) * sin(12 * pi / 8.0f)),
-	Vector3(cos(-1 * pi / 12.0f) * cos(13 * pi / 8.0f), sin(-1 * pi / 12.0f), cos(-1 * pi / 12.0f) * sin(13 * pi / 8.0f)),
-	Vector3(cos(-1 * pi / 12.0f) * cos(14 * pi / 8.0f), sin(-1 * pi / 12.0f), cos(-1 * pi / 12.0f) * sin(14 * pi / 8.0f)),
-	Vector3(cos(-1 * pi / 12.0f) * cos(15 * pi / 8.0f), sin(-1 * pi / 12.0f), cos(-1 * pi / 12.0f) * sin(15 * pi / 8.0f)),
+	Vector3(cos(-1 * pi / 12.0f) * cos( 0 * pi / 8.0f), cos(-1 * pi / 12.0f) * sin( 0 * pi / 8.0f), sin(-1 * pi / 12.0f)),
+	Vector3(cos(-1 * pi / 12.0f) * cos( 1 * pi / 8.0f), cos(-1 * pi / 12.0f) * sin( 1 * pi / 8.0f), sin(-1 * pi / 12.0f)),
+	Vector3(cos(-1 * pi / 12.0f) * cos( 2 * pi / 8.0f), cos(-1 * pi / 12.0f) * sin( 2 * pi / 8.0f), sin(-1 * pi / 12.0f)),
+	Vector3(cos(-1 * pi / 12.0f) * cos( 3 * pi / 8.0f), cos(-1 * pi / 12.0f) * sin( 3 * pi / 8.0f), sin(-1 * pi / 12.0f)),
+	Vector3(cos(-1 * pi / 12.0f) * cos( 4 * pi / 8.0f), cos(-1 * pi / 12.0f) * sin( 4 * pi / 8.0f), sin(-1 * pi / 12.0f)),
+	Vector3(cos(-1 * pi / 12.0f) * cos( 5 * pi / 8.0f), cos(-1 * pi / 12.0f) * sin( 5 * pi / 8.0f), sin(-1 * pi / 12.0f)),
+	Vector3(cos(-1 * pi / 12.0f) * cos( 6 * pi / 8.0f), cos(-1 * pi / 12.0f) * sin( 6 * pi / 8.0f), sin(-1 * pi / 12.0f)),
+	Vector3(cos(-1 * pi / 12.0f) * cos( 7 * pi / 8.0f), cos(-1 * pi / 12.0f) * sin( 7 * pi / 8.0f), sin(-1 * pi / 12.0f)),
+	Vector3(cos(-1 * pi / 12.0f) * cos( 8 * pi / 8.0f), cos(-1 * pi / 12.0f) * sin( 8 * pi / 8.0f), sin(-1 * pi / 12.0f)),
+	Vector3(cos(-1 * pi / 12.0f) * cos( 9 * pi / 8.0f), cos(-1 * pi / 12.0f) * sin( 9 * pi / 8.0f), sin(-1 * pi / 12.0f)),
+	Vector3(cos(-1 * pi / 12.0f) * cos(10 * pi / 8.0f), cos(-1 * pi / 12.0f) * sin(10 * pi / 8.0f), sin(-1 * pi / 12.0f)),
+	Vector3(cos(-1 * pi / 12.0f) * cos(11 * pi / 8.0f), cos(-1 * pi / 12.0f) * sin(11 * pi / 8.0f), sin(-1 * pi / 12.0f)),
+	Vector3(cos(-1 * pi / 12.0f) * cos(12 * pi / 8.0f), cos(-1 * pi / 12.0f) * sin(12 * pi / 8.0f), sin(-1 * pi / 12.0f)),
+	Vector3(cos(-1 * pi / 12.0f) * cos(13 * pi / 8.0f), cos(-1 * pi / 12.0f) * sin(13 * pi / 8.0f), sin(-1 * pi / 12.0f)),
+	Vector3(cos(-1 * pi / 12.0f) * cos(14 * pi / 8.0f), cos(-1 * pi / 12.0f) * sin(14 * pi / 8.0f), sin(-1 * pi / 12.0f)),
+	Vector3(cos(-1 * pi / 12.0f) * cos(15 * pi / 8.0f), cos(-1 * pi / 12.0f) * sin(15 * pi / 8.0f), sin(-1 * pi / 12.0f)),
 
 	// index : 113~128
-	Vector3(cos(-2 * pi / 12.0f) * cos( 0 * pi / 8.0f), sin(-2 * pi / 12.0f), cos(-2 * pi / 12.0f) * sin( 0 * pi / 8.0f)),
-	Vector3(cos(-2 * pi / 12.0f) * cos( 1 * pi / 8.0f), sin(-2 * pi / 12.0f), cos(-2 * pi / 12.0f) * sin( 1 * pi / 8.0f)),
-	Vector3(cos(-2 * pi / 12.0f) * cos( 2 * pi / 8.0f), sin(-2 * pi / 12.0f), cos(-2 * pi / 12.0f) * sin( 2 * pi / 8.0f)),
-	Vector3(cos(-2 * pi / 12.0f) * cos( 3 * pi / 8.0f), sin(-2 * pi / 12.0f), cos(-2 * pi / 12.0f) * sin( 3 * pi / 8.0f)),
-	Vector3(cos(-2 * pi / 12.0f) * cos( 4 * pi / 8.0f), sin(-2 * pi / 12.0f), cos(-2 * pi / 12.0f) * sin( 4 * pi / 8.0f)),
-	Vector3(cos(-2 * pi / 12.0f) * cos( 5 * pi / 8.0f), sin(-2 * pi / 12.0f), cos(-2 * pi / 12.0f) * sin( 5 * pi / 8.0f)),
-	Vector3(cos(-2 * pi / 12.0f) * cos( 6 * pi / 8.0f), sin(-2 * pi / 12.0f), cos(-2 * pi / 12.0f) * sin( 6 * pi / 8.0f)),
-	Vector3(cos(-2 * pi / 12.0f) * cos( 7 * pi / 8.0f), sin(-2 * pi / 12.0f), cos(-2 * pi / 12.0f) * sin( 7 * pi / 8.0f)),
-	Vector3(cos(-2 * pi / 12.0f) * cos( 8 * pi / 8.0f), sin(-2 * pi / 12.0f), cos(-2 * pi / 12.0f) * sin( 8 * pi / 8.0f)),
-	Vector3(cos(-2 * pi / 12.0f) * cos( 9 * pi / 8.0f), sin(-2 * pi / 12.0f), cos(-2 * pi / 12.0f) * sin( 9 * pi / 8.0f)),
-	Vector3(cos(-2 * pi / 12.0f) * cos(10 * pi / 8.0f), sin(-2 * pi / 12.0f), cos(-2 * pi / 12.0f) * sin(10 * pi / 8.0f)),
-	Vector3(cos(-2 * pi / 12.0f) * cos(11 * pi / 8.0f), sin(-2 * pi / 12.0f), cos(-2 * pi / 12.0f) * sin(11 * pi / 8.0f)),
-	Vector3(cos(-2 * pi / 12.0f) * cos(12 * pi / 8.0f), sin(-2 * pi / 12.0f), cos(-2 * pi / 12.0f) * sin(12 * pi / 8.0f)),
-	Vector3(cos(-2 * pi / 12.0f) * cos(13 * pi / 8.0f), sin(-2 * pi / 12.0f), cos(-2 * pi / 12.0f) * sin(13 * pi / 8.0f)),
-	Vector3(cos(-2 * pi / 12.0f) * cos(14 * pi / 8.0f), sin(-2 * pi / 12.0f), cos(-2 * pi / 12.0f) * sin(14 * pi / 8.0f)),
-	Vector3(cos(-2 * pi / 12.0f) * cos(15 * pi / 8.0f), sin(-2 * pi / 12.0f), cos(-2 * pi / 12.0f) * sin(15 * pi / 8.0f)),
+	Vector3(cos(-2 * pi / 12.0f) * cos( 0 * pi / 8.0f), cos(-2 * pi / 12.0f) * sin( 0 * pi / 8.0f), sin(-2 * pi / 12.0f)),
+	Vector3(cos(-2 * pi / 12.0f) * cos( 1 * pi / 8.0f), cos(-2 * pi / 12.0f) * sin( 1 * pi / 8.0f), sin(-2 * pi / 12.0f)),
+	Vector3(cos(-2 * pi / 12.0f) * cos( 2 * pi / 8.0f), cos(-2 * pi / 12.0f) * sin( 2 * pi / 8.0f), sin(-2 * pi / 12.0f)),
+	Vector3(cos(-2 * pi / 12.0f) * cos( 3 * pi / 8.0f), cos(-2 * pi / 12.0f) * sin( 3 * pi / 8.0f), sin(-2 * pi / 12.0f)),
+	Vector3(cos(-2 * pi / 12.0f) * cos( 4 * pi / 8.0f), cos(-2 * pi / 12.0f) * sin( 4 * pi / 8.0f), sin(-2 * pi / 12.0f)),
+	Vector3(cos(-2 * pi / 12.0f) * cos( 5 * pi / 8.0f), cos(-2 * pi / 12.0f) * sin( 5 * pi / 8.0f), sin(-2 * pi / 12.0f)),
+	Vector3(cos(-2 * pi / 12.0f) * cos( 6 * pi / 8.0f), cos(-2 * pi / 12.0f) * sin( 6 * pi / 8.0f), sin(-2 * pi / 12.0f)),
+	Vector3(cos(-2 * pi / 12.0f) * cos( 7 * pi / 8.0f), cos(-2 * pi / 12.0f) * sin( 7 * pi / 8.0f), sin(-2 * pi / 12.0f)),
+	Vector3(cos(-2 * pi / 12.0f) * cos( 8 * pi / 8.0f), cos(-2 * pi / 12.0f) * sin( 8 * pi / 8.0f), sin(-2 * pi / 12.0f)),
+	Vector3(cos(-2 * pi / 12.0f) * cos( 9 * pi / 8.0f), cos(-2 * pi / 12.0f) * sin( 9 * pi / 8.0f), sin(-2 * pi / 12.0f)),
+	Vector3(cos(-2 * pi / 12.0f) * cos(10 * pi / 8.0f), cos(-2 * pi / 12.0f) * sin(10 * pi / 8.0f), sin(-2 * pi / 12.0f)),
+	Vector3(cos(-2 * pi / 12.0f) * cos(11 * pi / 8.0f), cos(-2 * pi / 12.0f) * sin(11 * pi / 8.0f), sin(-2 * pi / 12.0f)),
+	Vector3(cos(-2 * pi / 12.0f) * cos(12 * pi / 8.0f), cos(-2 * pi / 12.0f) * sin(12 * pi / 8.0f), sin(-2 * pi / 12.0f)),
+	Vector3(cos(-2 * pi / 12.0f) * cos(13 * pi / 8.0f), cos(-2 * pi / 12.0f) * sin(13 * pi / 8.0f), sin(-2 * pi / 12.0f)),
+	Vector3(cos(-2 * pi / 12.0f) * cos(14 * pi / 8.0f), cos(-2 * pi / 12.0f) * sin(14 * pi / 8.0f), sin(-2 * pi / 12.0f)),
+	Vector3(cos(-2 * pi / 12.0f) * cos(15 * pi / 8.0f), cos(-2 * pi / 12.0f) * sin(15 * pi / 8.0f), sin(-2 * pi / 12.0f)),
 
 	// index : 129~144
-	Vector3(cos(-3 * pi / 12.0f) * cos( 0 * pi / 8.0f), sin(-3 * pi / 12.0f), cos(-3 * pi / 12.0f) * sin( 0 * pi / 8.0f)),
-	Vector3(cos(-3 * pi / 12.0f) * cos( 1 * pi / 8.0f), sin(-3 * pi / 12.0f), cos(-3 * pi / 12.0f) * sin( 1 * pi / 8.0f)),
-	Vector3(cos(-3 * pi / 12.0f) * cos( 2 * pi / 8.0f), sin(-3 * pi / 12.0f), cos(-3 * pi / 12.0f) * sin( 2 * pi / 8.0f)),
-	Vector3(cos(-3 * pi / 12.0f) * cos( 3 * pi / 8.0f), sin(-3 * pi / 12.0f), cos(-3 * pi / 12.0f) * sin( 3 * pi / 8.0f)),
-	Vector3(cos(-3 * pi / 12.0f) * cos( 4 * pi / 8.0f), sin(-3 * pi / 12.0f), cos(-3 * pi / 12.0f) * sin( 4 * pi / 8.0f)),
-	Vector3(cos(-3 * pi / 12.0f) * cos( 5 * pi / 8.0f), sin(-3 * pi / 12.0f), cos(-3 * pi / 12.0f) * sin( 5 * pi / 8.0f)),
-	Vector3(cos(-3 * pi / 12.0f) * cos( 6 * pi / 8.0f), sin(-3 * pi / 12.0f), cos(-3 * pi / 12.0f) * sin( 6 * pi / 8.0f)),
-	Vector3(cos(-3 * pi / 12.0f) * cos( 7 * pi / 8.0f), sin(-3 * pi / 12.0f), cos(-3 * pi / 12.0f) * sin( 7 * pi / 8.0f)),
-	Vector3(cos(-3 * pi / 12.0f) * cos( 8 * pi / 8.0f), sin(-3 * pi / 12.0f), cos(-3 * pi / 12.0f) * sin( 8 * pi / 8.0f)),
-	Vector3(cos(-3 * pi / 12.0f) * cos( 9 * pi / 8.0f), sin(-3 * pi / 12.0f), cos(-3 * pi / 12.0f) * sin( 9 * pi / 8.0f)),
-	Vector3(cos(-3 * pi / 12.0f) * cos(10 * pi / 8.0f), sin(-3 * pi / 12.0f), cos(-3 * pi / 12.0f) * sin(10 * pi / 8.0f)),
-	Vector3(cos(-3 * pi / 12.0f) * cos(11 * pi / 8.0f), sin(-3 * pi / 12.0f), cos(-3 * pi / 12.0f) * sin(11 * pi / 8.0f)),
-	Vector3(cos(-3 * pi / 12.0f) * cos(12 * pi / 8.0f), sin(-3 * pi / 12.0f), cos(-3 * pi / 12.0f) * sin(12 * pi / 8.0f)),
-	Vector3(cos(-3 * pi / 12.0f) * cos(13 * pi / 8.0f), sin(-3 * pi / 12.0f), cos(-3 * pi / 12.0f) * sin(13 * pi / 8.0f)),
-	Vector3(cos(-3 * pi / 12.0f) * cos(14 * pi / 8.0f), sin(-3 * pi / 12.0f), cos(-3 * pi / 12.0f) * sin(14 * pi / 8.0f)),
-	Vector3(cos(-3 * pi / 12.0f) * cos(15 * pi / 8.0f), sin(-3 * pi / 12.0f), cos(-3 * pi / 12.0f) * sin(15 * pi / 8.0f)),
+	Vector3(cos(-3 * pi / 12.0f) * cos( 0 * pi / 8.0f), cos(-3 * pi / 12.0f) * sin( 0 * pi / 8.0f), sin(-3 * pi / 12.0f)),
+	Vector3(cos(-3 * pi / 12.0f) * cos( 1 * pi / 8.0f), cos(-3 * pi / 12.0f) * sin( 1 * pi / 8.0f), sin(-3 * pi / 12.0f)),
+	Vector3(cos(-3 * pi / 12.0f) * cos( 2 * pi / 8.0f), cos(-3 * pi / 12.0f) * sin( 2 * pi / 8.0f), sin(-3 * pi / 12.0f)),
+	Vector3(cos(-3 * pi / 12.0f) * cos( 3 * pi / 8.0f), cos(-3 * pi / 12.0f) * sin( 3 * pi / 8.0f), sin(-3 * pi / 12.0f)),
+	Vector3(cos(-3 * pi / 12.0f) * cos( 4 * pi / 8.0f), cos(-3 * pi / 12.0f) * sin( 4 * pi / 8.0f), sin(-3 * pi / 12.0f)),
+	Vector3(cos(-3 * pi / 12.0f) * cos( 5 * pi / 8.0f), cos(-3 * pi / 12.0f) * sin( 5 * pi / 8.0f), sin(-3 * pi / 12.0f)),
+	Vector3(cos(-3 * pi / 12.0f) * cos( 6 * pi / 8.0f), cos(-3 * pi / 12.0f) * sin( 6 * pi / 8.0f), sin(-3 * pi / 12.0f)),
+	Vector3(cos(-3 * pi / 12.0f) * cos( 7 * pi / 8.0f), cos(-3 * pi / 12.0f) * sin( 7 * pi / 8.0f), sin(-3 * pi / 12.0f)),
+	Vector3(cos(-3 * pi / 12.0f) * cos( 8 * pi / 8.0f), cos(-3 * pi / 12.0f) * sin( 8 * pi / 8.0f), sin(-3 * pi / 12.0f)),
+	Vector3(cos(-3 * pi / 12.0f) * cos( 9 * pi / 8.0f), cos(-3 * pi / 12.0f) * sin( 9 * pi / 8.0f), sin(-3 * pi / 12.0f)),
+	Vector3(cos(-3 * pi / 12.0f) * cos(10 * pi / 8.0f), cos(-3 * pi / 12.0f) * sin(10 * pi / 8.0f), sin(-3 * pi / 12.0f)),
+	Vector3(cos(-3 * pi / 12.0f) * cos(11 * pi / 8.0f), cos(-3 * pi / 12.0f) * sin(11 * pi / 8.0f), sin(-3 * pi / 12.0f)),
+	Vector3(cos(-3 * pi / 12.0f) * cos(12 * pi / 8.0f), cos(-3 * pi / 12.0f) * sin(12 * pi / 8.0f), sin(-3 * pi / 12.0f)),
+	Vector3(cos(-3 * pi / 12.0f) * cos(13 * pi / 8.0f), cos(-3 * pi / 12.0f) * sin(13 * pi / 8.0f), sin(-3 * pi / 12.0f)),
+	Vector3(cos(-3 * pi / 12.0f) * cos(14 * pi / 8.0f), cos(-3 * pi / 12.0f) * sin(14 * pi / 8.0f), sin(-3 * pi / 12.0f)),
+	Vector3(cos(-3 * pi / 12.0f) * cos(15 * pi / 8.0f), cos(-3 * pi / 12.0f) * sin(15 * pi / 8.0f), sin(-3 * pi / 12.0f)),
 
 	// index : 145~160
-	Vector3(cos(-4 * pi / 12.0f) * cos( 0 * pi / 8.0f), sin(-4 * pi / 12.0f), cos(-4 * pi / 12.0f) * sin( 0 * pi / 8.0f)),
-	Vector3(cos(-4 * pi / 12.0f) * cos( 1 * pi / 8.0f), sin(-4 * pi / 12.0f), cos(-4 * pi / 12.0f) * sin( 1 * pi / 8.0f)),
-	Vector3(cos(-4 * pi / 12.0f) * cos( 2 * pi / 8.0f), sin(-4 * pi / 12.0f), cos(-4 * pi / 12.0f) * sin( 2 * pi / 8.0f)),
-	Vector3(cos(-4 * pi / 12.0f) * cos( 3 * pi / 8.0f), sin(-4 * pi / 12.0f), cos(-4 * pi / 12.0f) * sin( 3 * pi / 8.0f)),
-	Vector3(cos(-4 * pi / 12.0f) * cos( 4 * pi / 8.0f), sin(-4 * pi / 12.0f), cos(-4 * pi / 12.0f) * sin( 4 * pi / 8.0f)),
-	Vector3(cos(-4 * pi / 12.0f) * cos( 5 * pi / 8.0f), sin(-4 * pi / 12.0f), cos(-4 * pi / 12.0f) * sin( 5 * pi / 8.0f)),
-	Vector3(cos(-4 * pi / 12.0f) * cos( 6 * pi / 8.0f), sin(-4 * pi / 12.0f), cos(-4 * pi / 12.0f) * sin( 6 * pi / 8.0f)),
-	Vector3(cos(-4 * pi / 12.0f) * cos( 7 * pi / 8.0f), sin(-4 * pi / 12.0f), cos(-4 * pi / 12.0f) * sin( 7 * pi / 8.0f)),
-	Vector3(cos(-4 * pi / 12.0f) * cos( 8 * pi / 8.0f), sin(-4 * pi / 12.0f), cos(-4 * pi / 12.0f) * sin( 8 * pi / 8.0f)),
-	Vector3(cos(-4 * pi / 12.0f) * cos( 9 * pi / 8.0f), sin(-4 * pi / 12.0f), cos(-4 * pi / 12.0f) * sin( 9 * pi / 8.0f)),
-	Vector3(cos(-4 * pi / 12.0f) * cos(10 * pi / 8.0f), sin(-4 * pi / 12.0f), cos(-4 * pi / 12.0f) * sin(10 * pi / 8.0f)),
-	Vector3(cos(-4 * pi / 12.0f) * cos(11 * pi / 8.0f), sin(-4 * pi / 12.0f), cos(-4 * pi / 12.0f) * sin(11 * pi / 8.0f)),
-	Vector3(cos(-4 * pi / 12.0f) * cos(12 * pi / 8.0f), sin(-4 * pi / 12.0f), cos(-4 * pi / 12.0f) * sin(12 * pi / 8.0f)),
-	Vector3(cos(-4 * pi / 12.0f) * cos(13 * pi / 8.0f), sin(-4 * pi / 12.0f), cos(-4 * pi / 12.0f) * sin(13 * pi / 8.0f)),
-	Vector3(cos(-4 * pi / 12.0f) * cos(14 * pi / 8.0f), sin(-4 * pi / 12.0f), cos(-4 * pi / 12.0f) * sin(14 * pi / 8.0f)),
-	Vector3(cos(-4 * pi / 12.0f) * cos(15 * pi / 8.0f), sin(-4 * pi / 12.0f), cos(-4 * pi / 12.0f) * sin(15 * pi / 8.0f)),
+	Vector3(cos(-4 * pi / 12.0f) * cos( 0 * pi / 8.0f), cos(-4 * pi / 12.0f) * sin( 0 * pi / 8.0f), sin(-4 * pi / 12.0f)),
+	Vector3(cos(-4 * pi / 12.0f) * cos( 1 * pi / 8.0f), cos(-4 * pi / 12.0f) * sin( 1 * pi / 8.0f), sin(-4 * pi / 12.0f)),
+	Vector3(cos(-4 * pi / 12.0f) * cos( 2 * pi / 8.0f), cos(-4 * pi / 12.0f) * sin( 2 * pi / 8.0f), sin(-4 * pi / 12.0f)),
+	Vector3(cos(-4 * pi / 12.0f) * cos( 3 * pi / 8.0f), cos(-4 * pi / 12.0f) * sin( 3 * pi / 8.0f), sin(-4 * pi / 12.0f)),
+	Vector3(cos(-4 * pi / 12.0f) * cos( 4 * pi / 8.0f), cos(-4 * pi / 12.0f) * sin( 4 * pi / 8.0f), sin(-4 * pi / 12.0f)),
+	Vector3(cos(-4 * pi / 12.0f) * cos( 5 * pi / 8.0f), cos(-4 * pi / 12.0f) * sin( 5 * pi / 8.0f), sin(-4 * pi / 12.0f)),
+	Vector3(cos(-4 * pi / 12.0f) * cos( 6 * pi / 8.0f), cos(-4 * pi / 12.0f) * sin( 6 * pi / 8.0f), sin(-4 * pi / 12.0f)),
+	Vector3(cos(-4 * pi / 12.0f) * cos( 7 * pi / 8.0f), cos(-4 * pi / 12.0f) * sin( 7 * pi / 8.0f), sin(-4 * pi / 12.0f)),
+	Vector3(cos(-4 * pi / 12.0f) * cos( 8 * pi / 8.0f), cos(-4 * pi / 12.0f) * sin( 8 * pi / 8.0f), sin(-4 * pi / 12.0f)),
+	Vector3(cos(-4 * pi / 12.0f) * cos( 9 * pi / 8.0f), cos(-4 * pi / 12.0f) * sin( 9 * pi / 8.0f), sin(-4 * pi / 12.0f)),
+	Vector3(cos(-4 * pi / 12.0f) * cos(10 * pi / 8.0f), cos(-4 * pi / 12.0f) * sin(10 * pi / 8.0f), sin(-4 * pi / 12.0f)),
+	Vector3(cos(-4 * pi / 12.0f) * cos(11 * pi / 8.0f), cos(-4 * pi / 12.0f) * sin(11 * pi / 8.0f), sin(-4 * pi / 12.0f)),
+	Vector3(cos(-4 * pi / 12.0f) * cos(12 * pi / 8.0f), cos(-4 * pi / 12.0f) * sin(12 * pi / 8.0f), sin(-4 * pi / 12.0f)),
+	Vector3(cos(-4 * pi / 12.0f) * cos(13 * pi / 8.0f), cos(-4 * pi / 12.0f) * sin(13 * pi / 8.0f), sin(-4 * pi / 12.0f)),
+	Vector3(cos(-4 * pi / 12.0f) * cos(14 * pi / 8.0f), cos(-4 * pi / 12.0f) * sin(14 * pi / 8.0f), sin(-4 * pi / 12.0f)),
+	Vector3(cos(-4 * pi / 12.0f) * cos(15 * pi / 8.0f), cos(-4 * pi / 12.0f) * sin(15 * pi / 8.0f), sin(-4 * pi / 12.0f)),
 
 	// index : 161~176
-	Vector3(cos(-5 * pi / 12.0f) * cos( 0 * pi / 8.0f), sin(-5 * pi / 12.0f), cos(-5 * pi / 12.0f) * sin( 0 * pi / 8.0f)),
-	Vector3(cos(-5 * pi / 12.0f) * cos( 1 * pi / 8.0f), sin(-5 * pi / 12.0f), cos(-5 * pi / 12.0f) * sin( 1 * pi / 8.0f)),
-	Vector3(cos(-5 * pi / 12.0f) * cos( 2 * pi / 8.0f), sin(-5 * pi / 12.0f), cos(-5 * pi / 12.0f) * sin( 2 * pi / 8.0f)),
-	Vector3(cos(-5 * pi / 12.0f) * cos( 3 * pi / 8.0f), sin(-5 * pi / 12.0f), cos(-5 * pi / 12.0f) * sin( 3 * pi / 8.0f)),
-	Vector3(cos(-5 * pi / 12.0f) * cos( 4 * pi / 8.0f), sin(-5 * pi / 12.0f), cos(-5 * pi / 12.0f) * sin( 4 * pi / 8.0f)),
-	Vector3(cos(-5 * pi / 12.0f) * cos( 5 * pi / 8.0f), sin(-5 * pi / 12.0f), cos(-5 * pi / 12.0f) * sin( 5 * pi / 8.0f)),
-	Vector3(cos(-5 * pi / 12.0f) * cos( 6 * pi / 8.0f), sin(-5 * pi / 12.0f), cos(-5 * pi / 12.0f) * sin( 6 * pi / 8.0f)),
-	Vector3(cos(-5 * pi / 12.0f) * cos( 7 * pi / 8.0f), sin(-5 * pi / 12.0f), cos(-5 * pi / 12.0f) * sin( 7 * pi / 8.0f)),
-	Vector3(cos(-5 * pi / 12.0f) * cos( 8 * pi / 8.0f), sin(-5 * pi / 12.0f), cos(-5 * pi / 12.0f) * sin( 8 * pi / 8.0f)),
-	Vector3(cos(-5 * pi / 12.0f) * cos( 9 * pi / 8.0f), sin(-5 * pi / 12.0f), cos(-5 * pi / 12.0f) * sin( 9 * pi / 8.0f)),
-	Vector3(cos(-5 * pi / 12.0f) * cos(10 * pi / 8.0f), sin(-5 * pi / 12.0f), cos(-5 * pi / 12.0f) * sin(10 * pi / 8.0f)),
-	Vector3(cos(-5 * pi / 12.0f) * cos(11 * pi / 8.0f), sin(-5 * pi / 12.0f), cos(-5 * pi / 12.0f) * sin(11 * pi / 8.0f)),
-	Vector3(cos(-5 * pi / 12.0f) * cos(12 * pi / 8.0f), sin(-5 * pi / 12.0f), cos(-5 * pi / 12.0f) * sin(12 * pi / 8.0f)),
-	Vector3(cos(-5 * pi / 12.0f) * cos(13 * pi / 8.0f), sin(-5 * pi / 12.0f), cos(-5 * pi / 12.0f) * sin(13 * pi / 8.0f)),
-	Vector3(cos(-5 * pi / 12.0f) * cos(14 * pi / 8.0f), sin(-5 * pi / 12.0f), cos(-5 * pi / 12.0f) * sin(14 * pi / 8.0f)),
-	Vector3(cos(-5 * pi / 12.0f) * cos(15 * pi / 8.0f), sin(-5 * pi / 12.0f), cos(-5 * pi / 12.0f) * sin(15 * pi / 8.0f)),
+	Vector3(cos(-5 * pi / 12.0f) * cos( 0 * pi / 8.0f), cos(-5 * pi / 12.0f) * sin( 0 * pi / 8.0f), sin(-5 * pi / 12.0f)),
+	Vector3(cos(-5 * pi / 12.0f) * cos( 1 * pi / 8.0f), cos(-5 * pi / 12.0f) * sin( 1 * pi / 8.0f), sin(-5 * pi / 12.0f)),
+	Vector3(cos(-5 * pi / 12.0f) * cos( 2 * pi / 8.0f), cos(-5 * pi / 12.0f) * sin( 2 * pi / 8.0f), sin(-5 * pi / 12.0f)),
+	Vector3(cos(-5 * pi / 12.0f) * cos( 3 * pi / 8.0f), cos(-5 * pi / 12.0f) * sin( 3 * pi / 8.0f), sin(-5 * pi / 12.0f)),
+	Vector3(cos(-5 * pi / 12.0f) * cos( 4 * pi / 8.0f), cos(-5 * pi / 12.0f) * sin( 4 * pi / 8.0f), sin(-5 * pi / 12.0f)),
+	Vector3(cos(-5 * pi / 12.0f) * cos( 5 * pi / 8.0f), cos(-5 * pi / 12.0f) * sin( 5 * pi / 8.0f), sin(-5 * pi / 12.0f)),
+	Vector3(cos(-5 * pi / 12.0f) * cos( 6 * pi / 8.0f), cos(-5 * pi / 12.0f) * sin( 6 * pi / 8.0f), sin(-5 * pi / 12.0f)),
+	Vector3(cos(-5 * pi / 12.0f) * cos( 7 * pi / 8.0f), cos(-5 * pi / 12.0f) * sin( 7 * pi / 8.0f), sin(-5 * pi / 12.0f)),
+	Vector3(cos(-5 * pi / 12.0f) * cos( 8 * pi / 8.0f), cos(-5 * pi / 12.0f) * sin( 8 * pi / 8.0f), sin(-5 * pi / 12.0f)),
+	Vector3(cos(-5 * pi / 12.0f) * cos( 9 * pi / 8.0f), cos(-5 * pi / 12.0f) * sin( 9 * pi / 8.0f), sin(-5 * pi / 12.0f)),
+	Vector3(cos(-5 * pi / 12.0f) * cos(10 * pi / 8.0f), cos(-5 * pi / 12.0f) * sin(10 * pi / 8.0f), sin(-5 * pi / 12.0f)),
+	Vector3(cos(-5 * pi / 12.0f) * cos(11 * pi / 8.0f), cos(-5 * pi / 12.0f) * sin(11 * pi / 8.0f), sin(-5 * pi / 12.0f)),
+	Vector3(cos(-5 * pi / 12.0f) * cos(12 * pi / 8.0f), cos(-5 * pi / 12.0f) * sin(12 * pi / 8.0f), sin(-5 * pi / 12.0f)),
+	Vector3(cos(-5 * pi / 12.0f) * cos(13 * pi / 8.0f), cos(-5 * pi / 12.0f) * sin(13 * pi / 8.0f), sin(-5 * pi / 12.0f)),
+	Vector3(cos(-5 * pi / 12.0f) * cos(14 * pi / 8.0f), cos(-5 * pi / 12.0f) * sin(14 * pi / 8.0f), sin(-5 * pi / 12.0f)),
+	Vector3(cos(-5 * pi / 12.0f) * cos(15 * pi / 8.0f), cos(-5 * pi / 12.0f) * sin(15 * pi / 8.0f), sin(-5 * pi / 12.0f)),
 
 	// index : 177
-	Vector3(0, sin(-6 * pi / 12.0f), 0),
+	Vector3(0, 0, sin(-6 * pi / 12.0f)),
 };
 static std::vector<int> sphereIndices = {
 	// +6

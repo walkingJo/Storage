@@ -27,6 +27,9 @@ public:
 	* 
 	* basisConversion...?
 	*/
+	void update() {
+		return;
+	}
 };
 
 #endif // !OBJECT_H

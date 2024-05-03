@@ -2,23 +2,23 @@
 #ifndef PHYSICS_ENGINE_H
 #define PHYSICS_ENGINE_H
 
-#include "GameEngine.h"
+#include "Object.h"
 
 class PhysicsEngine {
 public:
 	PhysicsEngine() {
-		engine = nullptr;
-	}
-
-	void init(GameEngine* engine) {
-		this->engine = engine;
-	}
-	void update() {
 		//
 	}
 
+	void init() {
+		//
+	}
+	void update(GameEngine* engine) {
+		return;
+	}
+
 private:
-	class GameEngine* engine;
+	//?
 };
 
 #endif // !PHYSICS_ENGINE_H

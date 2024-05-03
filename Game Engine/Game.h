@@ -2,7 +2,6 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <SDL.h>
 #include "GameEngine.h"
 #include "GameManager.h"
 
@@ -22,6 +21,7 @@ public:
 		engine->run();
 		this->~Game();
 	}
+
 private:
 	GameEngine* engine;
 	GameManager* manager;
