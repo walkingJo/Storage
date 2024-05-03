@@ -179,7 +179,7 @@ void update(Object** objects, int objectCount) {
 ### `Model::rotate()` 구현
 
 `rotate()`는 아래와 같이 구현했다. 변수의 값을 바꾸는 동시에 반환값이 존재한다.
-```
+```cpp
 Vector3 rotate(const Vector3& axis, float radian) {
     //https://jebae.github.io/quaternion-rotation
     Vector3 qv = sin(radian / 2.0f) * axis;
