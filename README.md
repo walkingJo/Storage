@@ -1,11 +1,5 @@
 # Storage
 
-this is README file.
+이것저것 만들어 기록해두는 곳입니다.
 
-we can write math expressions
-
-like this
-
-$$
-\int_0^\infty 3x^2 dx = [x^3]_0^\infty
-$$
+아직은 많이 부족하지만 언젠가 최정상급 엔지니어가 되는 것이 꿈입니다.
