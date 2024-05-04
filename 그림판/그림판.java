@@ -1,4 +1,4 @@
-package ê·¸ë¦¼íŒ;
+package ±×¸²ÆÇ;
 
 import java.awt.Color;
 import java.awt.Container;
@@ -37,10 +37,10 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import ê·¸ë¦¼íŒ.MyCanvas;
-import ê·¸ë¦¼íŒ.MyCanvas.DRAW_TYPE;
+import ±×¸²ÆÇ.MyCanvas;
+import ±×¸²ÆÇ.MyCanvas.DRAW_TYPE;
 
-public class ê·¸ë¦¼íŒ extends JFrame implements ActionListener {
+public class ±×¸²ÆÇ extends JFrame implements ActionListener {
 	private JMenuItem[] fileItems = new JMenuItem[5];
 	private JMenuItem[] editItems = new JMenuItem[3];
 	private JMenuItem[] toolItems = new JMenuItem[5];
@@ -51,8 +51,8 @@ public class ê·¸ë¦¼íŒ extends JFrame implements ActionListener {
 	private String filePath;
 	private boolean fileSaved;
 	
- 	public ê·¸ë¦¼íŒ() {
-		super("ê·¸ë¦¼íŒ"); // í¸ì§‘í•˜ê³  ìˆëŠ” íŒŒì¼ì˜ ì´ë¦„ìœ¼ë¡œ ë°”ê¿€ ìˆ˜ ì—†ë‚˜?
+ 	public ±×¸²ÆÇ() {
+		super("±×¸²ÆÇ"); // ÆíÁıÇÏ°í ÀÖ´Â ÆÄÀÏÀÇ ÀÌ¸§À¸·Î ¹Ù²Ü ¼ö ¾ø³ª?
 		initializeComponents();
 	}
 	
@@ -67,10 +67,11 @@ public class ê·¸ë¦¼íŒ extends JFrame implements ActionListener {
 			shortcutButtons[i] = new ShortcutButton(i);
 			shortcuts.add(shortcutButtons[i]);
 		}
+		shortcutButtons[4].setOnlyOneImgOn();
 		c.add(shortcuts);
 		
 		canvas = new MyCanvas();
-		canvas.setê·¸ë¦¼íŒ(this);
+		canvas.set±×¸²ÆÇ(this);
 		c.add(canvas);
 
 		filePath = "";
@@ -80,16 +81,17 @@ public class ê·¸ë¦¼íŒ extends JFrame implements ActionListener {
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocation(100, 100);
-		setSize(720, 620);
+//		setSize(750, 620);
+		pack();
 		setVisible(true);
 	}
 
 	private void constructMenu() {
 		JMenuBar bar = new JMenuBar();
-		//íŒŒì¼, í¸ì§‘, ë„êµ¬, ë„í˜•, í¬ê¸°
+		//ÆÄÀÏ, ÆíÁı, µµ±¸, µµÇü, Å©±â
 		
-		JMenu fileMenu = new JMenu("íŒŒì¼(F)"); fileMenu.setMnemonic('F');
-		String[] fileItemName = { "ìƒˆë¡œ ë§Œë“¤ê¸°(N)", "ì—´ê¸°(O)", "ì €ì¥(S)", "ë‹¤ë¥¸ ì´ë¦„ìœ¼ë¡œ ì €ì¥(A)", "ì†ì„±(E)" };
+		JMenu fileMenu = new JMenu("ÆÄÀÏ(F)"); fileMenu.setMnemonic('F');
+		String[] fileItemName = { "»õ·Î ¸¸µé±â(N)", "¿­±â(O)", "ÀúÀå(S)", "´Ù¸¥ ÀÌ¸§À¸·Î ÀúÀå(A)", "¼Ó¼º(E)" };
 		char[] fileItemMnemonic = { 'N', 'O', 'S', 'A', 'E' };
 		int[] fileItemShortcuts = { KeyEvent.VK_N, KeyEvent.VK_O, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_E };
 		for(int i = 0; i < fileItems.length; ++i) {
@@ -101,8 +103,8 @@ public class ê·¸ë¦¼íŒ extends JFrame implements ActionListener {
 		}
 		bar.add(fileMenu);
 		
-		JMenu editMenu = new JMenu("í¸ì§‘(E)"); editMenu.setMnemonic('E');
-		String[] editItemName = { "ì˜ë¼ë‚´ê¸°(X)", "ë³µì‚¬(C)", "ë¶™ì—¬ë„£ê¸°(V)" };
+		JMenu editMenu = new JMenu("ÆíÁı(E)"); editMenu.setMnemonic('E');
+		String[] editItemName = { "Àß¶ó³»±â(X)", "º¹»ç(C)", "ºÙ¿©³Ö±â(V)" };
 		int[] editItemShortcuts = { KeyEvent.VK_X, KeyEvent.VK_C, KeyEvent.VK_V };
 		for(int i = 0; i < editItems.length; ++i) {
 			editItems[i] = new JMenuItem(editItemName[i], editItemShortcuts[i]);
@@ -113,8 +115,8 @@ public class ê·¸ë¦¼íŒ extends JFrame implements ActionListener {
 		}
 		bar.add(editMenu);
 		
-		JMenu toolMenu = new JMenu("ë„êµ¬(T)"); toolMenu.setMnemonic('T');
-		String[] toolItemName = { "ì—°í•„(A)", "ì±„ìš°ê¸°(B)", "ì§€ìš°ê°œ(C)", "ìƒ‰ ì¶”ì¶œ(D)", "íœ í¬ê¸°" };
+		JMenu toolMenu = new JMenu("µµ±¸(T)"); toolMenu.setMnemonic('T');
+		String[] toolItemName = { "¿¬ÇÊ(A)", "Ã¤¿ì±â(B)", "Áö¿ì°³(C)", "»ö ÃßÃâ(D)", "Ææ Å©±â" };
 		char[] toolItemMnemonic = { 'A', 'B', 'C', 'D', 'E' };
 		for(int i = 0; i < toolItems.length; ++i) {
 			toolItems[i] = new JMenuItem(toolItemName[i]);
@@ -124,8 +126,8 @@ public class ê·¸ë¦¼íŒ extends JFrame implements ActionListener {
 		}
 		bar.add(toolMenu);
 		
-		JMenu figureMenu = new JMenu("ë„í˜•(P)"); figureMenu.setMnemonic('P');
-		String[] figureName = { "ì§ì„ (A)", "ê³¡ì„ (B)", "ì‚¼ê°í˜•(C)", "ì‚¬ê°í˜•(D)", "íƒ€ì›(E)" };
+		JMenu figureMenu = new JMenu("µµÇü(P)"); figureMenu.setMnemonic('P');
+		String[] figureName = { "Á÷¼±(A)", "°î¼±(B)", "»ï°¢Çü(C)", "»ç°¢Çü(D)", "Å¸¿ø(E)" };
 		char[] figureMnemonic = { 'A', 'B', 'C', 'D', 'E' };
 		for(int i = 0; i < figureItems.length; ++i) {
 			figureItems[i] = new JMenuItem(figureName[i]);
@@ -135,8 +137,8 @@ public class ê·¸ë¦¼íŒ extends JFrame implements ActionListener {
 		}
 		bar.add(figureMenu);
 		
-		JMenu sizeMenu = new JMenu("í¬ê¸°(S)"); sizeMenu.setMnemonic('S');
-		String[] sizeName = { "í¬ê¸° ì¡°ì ˆ(S)", "ê¸°ìš¸ì´ê¸°(D)", "íšŒì „(T)" };
+		JMenu sizeMenu = new JMenu("Å©±â(S)"); sizeMenu.setMnemonic('S');
+		String[] sizeName = { "Å©±â Á¶Àı(S)", "±â¿ïÀÌ±â(D)", "È¸Àü(T)" };
 		char[] sizeMnemonic = { 'S', 'D', 'T' };
 		for (int i = 0; i < sizeItems.length; ++i) {
 			sizeItems[i] = new JMenuItem(sizeName[i]);
@@ -146,20 +148,20 @@ public class ê·¸ë¦¼íŒ extends JFrame implements ActionListener {
 		}
 		bar.add(sizeMenu);
 		/*
-		 * í¬ê¸° ì¡°ì •(ìƒí•˜ì¢Œìš° ë°©í–¥ìœ¼ë¡œ ëŠ˜ë¦¬ê¸°)
-		 * ê¸°ìš¸ì´ê¸°(ë°±ë¶„ìœ¨, í”½ì…€)
-		 * íšŒì „(ë„)
+		 * Å©±â Á¶Á¤(»óÇÏÁÂ¿ì ¹æÇâÀ¸·Î ´Ã¸®±â)
+		 * ±â¿ïÀÌ±â(¹éºĞÀ², ÇÈ¼¿)
+		 * È¸Àü(µµ)
 		 */
 		
 		setJMenuBar(bar);
 	}
 
 	public static void main(String[] args) {
-		ê·¸ë¦¼íŒ app = new ê·¸ë¦¼íŒ();
+		±×¸²ÆÇ app = new ±×¸²ÆÇ();
 	}
 
-	private int duWantSave() { //ì €ì¥í• ì§€ ë¬»ê¸°
-		int response = JOptionPane.showConfirmDialog(null, "ë³€ê²½ ë‚´ìš©ì„ ì €ì¥í•˜ì‹œê² ìŠµë‹ˆê¹Œ?\n(ì €ì¥í•˜ì§€ ì•Šìœ¼ë©´ ë³€ê²½ ë‚´ìš©ì€ ì‚­ì œë©ë‹ˆë‹¤.)", "ê·¸ë¦¼íŒ", JOptionPane.YES_NO_CANCEL_OPTION);
+	private int duWantSave() { //ÀúÀåÇÒÁö ¹¯±â
+		int response = JOptionPane.showConfirmDialog(null, "º¯°æ ³»¿ëÀ» ÀúÀåÇÏ½Ã°Ú½À´Ï±î?\n(ÀúÀåÇÏÁö ¾ÊÀ¸¸é º¯°æ ³»¿ëÀº »èÁ¦µË´Ï´Ù.)", "±×¸²ÆÇ", JOptionPane.YES_NO_CANCEL_OPTION);
 		return response;
 	}
 	private void newFile() {
@@ -167,7 +169,7 @@ public class ê·¸ë¦¼íŒ extends JFrame implements ActionListener {
 			switch(duWantSave()) {
 			case JOptionPane.YES_OPTION:
 				if (saveFile() != JFileChooser.APPROVE_OPTION) {
-					//ì—¬ê¸°ì— ë­”ê°€ ê²½ê³ ë¬¸ ë„ìš°ê¸°(íŒŒì¼ì°¾ì§€ëª»í•¨!!)
+					//¿©±â¿¡ ¹º°¡ °æ°í¹® ¶ç¿ì±â(ÆÄÀÏÃ£Áö¸øÇÔ!!)
 					return;
 				}
 				break;
@@ -175,17 +177,18 @@ public class ê·¸ë¦¼íŒ extends JFrame implements ActionListener {
 				return;
 			}
 		}
+		shortcutButtons[4].setOnlyOneImgOn();
 		canvas.reset();
 		filePath = "";
 		fileSaved = true;
 	}
 	private void openFile() {
 		if (!fileSaved) {
-			//íƒìƒ‰ê¸°ì—ì„œ ì·¨ì†Œë‚˜ ë‚˜ê°€ê¸°ë¥¼ ëˆŒë €ì„ ë•Œ
+			//Å½»ö±â¿¡¼­ Ãë¼Ò³ª ³ª°¡±â¸¦ ´­·¶À» ¶§
 			switch(duWantSave()) {
 			case JOptionPane.YES_OPTION:
 				if (saveFile() != JFileChooser.APPROVE_OPTION) {
-					//ì—¬ê¸°ì— ë­”ê°€ ê²½ê³ ë¬¸ ë„ìš°ê¸°(íŒŒì¼ì°¾ì§€ëª»í•¨!!)
+					//¿©±â¿¡ ¹º°¡ °æ°í¹® ¶ç¿ì±â(ÆÄÀÏÃ£Áö¸øÇÔ!!)
 					return;
 				}
 				break;
@@ -205,7 +208,7 @@ public class ê·¸ë¦¼íŒ extends JFrame implements ActionListener {
 			fileSaved = true;
 		}
 		else {
-			JOptionPane.showConfirmDialog(null, "íŒŒì¼ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.", "ê·¸ë¦¼íŒ", JOptionPane.CLOSED_OPTION);
+			JOptionPane.showConfirmDialog(null, "ÆÄÀÏÀ» Ã£À» ¼ö ¾ø½À´Ï´Ù.", "±×¸²ÆÇ", JOptionPane.CLOSED_OPTION);
 			return;
 		}
 		
@@ -214,7 +217,7 @@ public class ê·¸ë¦¼íŒ extends JFrame implements ActionListener {
 	}
 	private int saveFile() {
 		int response;
-		if (filePath != "") { // ê·¸ëƒ¥ íŒŒì¼ ê²½ë¡œì— ì €ì¥
+		if (filePath != "") { // ±×³É ÆÄÀÏ °æ·Î¿¡ ÀúÀå
 			response = JFileChooser.APPROVE_OPTION;
 			canvas.saveImage(new File(filePath));
 		} else {
@@ -235,20 +238,20 @@ public class ê·¸ë¦¼íŒ extends JFrame implements ActionListener {
 		if (response == JFileChooser.APPROVE_OPTION) {
 			File newFile = jfc.getSelectedFile();
 			filePath = newFile.getPath();
-			//íŒŒì¼ ì´ë¦„ì„ ì…ë ¥í•´ì„œ ë“¤ì–´ê°”ì„ ë•Œë„, íŒŒì¼ ì£¼ì†Œê°€ ì •ìƒì ìœ¼ë¡œ ê¸°ë¡ë˜ëŠ”ì§€ í™•ì¸
+			//ÆÄÀÏ ÀÌ¸§À» ÀÔ·ÂÇØ¼­ µé¾î°¬À» ¶§µµ, ÆÄÀÏ ÁÖ¼Ò°¡ Á¤»óÀûÀ¸·Î ±â·ÏµÇ´ÂÁö È®ÀÎ
 			canvas.saveImage(newFile);
 		}
 		else {
-			JOptionPane.showConfirmDialog(null, "íŒŒì¼ ê²½ë¡œë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.", "ê·¸ë¦¼íŒ", JOptionPane.CLOSED_OPTION);
+			JOptionPane.showConfirmDialog(null, "ÆÄÀÏ °æ·Î¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù.", "±×¸²ÆÇ", JOptionPane.CLOSED_OPTION);
 			return response;
 		}
 		
 		fileSaved = true;
 		return response;
 	}
-	private void showAttribute() { //ì†ì„±(Ctrl+E | íŒŒì¼ íŠ¹ì„± : ë§ˆì§€ë§‰ ì €ì¥, ë””ìŠ¤í¬ í¬ê¸°, í•´ìƒë„ | ì´ë¯¸ì§€ í¬ê¸° : ë„ˆë¹„, ë†’ì´)
+	private void showAttribute() { //¼Ó¼º(Ctrl+E | ÆÄÀÏ Æ¯¼º : ¸¶Áö¸· ÀúÀå, µğ½ºÅ© Å©±â, ÇØ»óµµ | ÀÌ¹ÌÁö Å©±â : ³Êºñ, ³ôÀÌ)
 		if (filePath == "") {
-			JOptionPane.showConfirmDialog(null, "ì´ë¯¸ì§€ê°€ íŒŒì¼ë¡œ ì €ì¥ë˜ì–´ ìˆì§€ ì•Šì•„ ì •ë³´ë¥¼ ë¶ˆëŸ¬ì˜¬ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.", "ê·¸ë¦¼íŒ", JOptionPane.CLOSED_OPTION);
+			JOptionPane.showConfirmDialog(null, "ÀÌ¹ÌÁö°¡ ÆÄÀÏ·Î ÀúÀåµÇ¾î ÀÖÁö ¾Ê¾Æ Á¤º¸¸¦ ºÒ·¯¿Ã ¼ö ¾ø½À´Ï´Ù.", "±×¸²ÆÇ", JOptionPane.CLOSED_OPTION);
 			return;
 		}
 		
@@ -280,31 +283,31 @@ public class ê·¸ë¦¼íŒ extends JFrame implements ActionListener {
 		 * editItems = 3 << ctrl+X, ctrl+C, ctrl+V
 		 * toolItems = 5
 		 * figureItems = 5
-		 * sizeItems = 3 << ì´ê²ƒë„ ìº”ë²„ìŠ¤ì— ê¸°ëŠ¥ì„ ë„£ì
+		 * sizeItems = 3 << ÀÌ°Íµµ Äµ¹ö½º¿¡ ±â´ÉÀ» ³ÖÀÚ
 		 */
-		if (e.getSource() == fileItems[0]) newFile(); // ìƒˆ íŒŒì¼
-		else if (e.getSource() == fileItems[1]) openFile(); // ì—´ê¸°
-		else if (e.getSource() == fileItems[2]) saveFile(); // ì €ì¥
-		else if (e.getSource() == fileItems[3]) saveNewFile(); // ë‹¤ë¥¸ ì´ë¦„ìœ¼ë¡œ ì €ì¥
-		else if (e.getSource() == fileItems[4]) showAttribute(); // ì†ì„±
+		if (e.getSource() == fileItems[0]) newFile(); // »õ ÆÄÀÏ
+		else if (e.getSource() == fileItems[1]) openFile(); // ¿­±â
+		else if (e.getSource() == fileItems[2]) saveFile(); // ÀúÀå
+		else if (e.getSource() == fileItems[3]) saveNewFile(); // ´Ù¸¥ ÀÌ¸§À¸·Î ÀúÀå
+		else if (e.getSource() == fileItems[4]) showAttribute(); // ¼Ó¼º
 		
 		else if (e.getSource() == editItems[0]) { canvas.ctrlX(); canvas.repaint(); }
 		else if (e.getSource() == editItems[1]) { canvas.ctrlC(); canvas.repaint(); }
 		else if (e.getSource() == editItems[2]) { canvas.ctrlV(); canvas.repaint(); }
 
-		else if (e.getSource() == toolItems[0]) canvas.setDrawType(DRAW_TYPE.PENCIL);
-		else if (e.getSource() == toolItems[1]) canvas.setDrawType(DRAW_TYPE.FILL);
-		else if (e.getSource() == toolItems[2]) canvas.setDrawType(DRAW_TYPE.ERASE);
-		else if (e.getSource() == toolItems[3]) canvas.setDrawType(DRAW_TYPE.EXTRACTOR);
+		else if (e.getSource() == toolItems[0]) { canvas.setDrawType(DRAW_TYPE.PENCIL);		setShortcutButtonOn( 4); }
+		else if (e.getSource() == toolItems[1]) { canvas.setDrawType(DRAW_TYPE.FILL);		setShortcutButtonOn( 5); }
+		else if (e.getSource() == toolItems[2]) { canvas.setDrawType(DRAW_TYPE.ERASE);		setShortcutButtonOn( 6); }
+		else if (e.getSource() == toolItems[3]) { canvas.setDrawType(DRAW_TYPE.EXTRACTOR);	setShortcutButtonOn( 7);}
 		else if (e.getSource() == toolItems[4]) {
-			PensizeDialog pDialog = new PensizeDialog(this);
+			PensizeDialog penSizeDialog = new PensizeDialog(this);
 		}
 
-		else if (e.getSource() == figureItems[0]) canvas.setDrawType(DRAW_TYPE.LINE);
-		else if (e.getSource() == figureItems[1]) canvas.setDrawType(DRAW_TYPE.CURVE0);
-		else if (e.getSource() == figureItems[2]) canvas.setDrawType(DRAW_TYPE.TRIANGLE); 
-		else if (e.getSource() == figureItems[3]) canvas.setDrawType(DRAW_TYPE.RECTANGLE);
-		else if (e.getSource() == figureItems[4]) canvas.setDrawType(DRAW_TYPE.OVAL);
+		else if (e.getSource() == figureItems[0]) { canvas.setDrawType(DRAW_TYPE.LINE);			setShortcutButtonOn( 8);}
+		else if (e.getSource() == figureItems[1]) { canvas.setDrawType(DRAW_TYPE.CURVE0);		setShortcutButtonOn( 9); }
+		else if (e.getSource() == figureItems[2]) { canvas.setDrawType(DRAW_TYPE.TRIANGLE);		setShortcutButtonOn(10); }
+		else if (e.getSource() == figureItems[3]) { canvas.setDrawType(DRAW_TYPE.RECTANGLE);	setShortcutButtonOn(11); }
+		else if (e.getSource() == figureItems[4]) { canvas.setDrawType(DRAW_TYPE.OVAL);			setShortcutButtonOn(12); }
 
 		else if (e.getSource() == sizeItems[0]) canvas.setDrawType(DRAW_TYPE.SCALE);
 		else if (e.getSource() == sizeItems[1]) canvas.setDrawType(DRAW_TYPE.LEAN);
@@ -319,15 +322,15 @@ public class ê·¸ë¦¼íŒ extends JFrame implements ActionListener {
 		JTextArea textArea;
 		
 		AttributeDialog(JFrame frame, BasicFileAttributes attrb){
-			super(frame, "ì†ì„±", true);
+			super(frame, "¼Ó¼º", true);
 			/*
-			 * ì•„ì§ ëª» ë„£ì€ ì†ì„± ì •ë³´ :
-			 *     í•´ìƒë„
-			 *     ë„ˆë¹„ & ë†’ì´
+			 * ¾ÆÁ÷ ¸ø ³ÖÀº ¼Ó¼º Á¤º¸ :
+			 *     ÇØ»óµµ
+			 *     ³Êºñ & ³ôÀÌ
 			 */
 			textArea = new JTextArea(
-					"ë§ˆì§€ë§‰ ì €ì¥ ì‹œê°„ :\t" + attrb.lastModifiedTime() + "\n" +
-					"íŒŒì¼ í¬ê¸° :\t\t" + (attrb.size() / 1024.0f) + "KiB");
+					"¸¶Áö¸· ÀúÀå ½Ã°£ :\t" + attrb.lastModifiedTime() + "\n" +
+					"ÆÄÀÏ Å©±â :\t\t" + (attrb.size() / 1024.0f) + "KiB");
 			textArea.setEditable(false);
 			add(textArea);
 			
@@ -343,7 +346,7 @@ public class ê·¸ë¦¼íŒ extends JFrame implements ActionListener {
 		JButton okButton = new JButton("ok");
 		
 		public PensizeDialog(JFrame frame) {
-			super(frame, "íœ í¬ê¸° ì¡°ì ˆ", true);
+			super(frame, "Ææ Å©±â Á¶Àı", true);
 			setLayout(new FlowLayout());
 			
 			penCombo.setMaximumRowCount(6);
@@ -367,6 +370,9 @@ public class ê·¸ë¦¼íŒ extends JFrame implements ActionListener {
 
 	}
 	
+	public void setShortcutButtonOn(int index) {
+		shortcutButtons[index].setOnlyOneImgOn();
+	}
 	class ShortcutButton extends JLabel implements MouseListener {
 		private BufferedImage bImg;
 		private int buttonId;
@@ -382,7 +388,7 @@ public class ê·¸ë¦¼íŒ extends JFrame implements ActionListener {
 		
 		ShortcutButton(int index) {
 			super("",
-					new ImageIcon(new ImageIcon("./ê·¸ë¦¼íŒì•„ì´ì½˜/icon" + index + ".png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT)),
+					new ImageIcon(new ImageIcon("./±×¸²ÆÇ¾ÆÀÌÄÜ/icon" + index + ".png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT)),
 					SwingConstants.LEFT);
 			bImg = new BufferedImage(50, 50, BufferedImage.TYPE_INT_RGB);
 			buttonId = index;
@@ -390,16 +396,14 @@ public class ê·¸ë¦¼íŒ extends JFrame implements ActionListener {
 		}
 		
 		@Override
-		public void mouseClicked(MouseEvent e) { // ê¸°ì¡´ì˜ mouseClicked ì´ë²¤íŠ¸. ë‹¨, ê° ë²„íŠ¼ì˜ id ê°’ì— ì˜ì¡´í•œë‹¤.
-			setShortcutClicked();
-		}
+		public void mouseClicked(MouseEvent e) {}
 		@Override
 		public void mousePressed(MouseEvent e) {
 			setImgOn();
 		}
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			setShortcutClicked();
+			shortcutClicked();
 		}
 		@Override
 		public void mouseEntered(MouseEvent e) {
@@ -411,37 +415,47 @@ public class ê·¸ë¦¼íŒ extends JFrame implements ActionListener {
 				setImgOff();
 		}
 		
-		private void setImgOn() {
-			setIcon(new ImageIcon(new ImageIcon("./ê·¸ë¦¼íŒì•„ì´ì½˜/icon" + buttonId + "_clicked.png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT)));
-		}		
-		private void setImgOff() {
-			setIcon(new ImageIcon(new ImageIcon("./ê·¸ë¦¼íŒì•„ì´ì½˜/icon" + buttonId + ".png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT)));
-		}
-		private void setShortcutClicked() {
-			for (int i = 0; i < 13; ++i) {
+		private void clearShortcutImgs() {
+			for (int i = 0; i < 14; ++i) {
 				shortcutButtons[i].setImgOff();
 				shortcutButtons[i].isClicked = false;
 			}
+		}
+		private void setImgOn() {
+			setIcon(new ImageIcon(new ImageIcon("./±×¸²ÆÇ¾ÆÀÌÄÜ/icon" + buttonId + "_clicked.png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT)));
+		}
+		private void setOnlyOneImgOn() {
+			clearShortcutImgs();
 			isClicked = true;
-			if (buttonId != 0 && buttonId != 1 && buttonId != 2)
-				this.setImgOn();
+			setImgOn();
+		}
+		private void setImgOff() {
+			setIcon(new ImageIcon(new ImageIcon("./±×¸²ÆÇ¾ÆÀÌÄÜ/icon" + buttonId + ".png").getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT)));
+		}
+		private void shortcutClicked() {
+			isClicked = true;
+			if (buttonId == 0 || buttonId == 1 || buttonId == 2)
+				clearShortcutImgs();
+			else
+				setOnlyOneImgOn();
+//			System.out.println("shortcut clicked!");
 			
 			switch(buttonId) {
-			case 0: newFile();	break; // ìƒˆ íŒŒì¼
-			case 1: openFile();	break; // íŒŒì¼ ë¶ˆëŸ¬ì˜¤ê¸°
-			case 2: saveFile();	break; // íŒŒì¼ ì €ì¥
-			case 3: canvas.setDrawType(DRAW_TYPE.AREA0);		break;
-			case 4: canvas.setDrawType(DRAW_TYPE.PENCIL);		break;
-			case 5: canvas.setDrawType(DRAW_TYPE.FILL);			break;
-			case 6: canvas.setDrawType(DRAW_TYPE.ERASE);		break;
-			case 7: canvas.setDrawType(DRAW_TYPE.EXTRACTOR);	break;
-			case 8: canvas.setDrawType(DRAW_TYPE.LINE);			break;
-			case 9: canvas.setDrawType(DRAW_TYPE.CURVE0);		break;
+			case  0: newFile();		break; // »õ ÆÄÀÏ
+			case  1: openFile();	break; // ÆÄÀÏ ºÒ·¯¿À±â
+			case  2: saveFile();	break; // ÆÄÀÏ ÀúÀå
+			case  3: canvas.setDrawType(DRAW_TYPE.AREA0);		break;
+			case  4: canvas.setDrawType(DRAW_TYPE.PENCIL);		break;
+			case  5: canvas.setDrawType(DRAW_TYPE.FILL);		break;
+			case  6: canvas.setDrawType(DRAW_TYPE.ERASE);		break;
+			case  7: canvas.setDrawType(DRAW_TYPE.EXTRACTOR);	break;
+			case  8: canvas.setDrawType(DRAW_TYPE.LINE);		break;
+			case  9: canvas.setDrawType(DRAW_TYPE.CURVE0);		break;
 			case 10: canvas.setDrawType(DRAW_TYPE.TRIANGLE);	break;
 			case 11: canvas.setDrawType(DRAW_TYPE.RECTANGLE);	break;
 			case 12: canvas.setDrawType(DRAW_TYPE.OVAL);		break;
 			case 13:
-				Color c = JColorChooser.showDialog(null, "íœ ìƒ‰ ê²°ì •", canvas.getPenColor());
+				Color c = JColorChooser.showDialog(null, "Ææ »ö °áÁ¤", canvas.getPenColor());
 				canvas.setPenColor(c);
 				break;
 			case 14: canvas.setDrawType(DRAW_TYPE.SCALE);		break;
