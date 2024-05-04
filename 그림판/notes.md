@@ -203,6 +203,32 @@
 `extractor(g)`의 `setShortcutButtonOn(idx)`와 관련된 조건문의 `drawType`을 `oldDrawType`로 바꿨지만 결과의 차이점은 없었다.
 따라서 이 버그의 원인은 `setDrawType(type)`또는 그 참조에 있으리라 생각된다.
 
+`setDrawType(type)`의 타입 값을 주는 과정에서 그 값을 출력하도록 `sysout`을 추가했다.
+```java
+[구문 추가]
+...
+oldDrawType = drawType;
+System.out.println("old draw type : " + oldDrawType);  //추가됨
+drawType = type;
+System.out.println("new draw type : " + drawType);     //추가됨
+```
+아니나 다를까 `shortcutButtons`를 통해 추츨을 선택했을 때, 아래와 같이 `oldDrawType`과 `newDrawType`이 같아진다.
+```
+[shotCut 선택 시 출력문]
+old draw type : PENCIL
+new draw type : EXTRACTOR
+old draw type : EXTRACTOR
+new draw type : EXTRACTOR
+```
+또한, 이를 통해 `setDrawType(type)`가 두 번 실행됨을 알 수 있다.
+~~그럼 두 번째 `setDrawType(type)`는 도대체 어디에 있는건데!~~
+
+`setDrawType(type)`가 두 번 실행되는 것이 `shortcutClicked()`가 두 번 실행되기 때문이라는 것까지 확인됐다.
+
+`shortcutClicked()`가 두 번 실행되는 원인이 해당 함수가 `mouseClicked(e)`와 `mouseReleased(e)`모두에 포함되어 있었기 때문이라는 결론이 났다.
+원인이 이러하기 때문에 드물게 버튼을 클릭했을 때에만 정상적으로 동작했던 것이다...
+`mouseClicked(e)`에서 `shortcutClicked()`를 제거한 이후에는 정상적으로 동작한다.
+
 ---
 
 ### 붙여넣기 두 번 실행 시 백지 출력 오류
