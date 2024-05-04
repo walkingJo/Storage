@@ -347,6 +347,8 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 //		curvePt1
 //		curvePt2
 //		dstPt
+		float speed_x; //여기서부터 수정
+		//3(-1+2-3+4)t^2 + 2(3*1-2*2+1)t + (-3*1+2)
 	}
 	private void drawCurve(Graphics graphics) {
 //		for (float t = 0.0f; t <= 1; t += 0.01f) {
