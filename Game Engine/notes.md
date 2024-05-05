@@ -27,8 +27,6 @@
       - 무적
 - 카메라 조작
 
----
-
 ### 핵심 클래스 연결도
 이 프로젝트의 구조적인 축은 `Game`, `GameEngine`, `GameManager`이고, 기능적인 축은 `RenderEngine`, `PhysicsEngine`, `Object`이다.
 위 클래스들은 아래와 같이 연결된다.
@@ -86,8 +84,6 @@
         +-------------+
 ```
 
----
-
 ### 추가할 것 :
 - `GameEngine`클래스에 `GetInput()`함수 추가 및 **입력 전달 방법** 고민
 - `Vector3`의 `rotate(axis, radian)`함수를 쿼터니언을 통해 구현
@@ -140,8 +136,6 @@ InputProcessor 의 타입으로 선언하는 모든 변수에서 C2027 의 오�
     마치 함수 정의를 아래에 둘 때, 프로토타입을 선언하는 것과 같은 이치라고 판단됨.
 ```
 
----
-
 ### `Update`의 순서?
 - `pEngine`, `gEngine`, `manager`, `object`의 업데이트 순서를 어떻게 정해야 하는가?
 - 일단 `gEngine`가 가장 마지막에 실행되는 것은 고정이다.
@@ -151,14 +145,10 @@ InputProcessor 의 타입으로 선언하는 모든 변수에서 C2027 의 오�
 
 따라서 최종적인 순서는 `pEngine`→`object`→`manager`→`gEngine` 이다.
 
----
-
 ### `GameManager`의 활용!
 - 게임 엔진을 조작해 게임을 진행하는 코드를 업데이트에 넣도록 한다.
 - 마치 **유티니의 `Scene`과 같은** 활용법도 가능할듯.
   - GameManager를 다수 생성해서 특정 상황에서 교체해 사용
-
----
 
 ### `RenderEngine` 구현
 
@@ -174,8 +164,6 @@ void update(Object** objects, int objectCount) {
 ```
 본래대로라면 `GameEngine*`를 받아서 진행해야 하지만, `C2027`오류 때문에 위와 같이 진행하게 됐다.
 
----
-
 ### `Model::rotate()` 구현
 
 `rotate()`는 아래와 같이 구현했다. 변수의 값을 바꾸는 동시에 반환값이 존재한다.
@@ -189,8 +177,6 @@ Vector3 rotate(const Vector3& axis, float radian) {
     return *this;
 }
 ```
-
----
 
 ### 현재 남은 작업들
 
@@ -212,8 +198,6 @@ Vector3 rotate(const Vector3& axis, float radian) {
   - `enum class`의 각각의 요소가 하위 개체를 갖는 것이 가능한가?
   - 보조 상태가 얼마 되지 않는다면 `BATTLE_FIGHT`, `BATTLE_GROGGY`처럼 하나하나 다 만드는 것도 상관은 없을 것 같다.
   - 아니면 상태 변수를 2개 만들어 활용하는 것도 고려해볼 만 하다.
-
----
 
 ### manager의 역할
 FPS같은 경우는 대부분 객체의 프로세스를 따른다.
@@ -238,11 +222,31 @@ FPS같은 경우는 대부분 객체의 프로세스를 따른다.
 - `centor`는 모델의 회전중심
 - `vertices`는 `centor`에 대한 상대좌표
   - `vertices`를 절대좌표로 저장하던 이전과는 다르다!
+    - 또한 덕분에 `rotate()`의 구현이 한결 편해졌다.
 - `Model::rotate()`는 모델의 정보 자체를 수정한다.
 - `Model::move()`에 더해, 회전중심을 옮기는 함수도 필요하다.
 
 중요한 점을 일깨워 주신 아버지께 감사를.
 
----
+#### `Object::rotateX()`, `Object::rotateY()`, `Object::rotateZ()`를 위한 `Model`의 필드...?
 
-### 
+이를 위해서는 `Model`에 방향벡터가 존재해야 하는 것 아닌가 싶다.
+
+모든 `Model`에 방향벡터가 있으면 골치아프니까 `Object`에만 부여할까?
+- 이거 좋은 듯
+
+### 마우스 입력
+
+전투 중에는 마우스가 중앙에 고정될 수 있도록 방법을 찾아보자.(`Windows API`를 참고해보자.)
+- 이 방식을 사용하면 `SDL_MOUSEMOTION`에 해당하는 연산을 더욱 자연스럽고 직관적으로 작성할 수 있다.
+
+마우스 좌우 키를 구분할 수 있어야 한다.
+- 현재는 좌우 구분 없이 입력을 받는다.
+- FPS류의 발사, 조준과 같은 기능을 구현하려면 필수적으로 필요하다.
+
+### 예상 오류 발생 지점!
+
+이걸 왜 이제야 생각해냈는지는 모르겠는데 암튼 중요하다.
+
+0으로 나누는 문제들
+- 이전 프로젝트에 분명 뭔가 있었다. 반드시 생각해내기를
