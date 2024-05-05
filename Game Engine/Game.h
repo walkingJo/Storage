@@ -17,7 +17,7 @@ public:
 	}
 
 	void run() {
-		initialize();
+		init();
 		engine->run();
 		this->~Game();
 	}
@@ -26,7 +26,7 @@ private:
 	GameEngine* engine;
 	GameManager* manager;
 
-	virtual void initialize() {
+	virtual void init() {
 		manager->init();
 		engine->init();
 		engine->setManager(manager);

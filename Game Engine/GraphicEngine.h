@@ -31,12 +31,12 @@ public:
 				depthBuffer[row][col] = ScreenFar;
 		}
 	}
-	/*void update(GameEngine* engine) {
-		clear(0x4E, 0xC9, 0xB0);
-		for (int i = 0; i < engine->livingObjectsCount; ++i)
-			drawObject(engine->livingObjects[i]);
-		renderPresent();
-	}*/
+	//void update(GameEngine* engine) {
+	//	clear(0x4E, 0xC9, 0xB0);
+	//	for (int i = 0; i < engine->livingObjectsCount; ++i)
+	//		drawObject(engine->livingObjects[i]);
+	//	renderPresent();
+	//}
 	void update(Object** objects, int objectCount) {
 		clear(0x4E, 0xC9, 0xB0);
 		for (int i = 0; i < objectCount; ++i)

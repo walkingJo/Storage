@@ -10,7 +10,7 @@ class Model {
 public:
 	Model(Vector3 centor, Vector3* vertices, int verCount, int* indices, int idxCount) {
 		this->centor = centor;
-		this->direction = Vector3::UnitY;
+		//this->direction = Vector3::UnitY;
 		
 		this->verSize = verCount;
 		this->vertices = new Vector3[verSize];
@@ -24,7 +24,7 @@ public:
 	}
 	Model(Vector3 centor, std::vector<Vector3> vertices, std::vector<int> indices) {
 		this->centor = centor;
-		this->direction = Vector3::UnitY;
+		//this->direction = Vector3::UnitY;
 
 		this->verSize = (int)vertices.size();
 		this->vertices = new Vector3[verSize];
@@ -43,22 +43,29 @@ public:
 
 	void move(const Vector3& movement) {
 		centor += movement;
+		//하위모델->move(movement);
 	}
 	void moveTo(const Vector3& location) {
-		centor = location;
+		move(location - centor);
 	}
+	/*vertices는 centor의 상대좌표.
+	* 따라서 centor와 vertices의 회전은 별개로 생각해야 한다.
+	*/
 	void rotate(const Vector3& axis, float radian) {
-		direction.rotate(axis, radian);
+		for (int i = 0; i < verSize; ++i) {
+			vertices[i].rotate(axis, radian);
+		}
+		//하위모델->rotate(axis, radian, centor);
 	}
 	void rotate(const Vector3& axis, float radian, const Vector3& rotateCentor) {
+		move(-1 * rotateCentor);
+		centor.rotate(axis, radian);
 		rotate(axis, radian);
-		centor = (centor - rotateCentor).rotate(axis, radian) + rotateCentor;
+		move(rotateCentor);
 	}
 	void scale(float xScale, float yScale, float zScale) {
 		for (int i = 0; i < verSize; ++i) {
-			vertices[i] =
-				(vertices[i] - centor) * Vector3(xScale, yScale, zScale)
-				+ centor;
+			vertices[i] *= Vector3(xScale, yScale, zScale);
 		}
 	}
 	
@@ -108,9 +115,10 @@ public:
 
 private:
 	Vector3 centor;
-	Vector3 direction;
-	Vector3* vertices;	short verSize;
-	short* indices;		short idxSize;
+	short verSize;
+	short idxSize;
+	Vector3* vertices; //좌표점들은 모두 centor에 대한 상대좌표이다.
+	short* indices;
 };
 
 #pragma region preprocessed model data

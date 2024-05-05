@@ -11,7 +11,7 @@ public:
 	}
 
 	void init() {
-		//
+		return;
 	}
 	void update(GameEngine* engine) {
 		return;

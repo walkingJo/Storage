@@ -44,6 +44,12 @@ public:
 		z *= scalar;
 		return *this;
 	}
+	Vector3& operator*=(const Vector3& right) {
+		x *= right.x;
+		y *= right.y;
+		z *= right.z;
+		return *this;
+	}
 	Vector3& operator+=(const Vector3& right) {
 		x += right.x;
 		y += right.y;
@@ -96,7 +102,6 @@ public:
 
 	Vector3 rotate(const Vector3& axis, float radian) {
 		//https://jebae.github.io/quaternion-rotation
-		//C:\Users\rererererelo\Pictures\Screenshots\½ºÅ©¸°¼¦ 2024-04-11 221005.png
 		Vector3 qv = sin(radian / 2.0f) * axis;
 		float   qw = cos(radian / 2.0f);
 		*this += 2.0f * Vector3::Cross(qv, Vector3::Cross(qv, *this) + qw * *this);

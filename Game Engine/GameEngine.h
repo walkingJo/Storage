@@ -78,9 +78,9 @@ public:
 private:
 	MouseCoord newCoord;
 	MouseCoord oldCoord;
-	bool isMousePressed;
-	bool isMouseMoved;
 	const Uint8* keyState;
+	bool isMousePressed; //언젠가는 rMouse, lMouse로 분리한다.
+	bool isMouseMoved;
 
 	bool processRunning;
 };
@@ -105,7 +105,7 @@ public:
 		delete pEngine;
 		delete gEngine;
 
-		//delete input;
+		delete input;
 	
 		for (int i = 0; i < livingObjectsCount; ++i)
 			delete livingObjects[i];
@@ -130,12 +130,12 @@ public:
 			isRunning = input->isRunning();
 #pragma endregion
 #pragma region Update
+			//object와 manager의 update()에는 충돌 판정이 필요하므로,
+			//    pEngine->object->Manager 의 순서로 update()를 실행하는 것임
 			timeUpdate();
 			pEngine->update(this);
-			for (int i = 0; i < livingObjectsCount; ++i)
-				livingObjects[i]->update();
-			manager->update(input); //manager의 연산에는 충돌 판정이 필요하므로 `pEngine`->`Manager`의 순서로 `update()`를 진행하는 것임
-			//gEngine->update(this);
+			for (int i = 0; i < livingObjectsCount; ++i) livingObjects[i]->update();
+			manager->update(input);
 			gEngine->update(livingObjects, livingObjectsCount);
 #pragma endregion
 		}
