@@ -12,9 +12,9 @@ public:
 		this->centor = centor;
 		//this->direction = Vector3::UnitY;
 		
-		this->verSize = verCount;
-		this->vertices = new Vector3[verSize];
-		for (int i = 0; i < verSize; ++i)
+		this->vrtSize = verCount;
+		this->vertices = new Vector3[vrtSize];
+		for (int i = 0; i < vrtSize; ++i)
 			this->vertices[i] = vertices[i];
 
 		this->idxSize = idxCount;
@@ -26,9 +26,9 @@ public:
 		this->centor = centor;
 		//this->direction = Vector3::UnitY;
 
-		this->verSize = (int)vertices.size();
-		this->vertices = new Vector3[verSize];
-		for (int i = 0; i < verSize; ++i)
+		this->vrtSize = (int)vertices.size();
+		this->vertices = new Vector3[vrtSize];
+		for (int i = 0; i < vrtSize; ++i)
 			this->vertices[i] = vertices[i];
 
 		this->idxSize = (int)indices.size();
@@ -52,7 +52,7 @@ public:
 	* 따라서 centor와 vertices의 회전은 별개로 생각해야 한다.
 	*/
 	void rotate(const Vector3& axis, float radian) {
-		for (int i = 0; i < verSize; ++i) {
+		for (int i = 0; i < vrtSize; ++i) {
 			vertices[i].rotate(axis, radian);
 		}
 		//하위모델->rotate(axis, radian, centor);
@@ -64,7 +64,7 @@ public:
 		move(rotateCentor);
 	}
 	void scale(float xScale, float yScale, float zScale) {
-		for (int i = 0; i < verSize; ++i) {
+		for (int i = 0; i < vrtSize; ++i) {
 			vertices[i] *= Vector3(xScale, yScale, zScale);
 		}
 	}
@@ -115,7 +115,7 @@ public:
 
 private:
 	Vector3 centor;
-	short verSize;
+	short vrtSize;
 	short idxSize;
 	Vector3* vertices; //좌표점들은 모두 centor에 대한 상대좌표이다.
 	short* indices;

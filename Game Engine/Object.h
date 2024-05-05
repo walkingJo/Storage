@@ -47,7 +47,6 @@ public:
 		move(rotateCentor);
 	}
 
-	//basisConversionTo //>> 얘는 어디다 넣는게 맞는건가
 	void lookAt(Vector3 target) {
 		Vector3 targetDirection = target - location;
 		targetDirection.normalize();

@@ -13,12 +13,12 @@ public:
 	void init() {
 		return;
 	}
-	void update(GameEngine* engine) {
+	void update(Object** objects, int objectSize) {
 		return;
 	}
 
 private:
-	//?
+	//일단 GraphicEngine이 다 만들어지기 전까지는 방치해두자
 };
 
 #endif // !PHYSICS_ENGINE_H

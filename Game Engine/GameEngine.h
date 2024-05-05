@@ -94,8 +94,8 @@ public:
 
 		input = new InputProcessor();
 
-		livingObjects = new Object * [MaxObjects];	livingObjectsCount = 0;
-		deadObjects = new Object * [MaxObjects];	deadObjectsCount = 0;
+		objects = new Object * [MaxObjects];
+		objSize = 0;
 
 		clock = 0;
 		deltaTime = 0.1f;
@@ -105,14 +105,10 @@ public:
 		delete pEngine;
 		delete gEngine;
 
+		delete manager;
 		delete input;
-	
-		for (int i = 0; i < livingObjectsCount; ++i)
-			delete livingObjects[i];
-		for (int i = 0; i < deadObjectsCount; ++i)
-			delete deadObjects[i];
-		delete livingObjects;
-		delete deadObjects;
+
+		delete objects;
 	}
 
 	void init() {
@@ -131,20 +127,27 @@ public:
 #pragma endregion
 #pragma region Update
 			//object와 manager의 update()에는 충돌 판정이 필요하므로,
-			//    pEngine->object->Manager 의 순서로 update()를 실행하는 것임
+			//    pEngine->object->Manager 의 순서로 update()를 실행하는 것이다.
 			timeUpdate();
-			pEngine->update(this);
-			for (int i = 0; i < livingObjectsCount; ++i) livingObjects[i]->update();
+			manager->setObjects();
+			pEngine->update(objects, objSize);
 			manager->update(input);
-			gEngine->update(livingObjects, livingObjectsCount);
+			gEngine->update(objects, objSize);
 #pragma endregion
 		}
 	}
 
+	void resetObjects() {
+		for (int i = 0; i < objSize; ++i)
+			objects[i] = nullptr;
+	}
+	void addObject(Object* obj) {
+		//
+	}
+
 private:
 #pragma region Engine Fields
-	friend GraphicEngine;
-	friend PhysicsEngine;
+
 
 	PhysicsEngine* pEngine;
 	GraphicEngine* gEngine;
@@ -152,8 +155,8 @@ private:
 
 	InputProcessor* input;
 
-	Object** livingObjects;	int livingObjectsCount;
-	Object** deadObjects;	int deadObjectsCount;
+	Object** objects;
+	short objSize;
 #pragma endregion
 
 #pragma region Time Fields

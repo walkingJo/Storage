@@ -37,9 +37,9 @@ public:
 	//		drawObject(engine->livingObjects[i]);
 	//	renderPresent();
 	//}
-	void update(Object** objects, int objectCount) {
+	void update(Object** objects, int objectSize) {
 		clear(0x4E, 0xC9, 0xB0);
-		for (int i = 0; i < objectCount; ++i)
+		for (int i = 0; i < objectSize; ++i)
 			drawObject(objects[i]);
 		renderPresent();
 	}

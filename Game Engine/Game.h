@@ -9,11 +9,11 @@ class Game {
 public:
 	Game() {
 		engine = new GameEngine();
-		manager = new GameManager();
+		defaultManager = new GameManager();
 	}
 	~Game() {
 		delete engine;
-		delete manager;
+		delete defaultManager;
 	}
 
 	void run() {
@@ -24,12 +24,12 @@ public:
 
 private:
 	GameEngine* engine;
-	GameManager* manager;
+	GameManager* defaultManager;
 
 	virtual void init() {
-		manager->init();
+		defaultManager->init();
 		engine->init();
-		engine->setManager(manager);
+		engine->setManager(defaultManager);
 	}
 };
 
