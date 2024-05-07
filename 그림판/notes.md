@@ -246,7 +246,7 @@ new draw type : EXTRACTOR
 
 ## 곡선 출력 방식의 변경 및 기존 방식과의 비교
 
-[비교 이미지](그림판/캡처/곡선 출력 방식 비교_1.png)
+![비교 이미지](https://raw.githubusercontent.com/walkingJo/Storage/main/그림판/캡처/곡선%20출력%20방식%20비교_1.png)
 
 이전의 방식과 비교해보면 출력이 꽤 균등해진 것은 사실이나, 여전히 불균형한 부분이 있다.
 
