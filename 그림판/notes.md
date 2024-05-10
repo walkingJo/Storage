@@ -251,3 +251,38 @@ new draw type : EXTRACTOR
 이전의 방식과 비교해보면 출력이 꽤 균등해진 것은 사실이나, 여전히 불균형한 부분이 있다.
 
 추후에 `curveSpeed(t)`함수에 오류가 없는지 확인해보자
+
+---
+
+# 2024-05-10
+
+위와 같은 상황에서 중앙의 한 바퀴 도는 부분의 간격이 큰 것은 해당 부분의 속도가 지나치게 느리기 때문이다.
+
+이는 이전의 방식과 비교했을 때, 속도가 빠른 부분에 대처는 좋을지 몰라도, 속도가 느린 부분에 대한 대처가 미흡하다고 볼 수 있다.
+
+하지만 이렇게 속도가 지나치게 느린 부분은 거의 존재하지 않기 때문에 부분적으로 수정하는 방식을 채택하는 것이 좋다고 생각한다.
+
+종합하자면, 단순히 속도가 일정 수준 이상으로 줄어들면 계수를 고정시키는 것이 좋다고 생각한다.
+
+이에 따라 아래와 같이 코드를 수정했다.
+
+```java
+float k = 1.0f;
+float coefficient = 1.0f;
+for (float t = 0.0f; t <= 1; t += coefficient) {
+	Point lerpedPt11 = lerp(srcPt, curvePt1, t);
+	Point lerpedPt12 = lerp(curvePt1, curvePt2, t);
+	Point lerpedPt13 = lerp(curvePt2, dstPt, t);
+
+	Point lerpedPt21 = lerp(lerpedPt11, lerpedPt12, t);
+	Point lerpedPt22 = lerp(lerpedPt12, lerpedPt13, t);
+
+	Point lerpedPt31 = lerp(lerpedPt21, lerpedPt22, t);
+
+	circle(graphics, lerpedPt31);
+
+	coefficient = k / curveSpeed(t);
+	if (coefficient > 0.02f)
+		coefficient = 0.02f;
+}
+```
