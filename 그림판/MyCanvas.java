@@ -374,8 +374,7 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 
 //		float k = 10.0f;
 		float k = 1.0f;
-		float coefficient = 1.0f;
-		for (float t = 0.0f; t <= 1; t += coefficient) {
+		for (float t = 0.0f, coefficient = 0.0f; t <= 1; t += coefficient) {
 			Point lerpedPt11 = lerp(srcPt, curvePt1, t);
 			Point lerpedPt12 = lerp(curvePt1, curvePt2, t);
 			Point lerpedPt13 = lerp(curvePt2, dstPt, t);
@@ -388,8 +387,8 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 			circle(graphics, lerpedPt31);
 		
 			coefficient = k / curveSpeed(t);
-			if (coefficient > 0.02f)
-				coefficient = 0.02f;
+			if (coefficient > 0.004f)
+				coefficient = 0.004f;
 		}
 	}
 	private void drawTriangle(Graphics graphics) { 
