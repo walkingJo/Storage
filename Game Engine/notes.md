@@ -325,3 +325,47 @@ FPS같은 경우는 대부분 객체의 프로세스를 따른다.
 2. `Objects`를 총괄해서 저장할 곳이 필요하다.
    - 일단 `GameManager`과 `GameEngine`중 하나다.
 3. 전달 과정은 됟록이면 깔끔하기를 원하기 때문에, 2)의 총괄 클래스를 인자로 맏도록 한다.
+
+# 2024-05-13
+
+## objects 관련
+
+어느 한 곳에 `objects`배열을 선언해 사용할 수 없는 것은 내부에서 원하는 오브젝트를 찾기 힘들기 때문이다.
+
+그렇기 때문에 ID를 부여하여 활용한다면 충분히 써먹을 만 하다고 생각했다.
+
+### Object에 ID 추가
+
+~~가장 간단하면서도 겹칠 우려가 없는 `clock()`으로 초기화하기로 했다.~~
+
+확인 결과, clock()은 숫자가 겹칠 가능성이 있기 때문에 그보다 더 작은 시간을 다루는 `chrono`를 사용하기로 했다.
+
+시간을 확인하는 함수는 다음과 같다.
+
+```cpp
+#include <chrono>
+std::chrono::system_clock::now();
+```
+
+---
+
+### GameManager의 objects 관련
+
+관련 필드를 모두 public으로 처리했다.
+- friend 선언 시 정체불명의 오류가 발생하기 때문
+  - Object에서 Model 필드를 선언할 때 역시 비슷한 문제가 발생 -> friend에 대해 더 공부하자
+ 
+pEngine, gEngine의 update()의 인자로 manager를 받게 했다.
+
+---
+
+## graphic 관련
+
+drawModel() 및 drawTriangle()의 내용을 대략적으로 작성
+- 이 이상을 작성하기 위해서는 기저변환 코드가 필요하다.
+
+---
+
+## Vector3 관련 수정사항
+
+기저변환, rotate(), lookAt(), scale()의 내용 수정
