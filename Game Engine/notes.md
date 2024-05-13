@@ -354,50 +354,6 @@ std::chrono::system_clock::now();
 관련 필드를 모두 public으로 처리했다.
 - friend 선언 시 정체불명의 오류가 발생하기 때문
   - Object에서 Model 필드를 선언할 때 역시 비슷한 문제가 발생 -> friend에 대해 더 공부하자
-
-GameManager에서 단순히 friend 키워드를 사용한 것만으로 아래의 오류들 발생.
-도대체 왜 이렇게 많은 문제가 생기는 것인가?
-```cpp
-private:
-    friend PhysicsEngine;
-    friend GraphicEngine;
-    Object** objects;
-    int objSize;
-```
-```
-1>C:\Users\rererererelo\Desktop\Projects\C++ Projects\Project Game Engine\Project Game Engine\GameManager.h(34,9): error C2433: 'PhysicsEngine': 데이터 선언에 'friend'을(를) 사용할 수 없습니다.
-1>(소스 파일 'Main.cpp'을(를) 컴파일하는 중)
-1>C:\Users\rererererelo\Desktop\Projects\C++ Projects\Project Game Engine\Project Game Engine\GameManager.h(34,22): error C4430: 형식 지정자가 없습니다. int로 가정합니다. 참고: C++에서는 기본 int를 지원하지 않습니다.
-1>(소스 파일 'Main.cpp'을(를) 컴파일하는 중)
-1>C:\Users\rererererelo\Desktop\Projects\C++ Projects\Project Game Engine\Project Game Engine\GameManager.h(35,9): error C2433: 'GraphicEngine': 데이터 선언에 'friend'을(를) 사용할 수 없습니다.
-1>(소스 파일 'Main.cpp'을(를) 컴파일하는 중)
-1>C:\Users\rererererelo\Desktop\Projects\C++ Projects\Project Game Engine\Project Game Engine\GameManager.h(35,22): error C4430: 형식 지정자가 없습니다. int로 가정합니다. 참고: C++에서는 기본 int를 지원하지 않습니다.
-...
-1>C:\Users\rererererelo\Desktop\Projects\C++ Projects\Project Game Engine\Project Game Engine\GameEngine.h(89,3): error C2065: 'pEngine': 선언되지 않은 식별자입니다.
-1>(소스 파일 'Main.cpp'을(를) 컴파일하는 중)
-1>C:\Users\rererererelo\Desktop\Projects\C++ Projects\Project Game Engine\Project Game Engine\GameEngine.h(89,17): error C2061: 구문 오류: 식별자 'PhysicsEngine'
-1>(소스 파일 'Main.cpp'을(를) 컴파일하는 중)
-1>C:\Users\rererererelo\Desktop\Projects\C++ Projects\Project Game Engine\Project Game Engine\GameEngine.h(90,3): error C2065: 'gEngine': 선언되지 않은 식별자입니다.
-1>(소스 파일 'Main.cpp'을(를) 컴파일하는 중)
-1>C:\Users\rererererelo\Desktop\Projects\C++ Projects\Project Game Engine\Project Game Engine\GameEngine.h(90,17): error C2061: 구문 오류: 식별자 'GraphicEngine'
-1>(소스 파일 'Main.cpp'을(를) 컴파일하는 중)
-1>C:\Users\rererererelo\Desktop\Projects\C++ Projects\Project Game Engine\Project Game Engine\GameEngine.h(100,10): error C2065: 'pEngine': 선언되지 않은 식별자입니다.
-1>(소스 파일 'Main.cpp'을(를) 컴파일하는 중)
-1>C:\Users\rererererelo\Desktop\Projects\C++ Projects\Project Game Engine\Project Game Engine\GameEngine.h(100,3): error C2541: 'delete': 포인터가 아닌 개체를 삭제할 수 없습니다.
-1>(소스 파일 'Main.cpp'을(를) 컴파일하는 중)
-1>C:\Users\rererererelo\Desktop\Projects\C++ Projects\Project Game Engine\Project Game Engine\GameEngine.h(101,10): error C2065: 'gEngine': 선언되지 않은 식별자입니다.
-1>(소스 파일 'Main.cpp'을(를) 컴파일하는 중)
-1>C:\Users\rererererelo\Desktop\Projects\C++ Projects\Project Game Engine\Project Game Engine\GameEngine.h(101,3): error C2541: 'delete': 포인터가 아닌 개체를 삭제할 수 없습니다.
-1>(소스 파일 'Main.cpp'을(를) 컴파일하는 중)
-1>C:\Users\rererererelo\Desktop\Projects\C++ Projects\Project Game Engine\Project Game Engine\GameEngine.h(108,3): error C2065: 'gEngine': 선언되지 않은 식별자입니다.
-1>(소스 파일 'Main.cpp'을(를) 컴파일하는 중)
-1>C:\Users\rererererelo\Desktop\Projects\C++ Projects\Project Game Engine\Project Game Engine\GameEngine.h(109,3): error C2065: 'pEngine': 선언되지 않은 식별자입니다.
-1>(소스 파일 'Main.cpp'을(를) 컴파일하는 중)
-1>C:\Users\rererererelo\Desktop\Projects\C++ Projects\Project Game Engine\Project Game Engine\GameEngine.h(125,4): error C2065: 'pEngine': 선언되지 않은 식별자입니다.
-1>(소스 파일 'Main.cpp'을(를) 컴파일하는 중)
-1>C:\Users\rererererelo\Desktop\Projects\C++ Projects\Project Game Engine\Project Game Engine\GameEngine.h(127,4): error C2065: 'gEngine': 선언되지 않은 식별자입니다.
-1>(소스 파일 'Main.cpp'을(를) 컴파일하는 중)
-```
  
 pEngine, gEngine의 update()의 인자로 manager를 받게 했다.
 
@@ -412,4 +368,7 @@ drawModel() 및 drawTriangle()의 내용을 대략적으로 작성
 
 ## Vector3 관련 수정사항
 
-기저변환, rotate(), lookAt(), scale()의 내용 수정
+direction을 directionX, directionY, directionZ로 분리해 사용하는 것으로 결정했다.
+하지만 이렇게 한다면 메모리 낭비가 되기 때문에 추후에 해결책을 찾아야 한다.
+
+기저변환, rotate(), lookAt(), scale()의 내용 수정.
