@@ -372,3 +372,148 @@ direction을 directionX, directionY, directionZ로 분리해 사용하는 것으
 하지만 이렇게 한다면 메모리 낭비가 되기 때문에 추후에 해결책을 찾아야 한다.
 
 기저변환, rotate(), lookAt(), scale()의 내용 수정.
+
+---
+
+# 2024-05-14
+
+## 기저변환에 대한 오늘의 이해
+
+기저변환은 원론적으로 벡터의 값은 놔둔 채, 표현만을 바꾸는 것이다.
+
+에를 들어 기저 $\alpha$, $\beta$에 대해서
+
+$$
+\begin{pmatrix}
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 0 & 1 \\
+\end{pmatrix}
+\= [\alpha],
+\begin{pmatrix}
+\\
+\hat{i} & \hat{j} & \hat{k} \\
+\\
+\end{pmatrix}
+\= [\beta]
+$$
+
+벡터 v는 $\alpha$와 $\beta$에 대해 아래와 같이 표현할 수 있다.
+
+$$
+v \=
+\begin{pmatrix}
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 0 & 1 \\
+\end{pmatrix}
+\begin{pmatrix}
+x \\
+y \\
+z \\
+\end{pmatrix}
+\=
+\begin{pmatrix}
+\\
+\hat{i} & \hat{j} & \hat{k} \\
+\\
+\end{pmatrix}
+\begin{pmatrix}
+a \\
+b \\
+c \\
+\end{pmatrix}
+$$
+
+이를 간추리면 아래처럼도 표현할 수 있을 듯 하다.
+
+$$
+\begin{pmatrix}
+x \\
+y \\
+z \\
+\end{pmatrix} _{[\alpha]}
+\=
+\begin{pmatrix}
+a \\
+b \\
+c \\
+\end{pmatrix} _{[\beta]}
+$$
+
+T가 $\alpha$에서 $\beta$로의 기저변환행렬이라 할 때, (기저변환은 단순히 표현의 변환에 지나지 않으므로) 아래와 같이 볼 수 있다.
+
+$$
+\begin{aligned}
+&
+T
+\begin{pmatrix}
+x \\
+y \\
+z \\
+\end{pmatrix}
+\=
+\begin{pmatrix}
+a \\
+b \\
+c \\
+\end{pmatrix} \\
+&
+\begin{pmatrix}
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 0 & 1 \\
+\end{pmatrix}
+\begin{pmatrix}
+x \\
+y \\
+z \\
+\end{pmatrix}
+\=
+\begin{pmatrix}
+\\
+\hat{i} & \hat{j} & \hat{k} \\
+\\
+\end{pmatrix}
+\begin{pmatrix}
+a \\
+b \\
+c \\
+\end{pmatrix} \\
+&
+\begin{pmatrix}
+\\
+\hat{i} & \hat{j} & \hat{k} \\
+\\
+\end{pmatrix}^{-1}
+\begin{pmatrix}
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 0 & 1 \\
+\end{pmatrix}
+\begin{pmatrix}
+x \\
+y \\
+z \\
+\end{pmatrix}
+\=
+\begin{pmatrix}
+a \\
+b \\
+c \\
+\end{pmatrix} \\
+&
+T \=
+\begin{pmatrix}
+\\
+\hat{i} & \hat{j} & \hat{k} \\
+\\
+\end{pmatrix}^{-1} \\
+\end{aligned}
+$$
+
+나의 경우로 생각해 보면, v는 기본적으로 표준기저로 표현되므로, Tv는 카메라 기준 
+
+카메라에 대한 ~ = T
+
+카메라 이동에 대한 ~ = T^{-1}
