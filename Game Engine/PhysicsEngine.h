@@ -13,7 +13,9 @@ public:
 	void init() {
 		return;
 	}
-	void update(Object** objects, int objectSize) {
+	void update(GameManager* manager) {
+		Object** objects = manager->objects;
+		int objSize = manager->objSize;
 		return;
 	}
 

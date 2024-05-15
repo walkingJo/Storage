@@ -3,23 +3,23 @@
 #define GAME_MANAGER_H
 
 #include "GameEngine.h"
+#include "Object.h"
+
+constexpr int MaxObjects = 50;
 
 class GameManager {
 public:
 	GameManager() {
 		engine = nullptr;
-		gEngine = nullptr;
+		objects = new Object * [MaxObjects];
+		objSize = 0;
 	}
 
 	virtual void init() {
 		return;
 	}
-	void setEngines(class GameEngine* engine, class GraphicEngine* gEngine) {
+	void setEngines(class GameEngine* engine) {
 		this->engine = engine;
-		this->gEngine = gEngine;
-	}
-	virtual void setObjects() {
-		return;
 	}
 	/* 실질적으로 게임을 돌아가게 하는 함수. */
 	/* GameManager는 내부에 Object들의 목록을 가지고 있으며,
@@ -31,7 +31,12 @@ public:
 
 private:
 	GameEngine* engine;
-	GraphicEngine* gEngine; //카메라 조작을 위한 필드다.
+
+	//friend PhysicsEngine;
+	//friend GraphicEngine;
+public:
+	Object** objects;
+	int objSize;
 };
 
 #endif // !GAME_MANAGER_H

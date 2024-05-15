@@ -6,8 +6,6 @@
 #include "PhysicsEngine.h"
 #include "GraphicEngine.h"
 
-constexpr int MaxObjects = 50;
-
 class MouseCoord {
 public:
 	int xCoord;
@@ -94,9 +92,6 @@ public:
 
 		input = new InputProcessor();
 
-		objects = new Object * [MaxObjects];
-		objSize = 0;
-
 		clock = 0;
 		deltaTime = 0.1f;
 		isRunning = true;
@@ -107,8 +102,6 @@ public:
 
 		delete manager;
 		delete input;
-
-		delete objects;
 	}
 
 	void init() {
@@ -117,7 +110,7 @@ public:
 	}
 	void setManager(GameManager* manager) {
 		this->manager = manager;
-		this->manager->setEngines(this, gEngine);
+		this->manager->setEngines(this);
 	}
 	void run() {
 		while (isRunning) {
@@ -129,20 +122,11 @@ public:
 			//object와 manager의 update()에는 충돌 판정이 필요하므로,
 			//    pEngine->object->Manager 의 순서로 update()를 실행하는 것이다.
 			timeUpdate();
-			manager->setObjects();
-			pEngine->update(objects, objSize);
-			manager->update(input);
-			gEngine->update(objects, objSize);
+			pEngine->update(manager);			// 되도록이면 해당 클래스 타입의 객체를 받아
+			manager->update(input);				// 업데이트를 진행할 수 있도록 한다.
+			gEngine->update(manager);			// ~~충돌 연산은 어떻게 저장하고 전달하나?~~
 #pragma endregion
 		}
-	}
-
-	void resetObjects() {
-		for (int i = 0; i < objSize; ++i)
-			objects[i] = nullptr;
-	}
-	void addObject(Object* obj) {
-		//
 	}
 
 private:
@@ -154,9 +138,6 @@ private:
 	GameManager* manager;
 
 	InputProcessor* input;
-
-	Object** objects;
-	short objSize;
 #pragma endregion
 
 #pragma region Time Fields

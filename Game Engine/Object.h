@@ -2,12 +2,17 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
+#include <ctime>
 #include "Model.h"
 
 class Object {
 public:
 	Object(Vector3 location = Vector3::Zero, Model* modelData = nullptr) {
+		ID = clock();
 		this->location = location;
+		this->directionX = Vector3::UnitX;
+		this->directionY = Vector3::UnitY;
+		this->directionZ = Vector3::UnitZ;
 		if (modelData)	this->model = new Model(*modelData);
 		else			this->model = new Model(Model::Cube);
 	}
@@ -65,8 +70,14 @@ public:
 	}
 
 private:
-	Vector3 location;
+	int ID;
 
+	Vector3 location;
+	Vector3 directionX;
+	Vector3 directionY;
+	Vector3 directionZ; //이 정보에 따라 회전을 새로 정의해야 함
+
+public:
 	Model* model;
 };
 
