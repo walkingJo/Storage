@@ -78,3 +78,5 @@ buildImage(objectCount);
 texture = IMG_LoadTexture(renderer, "smile.png");
 stretchTextureEx(renderer, 450-300, 450-300, 600, 600, texture, objectAngle[0]);
 ```
+
+일단 이미지 생성은 포기했고, 미리 만들어둔 7등분 원판을 이용해 프로그램을 돌리기로 했다.
