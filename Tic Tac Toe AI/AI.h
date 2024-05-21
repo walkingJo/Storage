@@ -27,8 +27,8 @@ private:
 	void readFile();
 	void writeFile();
 
-	//반추 함수
-	//준비 함수
+	//반추 함수 //reflect()
+	//준비 함수 //함수를 만들지 말고 readyNewGame()에 넣자
 	// -> readyNewGame()에 둘을 순서대로 포함시키도록 함
 
 	bool canSelect(short x, short y);

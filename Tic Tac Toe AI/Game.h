@@ -2,13 +2,8 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <cstdio>
 #include <SDL.h>
-#include <SDL_image.h>
 #include "AI.h"
-
-constexpr int ScreenWidth =  15 + 450 + 15;
-constexpr int ScreenHeight = 60 + 450 + 60;
 
 enum class DivideSign {
 	COM,
@@ -31,9 +26,6 @@ private:
 	bool isRunning = true;
 	short mouseXCoord = 0;
 	short mouseYCoord = 0;
-	//0 : ÀÏ¹Ý
-	//1 : ´­¸²
-	//2 : ¶¼Áü
 	MousePressType mousePressType = MousePressType::COMMON;
 
 	class AI* aiPlayer;
@@ -50,7 +42,8 @@ private:
 	DivideSign getWinner();
 	bool isGameDone();
 	void playerTurnUpdate();
-	void aiTurnUpdate();
+	void aiplayerTurnUpdate();
+	void renderStr(const char* str, short x, short y, short h);
 	
 	void init();
 	void input();
