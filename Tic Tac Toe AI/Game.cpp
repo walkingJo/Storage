@@ -2,9 +2,18 @@
 #include <SDL_image.h>
 #include "Game.h"
 
-constexpr int ScreenWidth = 15 + 450 + 15 + 345;
+constexpr int ScreenWidth = 15 + 450 + 15 + 345 + 15;
 constexpr int ScreenHeight = 60 + 450 + 60;
 
+//init
+void Game::resetField() {
+	for (int x = 0; x < 3; ++x) {
+		for (int y = 0; y < 3; ++y) {
+			field[y][x] = DivideSign::NON;
+		}
+	}
+}
+//Game::init(), Game::update()에서만 호출됨
 void Game::restartGame() {
 	switch (firstTurn) {
 	case DivideSign::NON:
@@ -13,13 +22,70 @@ void Game::restartGame() {
 	}
 	turn = firstTurn;
 
-	for (int x = 0; x < 3; ++x) {
-		for (int y = 0; y < 3; ++y) {
-			field[y][x] = DivideSign::NON;
+	aiPlayer->readyNewGame(getWinner());
+
+	resetField();
+}
+void Game::init() {
+	aiPlayer = new AI();
+	aiPlayer->init(this);
+	resetField();
+	restartGame();
+
+	window = SDL_CreateWindow("Tic Tac Toe",
+		100, 100,
+		ScreenWidth, ScreenHeight, NULL);
+	if (!window) {
+		SDL_Log("Failed to create window: %s", SDL_GetError());
+		throw;
+	}
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	if (!renderer) {
+		SDL_Log("Failed to create renderer: %s", SDL_GetError());
+		throw;
+	}
+}
+
+//input
+void Game::input() {
+	SDL_Event event;
+	if (mousePressType == MousePressType::RELEASED)
+		mousePressType = MousePressType::COMMON;
+	while (SDL_PollEvent(&event)) {
+		switch (event.type) {
+		case SDL_QUIT:
+			isRunning = false;
+			break;
+		case SDL_MOUSEBUTTONDOWN:
+			if (event.button.button == SDL_BUTTON_LEFT) {
+				mouseXCoord = event.button.x;
+				mouseYCoord = event.button.y;
+				mousePressType = MousePressType::PRESSED;
+			}
+			break;
+		case SDL_MOUSEMOTION:
+			if (event.button.button == SDL_BUTTON_LEFT) {
+				mouseXCoord = event.button.x;
+				mouseYCoord = event.button.y;
+				mousePressType = MousePressType::HOLDED;
+			}
+			break;
+		case SDL_MOUSEBUTTONUP:
+			if (event.button.button == SDL_BUTTON_LEFT) {
+				mouseXCoord = event.button.x;
+				mouseYCoord = event.button.y;
+				mousePressType = MousePressType::RELEASED;
+			}
+			break;
 		}
 	}
-	aiPlayer->readyNewGame();
+	const Uint8* state = SDL_GetKeyboardState(NULL);
+	if (state[SDL_SCANCODE_ESCAPE]) {
+		isRunning = false;
+	}
 }
+
+//update
 DivideSign Game::getWinner() {
 	//어느 한 쪽의 사인이 3칸 연속으로 존재하는지 확인
 	for (int y = 0; y < 3; ++y)
@@ -89,6 +155,7 @@ void Game::playerTurnUpdate() {
 			turn = DivideSign::COM;
 		}
 		isButtonPressed = false;
+		aiPlayer->addMovement();
 		break;
 	}
 }
@@ -96,79 +163,7 @@ void Game::aiplayerTurnUpdate() {
 	Coord aiSelection = aiPlayer->selectSpace();
 	field[aiSelection.y][aiSelection.x] = DivideSign::COM;
 	turn = DivideSign::HUM;
-}
-void Game::renderStr(const char* str, short x, short y, short h) {
-	//w*h = 35*50, 10개
-	//판과의 거리를 d라고 할 때, 첫 번째 숫자 이미지의 위치는 { d+465, 110, 35, 50 }이다.
-	//그리고 아마 d의 값은 (15+50)이 될 듯
-	SDL_Rect numImageSrcRect = {
-		0, 0,
-		35, 50
-	};
-	short d = 15 + 50;
-	SDL_Rect numImageDstRect = {
-		d + 465, 110,
-		35, 50
-	};
-	SDL_Texture* numTexture = IMG_LoadTexture(renderer, "numImages.png");
-	SDL_RenderCopy(renderer, numTexture, &numImageSrcRect, &numImageDstRect);
-	SDL_DestroyTexture(numTexture);
-}
-
-void Game::init() {
-	aiPlayer = new AI();
-	aiPlayer->init(this);
-	restartGame();
-
-	window = SDL_CreateWindow("Tic Tac Toe",
-		100, 100,
-		ScreenWidth, ScreenHeight, NULL);
-	if (!window) {
-		SDL_Log("Failed to create window: %s", SDL_GetError());
-		throw;
-	}
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	if (!renderer) {
-		SDL_Log("Failed to create renderer: %s", SDL_GetError());
-		throw;
-	}
-}
-void Game::input() {
-	SDL_Event event;
-	if (mousePressType == MousePressType::RELEASED)
-		mousePressType = MousePressType::COMMON;
-	while (SDL_PollEvent(&event)) {
-		switch (event.type) {
-		case SDL_QUIT:
-			isRunning = false;
-			break;
-		case SDL_MOUSEBUTTONDOWN:
-			if (event.button.button == SDL_BUTTON_LEFT) {
-				mouseXCoord = event.button.x;
-				mouseYCoord = event.button.y;
-				mousePressType = MousePressType::PRESSED;
-			}
-			break;
-		case SDL_MOUSEMOTION:
-			if (event.button.button == SDL_BUTTON_LEFT) {
-				mouseXCoord = event.button.x;
-				mouseYCoord = event.button.y;
-				mousePressType = MousePressType::HOLDED;
-			}
-			break;
-		case SDL_MOUSEBUTTONUP:
-			if (event.button.button == SDL_BUTTON_LEFT) {
-				mouseXCoord = event.button.x;
-				mouseYCoord = event.button.y;
-				mousePressType = MousePressType::RELEASED;
-			}
-			break;
-		}
-	}
-	const Uint8* state = SDL_GetKeyboardState(NULL);
-	if (state[SDL_SCANCODE_ESCAPE]) {
-		isRunning = false;
-	}
+	aiPlayer->addMovement();
 }
 void Game::update() {
 	if (isGameDone()) {
@@ -179,7 +174,6 @@ void Game::update() {
 		case DivideSign::HUM: humScore++; break;
 		case DivideSign::NON: drwScore++; break;
 		}
-		printf("hum : %d | draw : %d | com : %d\n", humScore, drwScore, comScore);
 		//새 게임 준비
 		wait();
 		restartGame();
@@ -187,9 +181,67 @@ void Game::update() {
 	else {
 		switch (turn) {
 		case DivideSign::HUM: playerTurnUpdate();	break;
-		case DivideSign::COM: aiplayerTurnUpdate();		break;
+		case DivideSign::COM: aiplayerTurnUpdate();	break;
 		}
 	}
+}
+
+//render
+void Game::renderStr(const char* str, short rectX, short rectY) {
+	//w*h = 35*50, 10개
+	//판과의 거리를 d라고 할 때, 첫 번째 숫자 이미지의 위치는 { d+465, 110, 35, 50 }이다.
+	//그리고 아마 d의 값은 (15+50)이 될 듯
+
+	//w*h = 35*50
+	SDL_Texture* numTexture = IMG_LoadTexture(renderer, "numImages.png");
+	//w*h = 40*(50+10)
+	SDL_Texture* abcTexture = IMG_LoadTexture(renderer, "abcImages.png");
+
+	for (int i = 0, deltaX = 0; str[i] != NULL; ++i) {
+		if ('0' <= str[i] && str[i] <= '9') {
+			SDL_Rect srcRect = {
+				35 * (str[i] - '0'), 0,
+				35, 50
+			};
+			SDL_Rect dstRect = {
+				rectX + deltaX, rectY,
+				35, 50
+			};
+			SDL_RenderCopy(renderer, numTexture, &srcRect, &dstRect);
+			deltaX += 35;
+		}
+		else if ('a' <= str[i] && str[i] <= 'z') {
+			SDL_Rect srcRect = {
+				40 * (str[i] - 'a'), 0,
+				40, 60
+			};
+			SDL_Rect dstRect = {
+				rectX + deltaX, rectY,
+				40, 60
+			};
+			SDL_RenderCopy(renderer, abcTexture, &srcRect, &dstRect);
+			deltaX += 40;
+		}
+		else if ('A' <= str[i] && str[i] <= 'Z') {
+			SDL_Rect srcRect = {
+				40 * (str[i] - 'A'), 0,
+				40, 60
+			};
+			SDL_Rect dstRect = {
+				rectX + deltaX, rectY,
+				40, 60
+			};
+			SDL_RenderCopy(renderer, abcTexture, &srcRect, &dstRect);
+			deltaX += 40;
+		}
+		else if (' ' == str[i]) {
+			//deltaX += 30;
+			deltaX += 40;
+		}
+	}
+
+	SDL_DestroyTexture(numTexture);
+	SDL_DestroyTexture(abcTexture);
 }
 void Game::render() {
 	SDL_SetRenderDrawColor(renderer, 0xDC, 0xDC, 0xAA, 0xFF);
@@ -256,22 +308,26 @@ void Game::render() {
 
 	//점수 출력
 	char buff[20] = {};
-	sprintf_s(buff, "COM  %04d", comScore);	renderStr(buff, 530, 85 + 150 * 0, 50);
-	sprintf_s(buff, "DRAW %04d", drwScore);	renderStr(buff, 530, 85 + 150 * 1, 50);
-	sprintf_s(buff, "HUM  %04d", humScore);	renderStr(buff, 530, 85 + 150 * 2, 50);
+	sprintf_s(buff, "COM  %-4d", comScore);	renderStr(buff, 480, 110 + 150 * 0);
+	sprintf_s(buff, "DRAW %-4d", drwScore);	renderStr(buff, 480, 110 + 150 * 1);
+	sprintf_s(buff, "HUM  %-4d", humScore);	renderStr(buff, 480, 110 + 150 * 2);
 
 	SDL_RenderPresent(renderer);
 }
+
+//release
 void Game::release() {
 	aiPlayer->release();
 }
 
+//systems
 void Game::wait(int time) {
 	clock_t oldClock = clock();
 	while (oldClock + time > clock());
 }
 void Game::wait() {
-	wait(250);
+	int time = 350;
+	wait(time);
 }
 void Game::run() {
 	init();

@@ -2,9 +2,29 @@
 #ifndef AI_H
 #define AI_H
 
-#include <cstdlib>
-#include <ctime>
+#include <string>
+#include <vector>
 #include "Game.h"
+
+constexpr int TotalCaseCount = 8953;
+
+using std::string;
+using std::vector;
+
+class Case {
+public:
+	string strCode;
+	float weight;
+
+	Case() {
+		strCode = "";
+		weight = 0.5f;
+	}
+	Case(std::string code) {
+		*this = Case();
+		strCode = code;
+	}
+};
 
 class Coord {
 public:
@@ -21,21 +41,29 @@ public:
 class AI {
 private:
 	const char* fileName = "playData.txt";
-
 	class Game* app = nullptr;
+
+	Case cases[TotalCaseCount] = {};
+	vector<string> movesInSingleGame;
 
 	void readFile();
 	void writeFile();
 
-	//반추 함수 //reflect()
-	//준비 함수 //함수를 만들지 말고 readyNewGame()에 넣자
-	// -> readyNewGame()에 둘을 순서대로 포함시키도록 함
+	string fieldToStr();
+	bool isCaseLinked(string srcCase, string dstCase);
+	vector<Case> getLinkedCasesWith(string nowCase);
+
+	//반추 함수
+	void analyze();
+	Coord selectBestCoordWithRandom();
 
 	bool canSelect(short x, short y);
 
 public:
+	void addMovement();
+
 	void init(class Game* app);
-	void readyNewGame();
+	void readyNewGame(enum class DivideSign winner);
 	Coord selectSpace(); //하나의 수를 둔다는 표현이 뭐지?
 	void release();
 

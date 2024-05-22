@@ -38,12 +38,13 @@ private:
 	int comScore = 0;
 	int drwScore = 0;
 
+	void resetField();
 	void restartGame();
 	DivideSign getWinner();
 	bool isGameDone();
 	void playerTurnUpdate();
 	void aiplayerTurnUpdate();
-	void renderStr(const char* str, short x, short y, short h);
+	void renderStr(const char* str, short x, short y);
 	
 	void init();
 	void input();
@@ -51,10 +52,11 @@ private:
 	void render();
 	void release();
 
+	void wait(int time);
+
 public:
 	DivideSign field[3][3] = {};
 
-	void wait(int time);
 	void wait();
 	void run();
 
