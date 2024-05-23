@@ -103,3 +103,52 @@ AI는 기본적으로 하나의 클래스로서 작용한다.
 
 - 확률은 어떻게 계산할까?
   - 선택할 수 있는 경우가 중복되어 있으니 가중치로 가자(되도록이면 $0\le t\le1$로)
+
+# 2024-05-23
+
+string out of range 에러 :
+- if (!~) return false 하면 될걸 assert 박아서 문제됨
+  - 처음에는 assert 자체를 삭제함
+  - 그러니까 랭크가 +1만큼 차이나는 경우 외의 경우를 거르지 못해 오류남
+  - 원래 코드에서 assert를 if (!~) return false 로 대체함
+- ```cpp
+  //최종 코드의 일부
+  bool AI::isCaseLinked(string srcCase, string dstCase) {
+      short srcRank = 0, dstRank = 0;
+      for (int i = 0; i < 9; ++i) {
+          if (srcCase[i] != '_') srcRank++;
+          if (dstCase[i] != '_') dstRank++;
+      }
+      if (srcRank + 1 != dstRank) //←본래는 이 부분에 assert 가 있었음
+          return false;
+      ...
+  }
+  ```
+
+vector out of range 에러 :
+- 처음에 각각의 weight에 1 이상의 가중치 k를 곱하지 않고 비교해 weightSum에서 모든 weight 만큼을 빼도 값이 남아 인덱스 범위를 벗어남
+  - 수정 후 선택 좌표값이 (가능한 한) 가장 작은 수가 출력됨 :
+    - k = 1000 * weightSum 으로 해야 하는데, k = 10000 * weight 로 함
+- ```cpp
+  Coord AI::selectBestCoordWithRandom() {
+      vector<Case> linkedCases = getLinkedCasesWith(fieldToStr());
+
+      float weightSum = 0;
+      for (Case singleCase : linkedCases)
+          weightSum += singleCase.weight;
+      float k = 1000 * 1.0f / weightSum; //k 선언 관련 오류 지점
+
+      float randVal1000 = (float)(rand() % 999);
+      for (int i = 0; i < linkedCases.size(); ++i) {
+          if (randVal1000 > linkedCases[i].weight * k) { //k를 곱하지 않아 오류가 생긴 지점
+              randVal1000 -= linkedCases[i].weight * k;  //
+          }
+          else {
+              for (short x = 0; x < 3; ++x)
+                  for (short y = 0; y < 3; ++y)
+                      if (fieldToStr()[3 * y + x] != linkedCases[i].strCode[3 * y + x])
+                          return Coord(x, y);
+          }
+      }
+  }
+  ```
