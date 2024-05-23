@@ -106,7 +106,7 @@ AI는 기본적으로 하나의 클래스로서 작용한다.
 
 # 2024-05-23
 
-string out of range 에러 :
+### string out of range 에러 :
 - if (!~) return false 하면 될걸 assert 박아서 문제됨
   - 처음에는 assert 자체를 삭제함
   - 그러니까 랭크가 +1만큼 차이나는 경우 외의 경우를 거르지 못해 오류남
@@ -125,11 +125,12 @@ string out of range 에러 :
   }
   ```
 
-vector out of range 에러 :
+### vector out of range 에러 :
 - 처음에 각각의 weight에 1 이상의 가중치 k를 곱하지 않고 비교해 weightSum에서 모든 weight 만큼을 빼도 값이 남아 인덱스 범위를 벗어남
   - 수정 후 선택 좌표값이 (가능한 한) 가장 작은 수가 출력됨 :
     - k = 1000 * weightSum 으로 해야 하는데, k = 10000 * weight 로 함
 - ```cpp
+  //최종 코드
   Coord AI::selectBestCoordWithRandom() {
       vector<Case> linkedCases = getLinkedCasesWith(fieldToStr());
 
