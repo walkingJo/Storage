@@ -40,7 +40,6 @@ private:
 
 	void resetField();
 	void restartGame();
-	DivideSign getWinner();
 	bool isGameDone();
 	void playerTurnUpdate();
 	void aiplayerTurnUpdate();
@@ -57,6 +56,7 @@ private:
 public:
 	DivideSign field[3][3] = {};
 
+	DivideSign getWinner();
 	void wait();
 	void run();
 

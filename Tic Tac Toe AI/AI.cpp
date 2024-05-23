@@ -74,7 +74,25 @@ vector<Case> AI::getLinkedCasesWith(string nowCase) {
 }
 
 void AI::analyze() {
-	return;
+	/*
+	* 베이즈 정리 : P(A|B) 를 통해 P(B|A) 를 구하는 정리
+	* 
+	* P(A|B) = P(B|A) * P(A) / P(B)
+	* 
+	* A : 승리할 확률		: lastCase.weight
+	* B : 수 t를 둘 확률	: case.weight 에 가공을 거친 것
+	* 라고 하자.
+	*/
+
+	DivideSign winner = app->getWinner();
+	switch (winner) {
+	case DivideSign::COM: //AI 승
+		break;
+	case DivideSign::HUM: //AI 패
+		break;
+	case DivideSign::NON: //무승부
+		break;
+	}
 }
 Coord AI::selectBestCoordWithRandom() {
 	vector<Case> linkedCases = getLinkedCasesWith(fieldToStr());
@@ -92,9 +110,18 @@ Coord AI::selectBestCoordWithRandom() {
 		else {
 			for (short x = 0; x < 3; ++x)
 				for (short y = 0; y < 3; ++y)
-					if (fieldToStr()[3 * y + x] != linkedCases[i].strCode[3 * y + x])
+					if (fieldToStr()[3 * y + x] != linkedCases[i].strCode[3 * y + x] && canSelect(x, y))
 						return Coord(x, y);
 		}
+	}
+	return selectRandomCoord();
+}
+Coord AI::selectRandomCoord() {
+	while (true) {
+		short x = rand() % 3;
+		short y = rand() % 3;
+		if (canSelect(x, y))
+			return Coord(x, y);
 	}
 }
 
@@ -142,18 +169,13 @@ void AI::readyNewGame(enum class DivideSign winner) {
 	movesInSingleGame = vector<string>();
 }
 Coord AI::selectSpace() {
+	app->wait();
+
 	/* AI의 본분을 다하는 코드 */
 	return selectBestCoordWithRandom();
 
 	/* random method */
-	while (true) {
-		short x = rand() % 3;
-		short y = rand() % 3;
-		if (canSelect(x, y)) {
-			app->wait();
-			return Coord(x, y);
-		}
-	}
+	return selectRandomCoord();
 }
 void AI::release() {
 	writeFile();

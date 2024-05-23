@@ -86,30 +86,6 @@ void Game::input() {
 }
 
 //update
-DivideSign Game::getWinner() {
-	//어느 한 쪽의 사인이 3칸 연속으로 존재하는지 확인
-	for (int y = 0; y < 3; ++y)
-		if (field[y][0] != DivideSign::NON &&
-			field[y][0] == field[y][1] &&
-			field[y][1] == field[y][2])
-			return field[y][0];
-	for (int x = 0; x < 3; ++x)
-		if (field[0][x] != DivideSign::NON &&
-			field[0][x] == field[1][x] &&
-			field[1][x] == field[2][x])
-			return field[0][x];
-
-	if (field[0][0] != DivideSign::NON &&
-		field[0][0] == field[1][1] &&
-		field[1][1] == field[2][2])
-		return field[1][1];
-	if (field[0][2] != DivideSign::NON &&
-		field[0][2] == field[1][1] &&
-		field[1][1] == field[2][0])
-		return field[1][1];
-
-	return DivideSign::NON;
-}
 bool Game::isGameDone() {
 	//승패가 났을 때 역시 게임이 종료된다.
 	if (getWinner() != DivideSign::NON)
@@ -308,9 +284,9 @@ void Game::render() {
 
 	//점수 출력
 	char buff[20] = {};
-	sprintf_s(buff, "COM  %-4d", comScore);	renderStr(buff, 480, 110 + 150 * 0);
-	sprintf_s(buff, "DRAW %-4d", drwScore);	renderStr(buff, 480, 110 + 150 * 1);
-	sprintf_s(buff, "HUM  %-4d", humScore);	renderStr(buff, 480, 110 + 150 * 2);
+	sprintf_s(buff, "COM  %4d", comScore);	renderStr(buff, 480, 110 + 150 * 0);
+	sprintf_s(buff, "DRAW %4d", drwScore);	renderStr(buff, 480, 110 + 150 * 1);
+	sprintf_s(buff, "HUM  %4d", humScore);	renderStr(buff, 480, 110 + 150 * 2);
 
 	SDL_RenderPresent(renderer);
 }
@@ -321,6 +297,30 @@ void Game::release() {
 }
 
 //systems
+DivideSign Game::getWinner() {
+	//어느 한 쪽의 사인이 3칸 연속으로 존재하는지 확인
+	for (int y = 0; y < 3; ++y)
+		if (field[y][0] != DivideSign::NON &&
+			field[y][0] == field[y][1] &&
+			field[y][1] == field[y][2])
+			return field[y][0];
+	for (int x = 0; x < 3; ++x)
+		if (field[0][x] != DivideSign::NON &&
+			field[0][x] == field[1][x] &&
+			field[1][x] == field[2][x])
+			return field[0][x];
+
+	if (field[0][0] != DivideSign::NON &&
+		field[0][0] == field[1][1] &&
+		field[1][1] == field[2][2])
+		return field[1][1];
+	if (field[0][2] != DivideSign::NON &&
+		field[0][2] == field[1][1] &&
+		field[1][1] == field[2][0])
+		return field[1][1];
+
+	return DivideSign::NON;
+}
 void Game::wait(int time) {
 	clock_t oldClock = clock();
 	while (oldClock + time > clock());

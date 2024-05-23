@@ -56,6 +56,7 @@ private:
 	//반추 함수
 	void analyze();
 	Coord selectBestCoordWithRandom();
+	Coord selectRandomCoord();
 
 	bool canSelect(short x, short y);
 
