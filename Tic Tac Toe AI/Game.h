@@ -34,13 +34,15 @@ private:
 	DivideSign turn = DivideSign::NON;
 	bool isButtonPressed = false;
 
+public:
 	int humScore = 0;
 	int comScore = 0;
 	int drwScore = 0;
 
+private:
 	void resetField();
 	void restartGame();
-	bool isGameDone();
+	bool isGameDone() const;
 	void playerTurnUpdate();
 	void aiplayerTurnUpdate();
 	void renderStr(const char* str, short x, short y);
@@ -56,7 +58,7 @@ private:
 public:
 	DivideSign field[3][3] = {};
 
-	DivideSign getWinner();
+	DivideSign getWinner() const;
 	void wait();
 	void run();
 

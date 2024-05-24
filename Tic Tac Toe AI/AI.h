@@ -54,10 +54,17 @@ private:
 	vector<Case> getLinkedCasesWith(string nowCase);
 
 	//반추 함수
+	Case getCaseEqualsStr(string str);
+	void setCaseEqualsStr(string str, float weight);
+	float getACapB();
+	void analyzeWithGameResult(bool didAIWon);
 	void analyze();
+	Coord getSingleDiffCoord(string srcStr, string dstStr);
 	Coord selectBestCoordWithRandom();
+public:
 	Coord selectRandomCoord();
 
+private:
 	bool canSelect(short x, short y);
 
 public:

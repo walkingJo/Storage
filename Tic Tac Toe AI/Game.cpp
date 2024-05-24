@@ -86,7 +86,7 @@ void Game::input() {
 }
 
 //update
-bool Game::isGameDone() {
+bool Game::isGameDone() const {
 	//승패가 났을 때 역시 게임이 종료된다.
 	if (getWinner() != DivideSign::NON)
 		return true;
@@ -99,6 +99,13 @@ bool Game::isGameDone() {
 	return true;
 }
 void Game::playerTurnUpdate() {
+	//테스트용 렌덤 수 출력기
+	/*Coord aiSelection = aiPlayer->selectRandomCoord();
+	field[aiSelection.y][aiSelection.x] = DivideSign::HUM;
+	turn = DivideSign::COM;
+	aiPlayer->addMovement();
+	return;*/
+
 	// x |  15~164 : 0, 165~314 : 1, 315~464 : 2
 	// y | 155~304 : 0, 305~454 : 1, 455~604 : 2
 	short xIdx = (mouseXCoord - 15 >= 0) ? (mouseXCoord - 15) / 150 : -1;
@@ -297,7 +304,7 @@ void Game::release() {
 }
 
 //systems
-DivideSign Game::getWinner() {
+DivideSign Game::getWinner() const {
 	//어느 한 쪽의 사인이 3칸 연속으로 존재하는지 확인
 	for (int y = 0; y < 3; ++y)
 		if (field[y][0] != DivideSign::NON &&
