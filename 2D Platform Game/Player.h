@@ -2,8 +2,8 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include <string>
 #include <ctime>
+#include "PlatformManager.h"
 
 constexpr int TextureXYSize = 64;
 
@@ -35,7 +35,8 @@ enum class FlipStateType {
 
 class Player {
 private:
-	SDL_Renderer* renderer; // ← 이 부분이 다음 기능 구현에서 핵심적이다.
+	SDL_Renderer* renderer;
+	class PlatformManager* platform;
 
 	CharacterType playerType;
 	SDL_Texture* texture;
@@ -49,7 +50,7 @@ private:
 	
 	void setTextureWithState();
 	void setState(PlayerStateType state);
-	int getIdxWithTime(int length);
+	int getAnimationIdxWithTime(int length);
 	
 	bool isPlayerTouchedGround();
 	bool isPlayerTouchedOnWallRightSide();
@@ -65,7 +66,7 @@ private:
 
 public:
 	Player();
-	Player(CharacterType playerType, SDL_Renderer* renderer);
+	Player(CharacterType playerType, SDL_Renderer* renderer, class PlatformManager* platform);
 	~Player();
 
 	void setCoord(int xCoord, int yCoord);

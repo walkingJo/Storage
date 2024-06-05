@@ -123,9 +123,6 @@ public:
 			keyStateEx[SDL_SCANCODE_LEFT]
 		);
 	}
-	KeyboardState getSpaceKeyState() {
-		return keyStateEx[SDL_SCANCODE_SPACE];
-	}
 	bool isUpKeyPressed() {
 		return isKeyPressed(getUpKeyState());
 	}
@@ -137,9 +134,6 @@ public:
 	}
 	bool isLeftKeyPressed() {
 		return isKeyPressed(getLeftKeyState());
-	}
-	bool isSpaceKeyPressed() {
-		return isKeyPressed(getSpaceKeyState());
 	}
 
 	bool isRunning() {

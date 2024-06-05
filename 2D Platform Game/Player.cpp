@@ -1,8 +1,12 @@
 #include <SDL_image.h>
+#include <string>
 #include <cassert>
+#include <ctime>
 #include "RenderEngine.h"
 #include "InputProcessor.h"
 #include "Player.h"
+
+constexpr int MotionPerSecond = 1000 / 15;
 
 void Player::setTextureWithState() {
 	//		"Pixel Adventure 1/Main Characters/Player Type/File Name.png";
@@ -59,8 +63,7 @@ void Player::setState(PlayerStateType state) {
 	stateStartTime = clock();
 	setTextureWithState();
 }
-int Player::getIdxWithTime(int length) {
-	constexpr int MotionPerSecond = 1000 / 15;
+int Player::getAnimationIdxWithTime(int length) {
 	return ((clock() - stateStartTime) / MotionPerSecond) % length;
 }
 
@@ -117,6 +120,7 @@ void Player::setLeftWallJumpSpeed() {
 
 Player::Player() {
 	renderer = nullptr;
+	platform = nullptr;
 
 	this->playerType = CharacterType::MASK_DUDE;
 	texture = nullptr;
@@ -128,8 +132,10 @@ Player::Player() {
 	flipState = FlipStateType::LOOK_AT_RIGHT;
 	stateStartTime = 0;
 }
-Player::Player(CharacterType playerType, SDL_Renderer* renderer) {
+Player::Player(CharacterType playerType, SDL_Renderer* renderer, PlatformManager* platform) {
 	this->renderer = renderer;
+
+	this->platform = platform;
 
 	this->playerType = playerType;
 	texture = nullptr;
@@ -159,7 +165,7 @@ void Player::setSpeed(int xSpeed, int ySpeed) {
 void Player::update(InputProcessor* input) {
 	bool isRightKeyPressed = input->isRightKeyPressed();
 	bool isLeftKeyPressed = input->isLeftKeyPressed();
-	bool isSpaceKeyTypePressed = input->getSpaceKeyState() == KeyboardState::PRESSED;
+	bool isSpaceKeyTypePressed = input->getKeyState(SDL_SCANCODE_SPACE) == KeyboardState::PRESSED;
 	switch (state) {
 	case PlayerStateType::NON:
 		break;
@@ -205,7 +211,7 @@ void Player::update(InputProcessor* input) {
 		}
 	}
 	case PlayerStateType::DOUBLE_JUMP: {
-		if (ySpeed < 0 &&
+		if (((clock() - stateStartTime) / MotionPerSecond) > 6 &&
 			state == PlayerStateType::DOUBLE_JUMP)
 			setState(PlayerStateType::FALL_DOUBLE_JUMP);
 	}
@@ -320,7 +326,7 @@ void Player::draw() {
 		break;
 	}
 	SDL_Rect srcRect = {
-		32 * getIdxWithTime(animationLength), 0,
+		32 * getAnimationIdxWithTime(animationLength), 0,
 		32, 32
 	};
 	SDL_Rect dstRect = {
