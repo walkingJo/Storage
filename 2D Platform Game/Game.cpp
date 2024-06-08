@@ -11,7 +11,7 @@ void Game::init() {
 	isRunning = true;
 
 	playerObj = Player(CharacterType::NINJA_FROG, renderer.getRenderer(), &platform);
-	platform.setPlayerOnStartCoord(&playerObj);
+	platform.setPlayerCoordOnStartPoint(&playerObj);
 
 	time = clock();
 	deltaTime = 1000 / 60;
@@ -21,7 +21,20 @@ void Game::getInput() {
 	isRunning = input.isRunning();
 
 /**/if (input.getKeyState(SDL_SCANCODE_R) == KeyboardState::PRESSED)
-/**/	platform.setPlayerOnStartCoord(&playerObj);
+/**/	platform.setPlayerCoordOnStartPoint(&playerObj);
+
+/**/if (input.getKeyState(SDL_SCANCODE_P) == KeyboardState::PRESSED)
+/**/	switch (playerObj.getState()) {
+/**/	case PlayerStateType::NON:				printf("non\n");				break;
+/**/	case PlayerStateType::IDLE:				printf("idle\n");				break;
+/**/	case PlayerStateType::RUN:				printf("run\n");				break;
+/**/	case PlayerStateType::JUMP:				printf("jump\n");				break;
+/**/	case PlayerStateType::DOUBLE_JUMP:		printf("double jump\n");		break;
+/**/	case PlayerStateType::WALL_JUMP:		printf("wall jump\n");			break;
+/**/	case PlayerStateType::FALL_JUMP:		printf("fall jump\n");			break;
+/**/	case PlayerStateType::FALL_DOUBLE_JUMP:	printf("fall double jump\n");	break;
+/**/	case PlayerStateType::HIT:				printf("hit\n");				break;
+/**/	}
 }
 void Game::update() {
 	playerObj.update(&input);

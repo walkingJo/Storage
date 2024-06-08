@@ -7,6 +7,7 @@
 #include "Player.h"
 
 constexpr int maxPlatformXYIdx{ 10 };
+constexpr short PNON{ -1 };
 constexpr short PSRC{ -2 };
 constexpr short PDST{ -3 };
 
@@ -37,7 +38,8 @@ public:
 	void loadPlatformDataFromCsvFile(std::string fileName);
 	void draw();
 
-	void setPlayerOnStartCoord(class Player* player);
+	void setPlayerCoordOnStartPoint(class Player* player);
+	bool isPlatformExist(int xCoord, int yCoord);
 
 };
 

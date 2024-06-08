@@ -15,17 +15,23 @@ void PlatformManager::loadPlatformDataFromCsvFile(std::string fileName) {
 	//처음부터 platformData 에 정보를 담는 방식으로 가라.
 
 	short tempPlatformData[maxPlatformXYIdx][maxPlatformXYIdx] = {
-		{ 300, 302,  -1,  -1,  -1,  -1,  -1,  -1, 300, 302 },
-		{ 306, 308,  -1,  -1,  -1,  -1,  -1,  -1, 306, 308 },
-		{ 306, 308,  -1,  -1,PSRC,  -1,  -1,  -1, 306, 308 },
-		{ 306, 308,  -1, 300, 301, 302,  -1,  -1, 306, 308 },
-		{ 306, 308,  -1, 306, 307, 310, 302,  -1, 306, 308 },
-		{ 306, 308,  -1, 312, 313, 313, 314,  -1, 306, 308 },
-		{ 306, 308,  -1,  -1,  -1,  -1,  -1,  -1, 306, 308 },
-		{ 306, 308,  -1,  -1,  -1,  -1,  -1,  -1, 306, 308 },
-		{ 306, 310, 301, 301, 301, 301, 301, 301, 311, 308 },
-		{ 312, 313, 313, 313, 313, 313, 313, 313, 313, 314 },
+		{   3,PNON,PNON,   3,PNON,PNON,PNON,PNON,   0,   2 },
+		{   9,PNON,PNON,   9,PNON,PNON,PNON,PNON,  12,   8 },
+		{   9,PNON,PNON,   9,PSRC,PNON,PNON,PNON,PNON,   9 },
+		{   9,PNON,PNON,   6,   1,   2,PNON,PNON,PNON,   9 },
+		{   9,PNON,PNON,   6,   7,  10,   2,PNON,PNON,   9 },
+		{   9,PNON,PNON,  12,  13,  13,  14,PNON,PNON,   9 },
+		{   9,PNON,PNON,PNON,PNON,PNON,PNON,PNON,PNON,   9 },
+		{   9,PNON,PNON,PNON,PNON,PNON,PNON,PNON,PNON,   9 },
+		{   6,   1,   1,   1,   1,   1,   1,   1,   1,   8 },
+		{  12,  13,  13,  13,  13,  13,  13,  13,  13,  14 },
 	};
+	for (int row = 0; row < maxPlatformXYIdx; ++row) {
+		for (int col = 0; col < maxPlatformXYIdx; ++col) {
+			if (tempPlatformData[row][col] >= 0)
+				tempPlatformData[row][col] += 300; // <- theme
+		}
+	}
 	for (int i = 0; i < maxPlatformXYIdx; ++i) {
 		for (int j = 0; j < maxPlatformXYIdx; ++j) {
 			platformData[i][j] = tempPlatformData[i][j];
@@ -56,7 +62,7 @@ void PlatformManager::draw() {
 	}
 }
 
-void PlatformManager::setPlayerOnStartCoord(class Player* player) {
+void PlatformManager::setPlayerCoordOnStartPoint(class Player* player) {
 	for (int row = 0; row < maxPlatformXYIdx; ++row) {
 		for (int col = 0; col < maxPlatformXYIdx; ++col) {
 			if (platformData[row][col] == PSRC) {
@@ -67,4 +73,17 @@ void PlatformManager::setPlayerOnStartCoord(class Player* player) {
 			}
 		}
 	}
+}
+bool PlatformManager::isPlatformExist(int xCoord, int yCoord) {
+	int pointRow = -yCoord / TextureXYSize;
+	int pointCol = xCoord / TextureXYSize;
+	//! 나중에 여기서 문제가 생긴다면, 'xCoord < 0'일 가능성이 있다.
+	//! 주시하도록.
+	if (!(0 <= pointRow && pointRow < maxPlatformXYIdx)) return false;
+	if (!(0 <= pointCol && pointCol < maxPlatformXYIdx)) return false;
+	
+	if (0 <= platformData[pointRow][pointCol])
+		return true;
+	else
+		return false;
 }

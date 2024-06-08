@@ -7,6 +7,10 @@
 #include "Player.h"
 
 constexpr int MotionPerSecond = 1000 / 15;
+constexpr int moveCoord = 10;
+constexpr int JumpSpeed = 15;
+constexpr int WallJumpXSpeed = 12;
+constexpr int WallJumpYSpeed = 14;
 
 void Player::setTextureWithState() {
 	//		"Pixel Adventure 1/Main Characters/Player Type/File Name.png";
@@ -67,55 +71,52 @@ int Player::getAnimationIdxWithTime(int length) {
 	return ((clock() - stateStartTime) / MotionPerSecond) % length;
 }
 
-bool Player::isPlayerTouchedGround() {
-	if (yCoord - TextureXYSize <= -RenderEngine::ScreenHeight)
-		return true;
-	return false;
-}
+//바닥에 닿는 판정은 일반적으로 벽에 닿는 판정을 (양쪽 모두) 포함한다.
 bool Player::isPlayerTouchedOnWallRightSide() {
-	if (xCoord <= 0)
+	if (platform->isPlatformExist(xCoord - 1, yCoord))
 		return true;
-	return false;
+	else
+		return false;
 }
 bool Player::isPlayerTouchedOnWallLeftSide() {
-	if (xCoord + TextureXYSize >= RenderEngine::ScreenWidth)
+	if (platform->isPlatformExist(xCoord + TextureXYSize, yCoord))
 		return true;
-	return false;
+	else
+		return false;
+}
+bool Player::isPlayerTouchedGround() {
+	if (platform->isPlatformExist(xCoord - 1 + 1, yCoord - TextureXYSize) ||
+		platform->isPlatformExist(xCoord + TextureXYSize - 1, yCoord - TextureXYSize))
+		return true;
+	else
+		return false;
 }
 bool Player::isPlayerTouchedOnCeiling() {
-	if (yCoord >= 0)
+	if (platform->isPlatformExist(xCoord - 1 + 1, yCoord) ||
+		platform->isPlatformExist(xCoord + TextureXYSize - 1, yCoord))
 		return true;
-	return false;
-}
-bool Player::isHeightEnoughToHangOnWall() {
-	if (yCoord - TextureXYSize >= TextureXYSize / 2 - RenderEngine::ScreenHeight)
-		return true;
-	return false;
+	else
+		return false;
 }
 
 void Player::setRightMoveSpeed() {
-	const int moveCoord = 10;
 	xCoord += moveCoord;
 	flipState = FlipStateType::LOOK_AT_RIGHT;
 }
 void Player::setLeftMoveSpeed() {
-	const int moveCoord = 10;
 	xCoord -= moveCoord;
 	flipState = FlipStateType::LOOK_AT_LEFT;
 }
 void Player::setJumpSpeed() {
-	const int JumpSpeed = 15;
 	ySpeed = JumpSpeed;
 }
 void Player::setRightWallJumpSpeed() {
-	const int JumpSpeed = 15;
-	xSpeed = JumpSpeed;
-	ySpeed = JumpSpeed;
+	xSpeed = WallJumpXSpeed;
+	ySpeed = WallJumpYSpeed;
 }
 void Player::setLeftWallJumpSpeed() {
-	const int JumpSpeed = 15;
-	xSpeed = -JumpSpeed;
-	ySpeed = JumpSpeed;
+	xSpeed = -WallJumpXSpeed;
+	ySpeed = WallJumpYSpeed;
 }
 
 Player::Player() {
@@ -173,23 +174,24 @@ void Player::update(InputProcessor* input) {
 	case PlayerStateType::IDLE:
 	case PlayerStateType::RUN: {
 		if (isRightKeyPressed ^ isLeftKeyPressed) {
-			setState(PlayerStateType::RUN);
+			setState(PlayerStateType::RUN);		//상태 설정 계수와 관련::움직임
 			if (isRightKeyPressed)	setRightMoveSpeed();
 			else					setLeftMoveSpeed();
 		}
 		else {
-			setState(PlayerStateType::IDLE);
+			setState(PlayerStateType::IDLE);	//상태 설정 계수와 관련::정지
 		}
 
 		if (isSpaceKeyTypePressed) {
-			setState(PlayerStateType::JUMP);
+			setState(PlayerStateType::JUMP);	//상태 설정 계수와 관련
 			setJumpSpeed();
 			break;
 		}
 
 		//갑자기 바닥이 사라지는 등의 이벤트 발생을 의미
-		if (isPlayerTouchedGround())
+		if (isPlayerTouchedGround()) {
 			ySpeed = 0;
+		}
 		else {
 			setState(PlayerStateType::FALL_JUMP);
 			//ySpeed -= 1;
@@ -205,50 +207,54 @@ void Player::update(InputProcessor* input) {
 	}
 	case PlayerStateType::FALL_JUMP: {
 		if (isSpaceKeyTypePressed) {
-			setState(PlayerStateType::DOUBLE_JUMP);
+			setState(PlayerStateType::DOUBLE_JUMP);	//상태 설정 계수와 관련
 			setJumpSpeed();
 			break;
 		}
 	}
 	case PlayerStateType::DOUBLE_JUMP: {
-		if (((clock() - stateStartTime) / MotionPerSecond) > 6 &&
-			state == PlayerStateType::DOUBLE_JUMP)
+		if (state == PlayerStateType::DOUBLE_JUMP &&
+			((clock() - stateStartTime) / MotionPerSecond) > 6)
 			setState(PlayerStateType::FALL_DOUBLE_JUMP);
 	}
 	case PlayerStateType::FALL_DOUBLE_JUMP: {
 		if (isRightKeyPressed ^ isLeftKeyPressed) {
-			if (isRightKeyPressed)
-				setRightMoveSpeed();
-			else
-				setLeftMoveSpeed();
+			if (isRightKeyPressed)	setRightMoveSpeed();
+			else					setLeftMoveSpeed();
 		}
 
-		if (isPlayerTouchedGround()) {
+		if (isPlayerTouchedGround() &&
+			!isPlayerTouchedOnWallRightSide() &&
+			!isPlayerTouchedOnWallLeftSide()) {
 			if (isRightKeyPressed ^ isLeftKeyPressed)
 				setState(PlayerStateType::RUN);
 			else
 				setState(PlayerStateType::IDLE);
 			break;
 		}
-
-		if (!isHeightEnoughToHangOnWall() || (!isPlayerTouchedOnWallRightSide() && !isPlayerTouchedOnWallLeftSide()));
-		else if (isLeftKeyPressed && isPlayerTouchedOnWallRightSide() && isHeightEnoughToHangOnWall()) {
+		else if (isLeftKeyPressed && isPlayerTouchedOnWallRightSide()) {
 			setState(PlayerStateType::WALL_JUMP);
 			flipState = FlipStateType::LOOK_AT_RIGHT_ON_WALL;
-			xCoord = 0;
 			xSpeed = 0;
 		}
-		else if (isRightKeyPressed && isPlayerTouchedOnWallLeftSide() && isHeightEnoughToHangOnWall()) {
+		else if (isRightKeyPressed && isPlayerTouchedOnWallLeftSide()) {
 			setState(PlayerStateType::WALL_JUMP);
 			flipState = FlipStateType::LOOK_AT_LEFT_ON_WALL;
-			xCoord = RenderEngine::ScreenWidth - TextureXYSize;
 			xSpeed = 0;
 		}
 	}
 		break;
 
 	case PlayerStateType::WALL_JUMP: {
-		if (!isHeightEnoughToHangOnWall() || (!isPlayerTouchedOnWallRightSide() && !isPlayerTouchedOnWallLeftSide())) {
+		if (isPlayerTouchedGround() /*&&
+			!isPlayerTouchedOnWallRightSide() && !isPlayerTouchedOnWallLeftSide()*/) {
+			if (isRightKeyPressed ^ isLeftKeyPressed)
+				setState(PlayerStateType::RUN);
+			else
+				setState(PlayerStateType::IDLE);
+			break;
+		}
+		else if (!isPlayerTouchedOnWallRightSide() && !isPlayerTouchedOnWallLeftSide()) {
 			setState(PlayerStateType::FALL_JUMP);
 		}
 
@@ -279,8 +285,9 @@ void Player::update(InputProcessor* input) {
 				setLeftWallJumpSpeed();
 			}
 		}
-		else
+		else {
 			ySpeed = -1;
+		}
 	}
 		break;
 
@@ -298,13 +305,24 @@ void Player::update(InputProcessor* input) {
 	else if (xSpeed <= -1)	xSpeed += 1;
 	else					xSpeed = 0;
 
-	/*나중에 알아서 바닥면 충돌에 추가하는 방식으로 잘 일반화하기*/
-	/* 바닥과 벽에 충돌했을 때, 블록에 끼이거나 통과하지 않도록 보정치 설정 */
-	if (isPlayerTouchedOnWallRightSide()) xCoord = 0;
-	if (isPlayerTouchedOnWallLeftSide()) xCoord = RenderEngine::ScreenWidth - TextureXYSize;
-
-	if (yCoord < TextureXYSize - RenderEngine::ScreenHeight)
-		yCoord = TextureXYSize - RenderEngine::ScreenHeight;
+	//아래 함수들은 좌표값이 0을 지나갈 때 문제가 생기는 듯 하다.
+	//지금의 움직임 범위에서는 문제가 없으니 카메라 기능을 구현한 후 현상을 관찰하자.
+	if (isPlayerTouchedGround()) {
+		yCoord += (TextureXYSize - yCoord % TextureXYSize) % TextureXYSize;
+		ySpeed = 0;
+	}
+	if (isPlayerTouchedOnCeiling()) {
+		yCoord -= (TextureXYSize + yCoord % TextureXYSize) % TextureXYSize;
+		ySpeed = 0;
+	}
+	if (isPlayerTouchedOnWallRightSide()) {
+		xCoord += (TextureXYSize - xCoord % TextureXYSize) % TextureXYSize;
+		xSpeed = 0;
+	}
+	if (isPlayerTouchedOnWallLeftSide()) {
+		xCoord -= (TextureXYSize + xCoord % TextureXYSize) % TextureXYSize;
+		xSpeed = 0;
+	}
 }
 void Player::draw() {
 	setTextureWithState();

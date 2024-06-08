@@ -56,13 +56,39 @@ private:
 	bool isPlayerTouchedOnWallRightSide();
 	bool isPlayerTouchedOnWallLeftSide();
 	bool isPlayerTouchedOnCeiling();
-	bool isHeightEnoughToHangOnWall();
+	//bool isHeightEnoughToHangOnWall() {
+	//	if (yCoord - TextureXYSize >= TextureXYSize / 2 - RenderEngine::ScreenHeight)
+	//		return true;
+	//	return false;
+	//}
 
 	void setRightMoveSpeed();
 	void setLeftMoveSpeed();
 	void setJumpSpeed();
 	void setRightWallJumpSpeed();
 	void setLeftWallJumpSpeed();
+
+	//void doNormalHorizontalMoveProcess(InputProcessor* input, PlayerStateType movingState, PlayerStateType nonMovingState) {
+	//	const bool& isRightKeyPressed = input->isRightKeyPressed();
+	//	const bool& isLeftKeyPressed = input->isLeftKeyPressed();
+	//	if (isRightKeyPressed ^ isLeftKeyPressed) {
+	//		setState(movingState);
+	//		if (isRightKeyPressed)	setRightMoveSpeed();
+	//		else					setLeftMoveSpeed();
+	//	}
+	//	else {
+	//		setState(nonMovingState);
+	//	}
+	//}
+	//void doNormalJumpProcess(InputProcessor* input, PlayerStateType jumpState) {
+	//	static bool isSpaceKeyTypePressed;
+	//	isSpaceKeyTypePressed = input->getKeyState(SDL_SCANCODE_SPACE) == KeyboardState::PRESSED;
+	//	if (isSpaceKeyTypePressed) {
+	//		setState(jumpState);
+	//		setJumpSpeed();
+	//	}
+	//	//break; // <- 이 구문을 꼭 넣어야 하는데..., switch 문 안에 넣지 않으면 의미가 없다 ㅋ
+	//}
 
 public:
 	Player();
@@ -73,6 +99,10 @@ public:
 	void setSpeed(int xSpeed, int ySpeed);
 	void update(class InputProcessor* input);
 	void draw();
+
+/**/PlayerStateType getState() {
+/**/	return state;
+/**/}
 
 };
 
