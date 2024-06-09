@@ -5,7 +5,7 @@ void Game::init() {
 	renderer.init();
 
 	platform = PlatformManager(renderer.getRenderer());
-	platform.loadPlatformDataFromCsvFile("null");
+	platform.loadPlatformDataFromCSVFile("null");
 
 	input = InputProcessor();
 	isRunning = true;
@@ -19,6 +19,24 @@ void Game::init() {
 void Game::getInput() {
 	input.update();
 	isRunning = input.isRunning();
+
+	const clock_t 임계시간 = 500;
+	static clock_t upKeyPressedTime = 0;
+	static clock_t downKeyPressedTime = 0;
+	switch (input.getUpKeyState()) {
+	case KeyboardState::PRESSED:	upKeyPressedTime = clock(); break;
+	case KeyboardState::HOLDED:
+		if (임계시간 <= clock() - upKeyPressedTime)
+			renderer.setCameraCoordWithPlayerLookUp(&playerObj);
+		break;
+	}
+	switch (input.getDownKeyState()) {
+	case KeyboardState::PRESSED:	downKeyPressedTime = clock(); break;
+	case KeyboardState::HOLDED:
+		if (임계시간 <= clock() - downKeyPressedTime)
+			renderer.setCameraCoordWithPlayerLookDown(&playerObj);
+		break;
+	}
 
 /**/if (input.getKeyState(SDL_SCANCODE_R) == KeyboardState::PRESSED)
 /**/	platform.setPlayerCoordOnStartPoint(&playerObj);
@@ -42,8 +60,9 @@ void Game::update() {
 void Game::render() {
 	renderer.renderClear();
 
-	platform.draw();
-	playerObj.draw();
+	renderer.setCameraCoordWithPlayerCoord(&playerObj);
+	renderer.draw(&platform);
+	renderer.draw(&playerObj);
 
 	renderer.renderPresent();
 }

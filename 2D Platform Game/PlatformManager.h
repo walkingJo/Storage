@@ -6,26 +6,10 @@
 #include <string>
 #include "Player.h"
 
-constexpr int maxPlatformXYIdx{ 10 };
+constexpr int maxPlatformXYIdx{ 30 };
 constexpr short PNON{ -1 };
 constexpr short PSRC{ -2 };
 constexpr short PDST{ -3 };
-
-enum class PlatformType {
-	OUTLINE_ROCK,
-	OUTLINE_WOOD,
-	OUTLINE_LEAF,
-
-	GROUND_GREEN,
-	GROUND_ORANGE,
-	GROUND_PINK,
-
-	BLOCK_COPPER,
-	BLOCK_SILBER,
-	BLOCK_PLASTIC,
-	BLOCK_BRICK,
-	BLOCK_GOLD,
-};
 
 class PlatformManager {
 public:
@@ -35,8 +19,8 @@ public:
 
 	PlatformManager();
 	PlatformManager(SDL_Renderer* renderer);
-	void loadPlatformDataFromCsvFile(std::string fileName);
-	void draw();
+	void loadPlatformDataFromCSVFile(std::string fileName);
+	void draw(int xMovement, int yMovement);
 
 	void setPlayerCoordOnStartPoint(class Player* player);
 	bool isPlatformExist(int xCoord, int yCoord);

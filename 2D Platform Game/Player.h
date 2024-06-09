@@ -5,7 +5,7 @@
 #include <ctime>
 #include "PlatformManager.h"
 
-constexpr int TextureXYSize = 64;
+constexpr int PlayerTextureXYSize = 64;
 
 enum class CharacterType {
 	MASK_DUDE,
@@ -95,10 +95,17 @@ public:
 	Player(CharacterType playerType, SDL_Renderer* renderer, class PlatformManager* platform);
 	~Player();
 
+	int getXCoord() {
+		return xCoord;
+	}
+	int getYCoord() {
+		return yCoord;
+	}
 	void setCoord(int xCoord, int yCoord);
 	void setSpeed(int xSpeed, int ySpeed);
 	void update(class InputProcessor* input);
-	void draw();
+	void draw(int screenXCoord, int screenYCoord);
+	void drawWithCameraCoord(int centorXCoord, int centorYCoord);
 
 /**/PlayerStateType getState() {
 /**/	return state;

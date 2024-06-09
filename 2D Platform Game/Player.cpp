@@ -9,8 +9,10 @@
 constexpr int MotionPerSecond = 1000 / 15;
 constexpr int moveCoord = 10;
 constexpr int JumpSpeed = 15;
-constexpr int WallJumpXSpeed = 12;
-constexpr int WallJumpYSpeed = 14;
+constexpr int WallJumpXSpeed = 13;
+constexpr int WallJumpYSpeed = 15;
+
+constexpr int marginXYSize = 10;
 
 void Player::setTextureWithState() {
 	//		"Pixel Adventure 1/Main Characters/Player Type/File Name.png";
@@ -73,27 +75,27 @@ int Player::getAnimationIdxWithTime(int length) {
 
 //바닥에 닿는 판정은 일반적으로 벽에 닿는 판정을 (양쪽 모두) 포함한다.
 bool Player::isPlayerTouchedOnWallRightSide() {
-	if (platform->isPlatformExist(xCoord - 1, yCoord))
+	if (platform->isPlatformExist(xCoord + marginXYSize - 1, yCoord - marginXYSize))
 		return true;
 	else
 		return false;
 }
 bool Player::isPlayerTouchedOnWallLeftSide() {
-	if (platform->isPlatformExist(xCoord + TextureXYSize, yCoord))
+	if (platform->isPlatformExist(xCoord - marginXYSize + PlayerTextureXYSize, yCoord - marginXYSize))
 		return true;
 	else
 		return false;
 }
 bool Player::isPlayerTouchedGround() {
-	if (platform->isPlatformExist(xCoord - 1 + 1, yCoord - TextureXYSize) ||
-		platform->isPlatformExist(xCoord + TextureXYSize - 1, yCoord - TextureXYSize))
+	if (platform->isPlatformExist(xCoord + marginXYSize - 1 + 1, yCoord - PlayerTextureXYSize) ||
+		platform->isPlatformExist(xCoord - marginXYSize + PlayerTextureXYSize - 1, yCoord - PlayerTextureXYSize))
 		return true;
 	else
 		return false;
 }
 bool Player::isPlayerTouchedOnCeiling() {
-	if (platform->isPlatformExist(xCoord - 1 + 1, yCoord) ||
-		platform->isPlatformExist(xCoord + TextureXYSize - 1, yCoord))
+	if (platform->isPlatformExist(xCoord + marginXYSize - 1 + 1, yCoord - marginXYSize) ||
+		platform->isPlatformExist(xCoord - marginXYSize + PlayerTextureXYSize - 1, yCoord - marginXYSize))
 		return true;
 	else
 		return false;
@@ -307,24 +309,24 @@ void Player::update(InputProcessor* input) {
 
 	//아래 함수들은 좌표값이 0을 지나갈 때 문제가 생기는 듯 하다.
 	//지금의 움직임 범위에서는 문제가 없으니 카메라 기능을 구현한 후 현상을 관찰하자.
-	if (isPlayerTouchedGround()) {
-		yCoord += (TextureXYSize - yCoord % TextureXYSize) % TextureXYSize;
-		ySpeed = 0;
-	}
-	if (isPlayerTouchedOnCeiling()) {
-		yCoord -= (TextureXYSize + yCoord % TextureXYSize) % TextureXYSize;
-		ySpeed = 0;
-	}
 	if (isPlayerTouchedOnWallRightSide()) {
-		xCoord += (TextureXYSize - xCoord % TextureXYSize) % TextureXYSize;
+		xCoord += (PlayerTextureXYSize - (xCoord + marginXYSize) % PlayerTextureXYSize) % PlayerTextureXYSize;
 		xSpeed = 0;
 	}
 	if (isPlayerTouchedOnWallLeftSide()) {
-		xCoord -= (TextureXYSize + xCoord % TextureXYSize) % TextureXYSize;
+		xCoord -= (PlayerTextureXYSize + (xCoord - marginXYSize) % PlayerTextureXYSize) % PlayerTextureXYSize;
 		xSpeed = 0;
 	}
+	if (isPlayerTouchedGround()) {
+		yCoord += (PlayerTextureXYSize - yCoord % PlayerTextureXYSize) % PlayerTextureXYSize;
+		ySpeed = 0;
+	}
+	if (isPlayerTouchedOnCeiling()) {
+		yCoord -= (PlayerTextureXYSize + (yCoord - marginXYSize) % PlayerTextureXYSize) % PlayerTextureXYSize;
+		ySpeed = 0;
+	}
 }
-void Player::draw() {
+void Player::draw(int screenXCoord, int screenYCoord) {
 	setTextureWithState();
 	//SDL_Texture* texture = IMG_LoadTexture(renderer, "Pixel Adventure 1/Main Characters/Ninja Frog/Idle (32x32).png");
 	//왜 이걸 지우면 제대로 된 출력이 되질 않는가?
@@ -348,8 +350,8 @@ void Player::draw() {
 		32, 32
 	};
 	SDL_Rect dstRect = {
-		xCoord, -yCoord,
-		TextureXYSize, TextureXYSize
+		screenXCoord, screenYCoord,
+		PlayerTextureXYSize, PlayerTextureXYSize
 	};
 	SDL_RendererFlip sdlFlipType = SDL_FLIP_NONE;
 	switch (flipState) {
@@ -364,4 +366,10 @@ void Player::draw() {
 	SDL_RenderCopyEx(renderer, texture, &srcRect, &dstRect, 0, nullptr, sdlFlipType);
 
 	SDL_DestroyTexture(texture);
+}
+void Player::drawWithCameraCoord(int centorXCoord, int centorYCoord) {
+	draw(
+		xCoord - (centorXCoord - RenderEngine::centorXCoord),
+		(centorYCoord - RenderEngine::centorYCoord) - yCoord
+	);
 }
