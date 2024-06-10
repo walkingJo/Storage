@@ -93,3 +93,29 @@ fall 상태일 때 r 로 원위치 시켰을 때, 상태가 유지되는 문제
 ## 추가로 할 것
 
 맵 - 텍스처 자동 설정 기능 추가
+
+애니메이션 일반화
+- 플레이어 캐릭터 외에도 지형, 적 등에도 활용하기 위함
+  - 충돌 역시 SDL_Rect를 사용해 일반화하자
+- 클래스에 담을 정보
+  - 이미지 프레임의 수
+    - 나중에 이미지 크기 정보를 통해 자동화가 가능한지 확인하
+  - 파일명
+  - 프레임별 시간
+- 필요한 함수
+  - 텍스처 반환
+  - 애니메이션 인덱스 반환
+  - 애니메이션을 특정 장소에 출력?
+- 클래스화
+  - ```cpp
+    class AnimationData {
+    public:
+        std::string fileName;
+        short imgCount;
+        clock_t frameTime;
+
+        SDL_Texture* getTexture();
+        static int getFrameIndex(int maxIdx);
+        void drawAnimation(SDL_Rect* dstRect);
+    }
+    ```
