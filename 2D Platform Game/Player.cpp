@@ -22,13 +22,13 @@ void Player::setTextureWithState() {
 	if (renderer == NULL)
 		return;
 
-	const char characterNames[4][12] = {
+	std::string characterNames[4] = {
 		"Mask Dude",
 		"Virtual Guy",
 		"Pink Man",
 		"Ninja Frog",
 	};
-	const char fileNames[7][24] = {
+	std::string fileNames[7] = {
 		"Idle (32x32).png",
 		"Run (32x32).png",
 		"Jump (32x32).png",

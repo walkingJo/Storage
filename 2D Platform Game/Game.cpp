@@ -10,7 +10,7 @@ void Game::init() {
 	input = InputProcessor();
 	isRunning = true;
 
-	playerObj = Player(CharacterType::NINJA_FROG, renderer.getRenderer(), &platform);
+	playerObj = Player(commonCharacter, renderer.getRenderer(), &platform);
 	platform.setPlayerCoordOnStartPoint(&playerObj);
 
 	time = clock();
@@ -20,20 +20,20 @@ void Game::getInput() {
 	input.update();
 	isRunning = input.isRunning();
 
-	const clock_t 임계시간 = 500;
+	const clock_t thresholdTime = 500;
 	static clock_t upKeyPressedTime = 0;
 	static clock_t downKeyPressedTime = 0;
 	switch (input.getUpKeyState()) {
 	case KeyboardState::PRESSED:	upKeyPressedTime = clock(); break;
 	case KeyboardState::HOLDED:
-		if (임계시간 <= clock() - upKeyPressedTime)
+		if (thresholdTime <= clock() - upKeyPressedTime)
 			renderer.setCameraCoordWithPlayerLookUp(&playerObj);
 		break;
 	}
 	switch (input.getDownKeyState()) {
 	case KeyboardState::PRESSED:	downKeyPressedTime = clock(); break;
 	case KeyboardState::HOLDED:
-		if (임계시간 <= clock() - downKeyPressedTime)
+		if (thresholdTime <= clock() - downKeyPressedTime)
 			renderer.setCameraCoordWithPlayerLookDown(&playerObj);
 		break;
 	}
@@ -61,6 +61,7 @@ void Game::render() {
 	renderer.renderClear();
 
 	renderer.setCameraCoordWithPlayerCoord(&playerObj);
+	renderer.drawBackGround(commonBackground);
 	renderer.draw(&platform);
 	renderer.draw(&playerObj);
 

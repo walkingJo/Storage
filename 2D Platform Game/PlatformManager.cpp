@@ -1,6 +1,8 @@
 #include <SDL_image.h>
 #include "PlatformManager.h"
 
+constexpr int commonThema = 3;
+
 enum platformThema {
 	OUTLINE_ROCK,
 	OUTLINE_WOOD,
@@ -89,7 +91,7 @@ void PlatformManager::loadPlatformDataFromCSVFile(std::string fileName) {
 	for (int row = 0; row < maxPlatformXYIdx; ++row) {
 		for (int col = 0; col < maxPlatformXYIdx; ++col) {
 			if (tempPlatformData[row][col] >= 0)
-				tempPlatformData[row][col] += 7 * 100; // <- theme
+				tempPlatformData[row][col] += commonThema * 100; // <- theme
 		}
 	}
 	for (int i = 0; i < maxPlatformXYIdx; ++i) {

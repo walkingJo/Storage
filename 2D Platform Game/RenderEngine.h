@@ -5,6 +5,16 @@
 #include <SDL.h>
 #include "PlatformManager.h"
 	
+enum class BackgroundType {
+	BLUE,
+	BROWN,
+	GRAY,
+	GREEN,
+	PINK,
+	PURPLE,
+	YELLOW,
+};
+
 class RenderEngine {
 private:
 	SDL_Window* window;
@@ -31,6 +41,7 @@ public:
 	void setCameraCoordWithPlayerCoord(Player* playerObj);
 	void setCameraCoordWithPlayerLookUp(Player* playerObj);
 	void setCameraCoordWithPlayerLookDown(Player* playerObj);
+	void drawBackGround(BackgroundType background);
 	void draw(PlatformManager* platform);
 	void draw(Player* playerObj);
 	void renderPresent();

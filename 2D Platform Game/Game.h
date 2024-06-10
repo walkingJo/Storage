@@ -8,6 +8,9 @@
 #include "InputProcessor.h"
 #include "Player.h"
 
+constexpr CharacterType commonCharacter = CharacterType::NINJA_FROG;
+constexpr BackgroundType commonBackground = BackgroundType::GRAY;
+
 class Game {
 private:
 	RenderEngine renderer;

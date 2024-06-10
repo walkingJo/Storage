@@ -64,6 +64,37 @@ void RenderEngine::setCameraCoordWithPlayerLookDown(Player* playerObj) {
 	int dstYCoord = playerObj->getYCoord() - PlayerTextureXYSize / 2 - 500;
 	setCameraCoordWithDstCoord(dstXCoord, dstYCoord);
 }
+void RenderEngine::drawBackGround(BackgroundType background) {
+	std::string filePath = "Pixel Adventure 1/Background/";
+	switch (background) {
+	case BackgroundType::BLUE:		filePath += "Blue";		break;
+	case BackgroundType::BROWN:		filePath += "Brown";	break;
+	case BackgroundType::GRAY:		filePath += "Gray";		break;
+	case BackgroundType::GREEN:		filePath += "Green";	break;
+	case BackgroundType::PINK:		filePath += "Pink";		break;
+	case BackgroundType::PURPLE:	filePath += "Purple";	break;
+	case BackgroundType::YELLOW:	filePath += "Yellow";	break;
+	}
+	filePath += ".png";
+
+	const int backgroundTextureXYSize = 64 * 1;
+	SDL_Texture* texture = IMG_LoadTexture(renderer, filePath.c_str());
+	SDL_Rect srcRect = {
+		0, 0,
+		backgroundTextureXYSize, backgroundTextureXYSize
+	};
+	for (int row = 0; row <= ScreenWidth; row += backgroundTextureXYSize) {
+		for (int col = 0; col <= ScreenHeight; col += backgroundTextureXYSize) {
+			SDL_Rect dstRect = {
+				row, col,
+				backgroundTextureXYSize, backgroundTextureXYSize
+			};
+			SDL_RenderCopy(renderer, texture, &srcRect, &dstRect);
+		}
+	}
+
+	SDL_DestroyTexture(texture);
+}
 void RenderEngine::draw(PlatformManager* platform) {
 	platform->draw(
 		centorXCoord - cameraXCoord,
