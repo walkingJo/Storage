@@ -48,3 +48,48 @@
 - 카메라
 - 장애물
   - 점수 시스템
+
+# 2024-06-10
+
+## 수정사항
+
+카메라 기능
+- player.draw() 재정의
+- ```cpp
+  void Player::draw(int screenXCoord, int screenYCoord);
+  void Player::drawWithCameraCoord(int centorXCoord, int centorYCoord) {
+	  draw(
+		  xCoord - (centorXCoord - RenderEngine::centorXCoord),
+		  (centorYCoord - RenderEngine::centorYCoord) - yCoord
+	  );
+  }
+  ```
+- 지상에서 '↑', '↓'키를 누르면 시야를 위, 아래로 확장할 수 있도록 함
+
+맵 확장
+- 황금 블록 텍스쳐 다시 만들기 - 반사 부분을 중점적으로
+
+## 버그 수정
+
+조작감의 개선
+- `isPlayerTouchedOnWallRightSide`와 `isPlayerTouchedOnWallLeftSide`를 `isPlayerTouchedGround`와 `isPlayerTouchedOnCeiling`보다 앞에 뒀더니, 원하는 방식대로 (wall jump를 부드럽게) 움직일 수 있게 되었다.
+
+fall 상태일 때 r 로 원위치 시켰을 때, 상태가 유지되는 문제
+- 조작감 개선과 함께 해결함
+
+## 깨달음
+
+변수 기본값 설정은 선언 단계에서만 해도 된다.
+- 그러니까 *.cpp파일이 아닌 *.h파일에만 적용하면 된다
+- ex)
+  - ```cpp
+    void setCameraCoord(int xCoord = centorXCoord, int yCoord = centorYCoord);
+    void RenderEngine::setCameraCoord(int xCoord, int yCoord) {
+	    this->cameraXCoord = xCoord;
+  	  this->cameraYCoord = yCoord;
+    }
+    ```
+
+## 추가로 할 것
+
+맵 - 텍스처 자동 설정 기능 추가
