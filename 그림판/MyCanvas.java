@@ -305,10 +305,16 @@ public class MyCanvas extends JPanel implements MouseListener, MouseMotionListen
 		while (qu.size() > 0) {
 			Point qPt = qu.remove();
 
-			Point qPts[] = { new Point(qPt.x - 1, qPt.y), new Point(qPt.x + 1, qPt.y), new Point(qPt.x, qPt.y - 1), new Point(qPt.x, qPt.y + 1) };
+			Point qPts[] = {
+				new Point(qPt.x - 1, qPt.y),
+				new Point(qPt.x + 1, qPt.y),
+				new Point(qPt.x, qPt.y - 1),
+				new Point(qPt.x, qPt.y + 1)
+			};
 			for (Point newPt : qPts) {
-				if (0 <= newPt.x && newPt.x < 750 && 0 <= newPt.y && newPt.y < 500
-						&& img.getRGB(newPt.x, newPt.y) == ocolor) {
+				if (0 <= newPt.x && newPt.x < 750 &&
+				    0 <= newPt.y && newPt.y < 500 &&
+				    img.getRGB(newPt.x, newPt.y) == ocolor) {
 					img.setRGB(newPt.x, newPt.y, pcolor);
 					qu.add(newPt);
 				}
