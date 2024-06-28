@@ -119,3 +119,36 @@ fall 상태일 때 r 로 원위치 시켰을 때, 상태가 유지되는 문제
         void drawAnimation(SDL_Rect* dstRect);
     }
     ```
+
+# 2024-06-28
+
+## 이전에 기록해 두었던 것 정리
+
+//벽에 붙어 떨어지면 fall 이 해제되지 않는 버그
+
+점프했을 때, 바로 앞에 블럭이 있다면 그 블럭 위로 순간이동하는 버그
+->	isPlayerTouchedOnWallRightSide
+	isPlayerTouchedOnWallLeftSide
+	isPlayerTouchedGround
+	isPlayerTouchedOnCeiling 와 관련이 있을 것으로 예상
+
+// -> 이런 버그들이 생기는 것은 getInput 과 update 를 분리하지 않았기 때문일지도 모른다
+
+----
+
+run::state 군더더기 제거
+
+----
+
+프로젝트를 새로 만들자.
+	-> 모든 오브젝트가 collider를 갖도록 하고, 충돌 관련 함수들은 모두 collider에 넣자
+	-> collider 클래스를 접목시킴으로서 한층 일반화가 가능할 것이다.
+	-> 내친김에 2차원 좌표점 클래스도 만들자(float)
+
+충돌 방식에서 AABB rect의 각 꼭짓점이 어떻게 충돌했는지에 따라 움직임을 달리하자
+	-> 1개 겹침 : 충돌의 깊이에 따라 어느 방향으로 움직일지 선택
+	-> 2개 겹침 : 둘이 대각선 방향이라면 생각해 보고, 그 외에는 움직일 방향이 확실함
+		-> 역시 직전 프레임의 위치를 기록해두는 게 좋으려나
+			-> 그렇게 하자
+	-> 3개 겹침 : 움직일 방향이 확실함
+	-> 4개 겹침 : ???
